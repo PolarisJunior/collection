@@ -1,9 +1,9 @@
 .vs/
 .vscode/
-./Debug/
-./x64/
-./collection/Debug/
-./collection/x64/
-./collection.vcxproj*
-./collection.sln
+Debug/
+x64/
+collection/Debug/
+collection/x64/
+collection.vcxproj*
+collection.sln
 
