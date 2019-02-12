@@ -7,24 +7,31 @@
 
 template <typename T>
 class Trie {
- public:
-  ~Trie() {
-    for (auto it = children.begin(); it != children.end(); it++) {
-      delete it->second;
+ private:
+  struct TrieNode {
+    ~TrieNode() {
+      for (auto it = children.begin(); it != children.end(); it++) {
+        delete it->second;
+      }
     }
-  }
+
+    std::unordered_map<char, TrieNode*> children;
+    // wrap this in an optional?
+    T value;
+  };
+
+ public:
+  ~Trie() {}
 
   void insert(const std::string& key, T value) {
-    // loop does not contain the null terminator
-    Trie* node = this;
-
+    TrieNode* node = &root;
     for (char c : key) {
       if (node->children.count(c)) {
         // does contain c
         node = node->children[c];
       } else {
         // does not contain c
-        node->children[c] = new Trie;
+        node->children[c] = new TrieNode;
         node = node->children[c];
       }
     }
@@ -33,7 +40,7 @@ class Trie {
   }
 
   std::optional<T> get(const std::string& key) {
-    Trie* node = this;
+    TrieNode* node = &root;
 
     for (char c : key) {
       if (node->children.count(c)) {
@@ -49,7 +56,7 @@ class Trie {
   void remove(const std::string& key) {}
 
   bool hasKey(const std::string& key) {
-    Trie* node = this;
+    TrieNode* node = &root;
     for (char c : key) {
       if (node->children.count(c)) {
         node = node->children[c];
@@ -60,9 +67,9 @@ class Trie {
     return true;
   }
 
- private:
-  std::unordered_map<char, Trie*> children;
-  T value;
+  uint32_t getSize() { return size; }
 
+ private:
+  TrieNode root;
   uint32_t size = 0;
 };
