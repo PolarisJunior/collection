@@ -1,3 +1,4 @@
+#pragma once
 
 #include <algorithm>
 #include <vector>
@@ -5,7 +6,7 @@
 /* Strategy at each point is to go to the next
    index that has the farthest reach, reach is defined
    as index + value */
-std::vector<int> arrayHop(std::vector<int> vec) {
+inline static std::vector<int> arrayHop(std::vector<int> vec) {
   std::vector<int> path;
   if (vec.size() < 1) {
     return path;
