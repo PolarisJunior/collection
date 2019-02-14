@@ -3,6 +3,7 @@
 #include <string>
 
 struct SDL_Window;
+struct Renderer;
 
 class Window {
  public:
@@ -10,6 +11,7 @@ class Window {
   ~Window();
 
   SDL_Window* getSdlWindow();
+  Renderer getRenderer();
 
  private:
   SDL_Window* sdlWindow;
