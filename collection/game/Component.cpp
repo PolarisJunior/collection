@@ -7,8 +7,10 @@ void Component::attachToActor(Actor* actor, bool notify) {
   if (notify) {
     attachedActor->attachComponent(this, false);
   }
+
+  onAttached(actor);
 }
 
-void Component::onAttached() {}
+void Component::onAttached(Actor* actor) {}
 
-void Component::onUnattached() {}
+void Component::onUnattached(Actor* actor) {}

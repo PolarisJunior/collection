@@ -25,3 +25,5 @@ inline void Camera2::moveCamera(float x, float y) {
   position.x = x;
   position.y = y;
 }
+
+extern Camera2 mainCamera;
