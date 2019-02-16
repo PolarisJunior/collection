@@ -17,10 +17,14 @@
 #include "../game/Component.h"
 #include "../game/RenderComponent.h"
 #include "../game/RenderSystem.h"
+
 #include "../graphics/Color.h"
 #include "../graphics/Renderer.h"
+
 #include "../math/geometry/Rect.h"
 #include "../util/EventScheduler.h"
+
+#include "../io/File.h"
 
 static bool running;
 static SdlEventPoller eventPoller;
@@ -87,6 +91,15 @@ int main(int argc, char** argv) {
   eventScheduler.scheduleEvent(
       []() { std::cout << "scheduled event ran" << std::endl; }, 3.0);
   Rect rect = {0, 0, 50, 50};
+
+  File file("./data.txt");
+  std::cout << "exists " << file.exists() << std::endl;
+  std::cout << "file size " << file.getSize() << std::endl;
+  std::cout << "contents: " << file.readAsString() << std::endl;
+  auto lines = file.readLines();
+  for (auto it = lines.begin(); it < lines.end(); it++) {
+    std::cout << "line: " << *it << std::endl;
+  }
 
   /* Main Game Loop */
   running = true;

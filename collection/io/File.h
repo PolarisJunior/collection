@@ -1,16 +1,22 @@
 
 #pragma once
-#include <sys/stat.h>
 #include <cstdint>
-#include <filesystem>
+#include <memory>
 #include <string>
+#include <vector>
 /* Note we can either use c++ filesystem library or
    low-level sys functions */
+namespace std::filesystem {
+class path;
+}
 
 class File {
  public:
-  File(const std::string& filePath);
-  ~File() = default;
+  File() = default;
+  File(const std::string& path);
+  File(const File& other);
+  File(File&& other);
+  ~File();
 
   bool isDir();
   bool makeDir();
@@ -22,28 +28,14 @@ class File {
   bool write(const std::string& dat);
   bool append(const std::string& dat);
 
-  std::string readString();
-  std::string readLine();
+  std::string readAsString();
+  std::vector<std::string> readLines();
+
+  File& operator=(File other);
+
+  friend void swap(File& first, File& second);
 
  private:
-  std::string path;
+  std::string pathString;
+  std::filesystem::path* filePath;
 };
-
-File::File(const std::string& filePath) {
-  this->path = filePath;
-}
-
-/* Get file size or returns -1 if file does not exist */
-int64_t File::getSize() {
-  struct stat fileStat;
-  if (stat(path.c_str(), &fileStat) < 0) {
-    return -1;
-  } else {
-    return fileStat.st_size;
-  }
-}
-
-bool File::exists() {
-  std::filesystem::path p(path);
-  return std::filesystem::exists(p);
-}
