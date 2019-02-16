@@ -16,6 +16,6 @@ class Component {
 
   // virtual void update();
 
- private:
+ protected:
   Actor* attachedActor;
 };

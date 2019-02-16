@@ -18,6 +18,9 @@ class WindowBuilder {
 
   WindowBuilder& setFlags(uint32_t flags);
 
+  WindowBuilder& setResizable();
+  WindowBuilder& setVisible();
+
   Window* getWindow();
 
  private:

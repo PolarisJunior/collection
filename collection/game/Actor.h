@@ -6,6 +6,8 @@ class Component;
 
 class Actor {
  public:
+  float x;
+  float y;
   void attachComponent(Component* component, bool notify = true);
 
   bool hasComponent(int32_t componentId);

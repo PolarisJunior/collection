@@ -29,3 +29,15 @@ Renderer Window::getRenderer() {
   }
   return Renderer(r);
 }
+
+int32_t Window::getWidth() {
+  int32_t w;
+  SDL_GetWindowSize(sdlWindow, &w, nullptr);
+  return w;
+}
+
+int32_t Window::getHeight() {
+  int32_t h;
+  SDL_GetWindowSize(sdlWindow, nullptr, &h);
+  return h;
+}

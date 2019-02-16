@@ -42,6 +42,16 @@ WindowBuilder& WindowBuilder::setFlags(uint32_t flags) {
   return *this;
 }
 
+WindowBuilder& WindowBuilder::setVisible() {
+  this->flags |= SDL_WINDOW_SHOWN;
+  return *this;
+}
+
+WindowBuilder& WindowBuilder::setResizable() {
+  this->flags |= SDL_WINDOW_RESIZABLE;
+  return *this;
+}
+
 Window* WindowBuilder::getWindow() {
   Window* window = new Window(this->title, xPos, yPos, width, height, flags);
   return window;

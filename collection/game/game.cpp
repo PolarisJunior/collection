@@ -1,6 +1,7 @@
 
 #include <SDL.h>
 #include <iostream>
+#include <memory>
 
 #include "../datastructures/Trie.h"
 #include "../misc/arrayHopper.h"
@@ -28,6 +29,8 @@ static const uint32_t UPDATE_FREQUENCY = 60;
 static const uint32_t UPDATE_PERIOD = 1000 / UPDATE_FREQUENCY;
 static const uint32_t MAX_LOOPS = 10;
 
+static Actor actor;
+
 Camera2 mainCamera;
 EventScheduler eventScheduler;
 Renderer mainRenderer;
@@ -38,18 +41,41 @@ int main(int argc, char** argv) {
   }
 
   WindowBuilder windowBuilder;
-  windowBuilder.setTitle("Game").setDims(800, 600);
-  Window* window = windowBuilder.getWindow();
+  windowBuilder.setTitle("Game").setDims(800, 600).setVisible();
+
+  std::unique_ptr<Window> window =
+      std::unique_ptr<Window>(windowBuilder.getWindow());
+
   mainRenderer = window->getRenderer();
 
   eventPoller.addListener(SDL_QUIT,
                           [](const SDL_Event& event) { running = false; });
+  mainCamera.width = window->getWidth();
+  mainCamera.height = window->getHeight();
 
-  Actor actor;
+  actor.x = 0;
+  actor.y = 0;
+  mainCamera.moveCamera(-10, -10);
   Component component;
   RenderComponent renderComp;
   actor.attachComponent(&renderComp);
-  // actor.attachComponent(&component);
+
+  eventPoller.addListener(SDL_KEYDOWN, [](const SDL_Event& event) {
+    switch (event.key.keysym.sym) {
+      case SDLK_UP:
+        actor.y += -1;
+        break;
+      case SDLK_RIGHT:
+        actor.x += 1;
+        break;
+      case SDLK_DOWN:
+        actor.y += 1;
+        break;
+      case SDLK_LEFT:
+        actor.x -= 1;
+        break;
+    }
+  });
 
   eventScheduler.scheduleEvent(
       []() { std::cout << "scheduled event ran" << std::endl; }, 3.0);
