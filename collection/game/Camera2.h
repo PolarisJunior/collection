@@ -47,6 +47,10 @@ inline Vector2 Camera2::toScreenCoords(const Vector2& worldPos) {
                  midpoint.y + worldPos.y - this->position.y);
 }
 
-// inline Vector2 Camera2::toWorldCoords(const Vector2& screenPos) {}
+inline Vector2 Camera2::toWorldCoords(const Vector2& screenPos) {
+  Vector2 midpoint = getMidPoint();
+  return Vector2(screenPos.x + this->position.x - midpoint.x,
+                 screenPos.y + this->position.y - midpoint.y);
+}
 
 extern Camera2 mainCamera;

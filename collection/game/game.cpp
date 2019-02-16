@@ -77,6 +77,13 @@ int main(int argc, char** argv) {
     }
   });
 
+  eventPoller.addListener(SDL_MOUSEBUTTONDOWN, [](const SDL_Event& event) {
+    Vector2 worldPos =
+        mainCamera.toWorldCoords(Vector2(event.button.x, event.button.y));
+    printf("screen coords: (%d, %d), world coords: (%.3f, %.3f)\n",
+           event.button.x, event.button.y, worldPos.x, worldPos.y);
+  });
+
   eventScheduler.scheduleEvent(
       []() { std::cout << "scheduled event ran" << std::endl; }, 3.0);
   Rect rect = {0, 0, 50, 50};
