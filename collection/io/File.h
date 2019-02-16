@@ -30,6 +30,7 @@ class File {
 
   std::string readAsString();
   std::vector<std::string> readLines();
+  std::unique_ptr<char[]> readBytes();
 
   File& operator=(File other);
 

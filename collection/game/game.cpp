@@ -1,5 +1,6 @@
 
 #include <SDL.h>
+#include <SDL_image.h>
 #include <iostream>
 #include <memory>
 
@@ -43,6 +44,12 @@ int main(int argc, char** argv) {
   if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO)) {
     SDL_LogError(SDL_LOG_CATEGORY_ERROR, SDL_GetError());
   }
+  {
+    uint32_t flags = IMG_INIT_PNG | IMG_INIT_JPG | IMG_INIT_TIF;
+    if (IMG_Init(flags) != flags) {
+      SDL_LogError(SDL_LOG_CATEGORY_ERROR, IMG_GetError());
+    }
+  }
 
   WindowBuilder windowBuilder;
   windowBuilder.setTitle("Game").setDims(800, 600).setVisible();
@@ -51,6 +58,14 @@ int main(int argc, char** argv) {
       std::unique_ptr<Window>(windowBuilder.getWindow());
 
   mainRenderer = window->getRenderer();
+
+  {
+    SDL_Surface* surface = IMG_Load("../res/monkey.png");
+    SDL_Texture* tex =
+        SDL_CreateTextureFromSurface(mainRenderer.sdlRenderer, surface);
+    SDL_RenderCopy(mainRenderer.sdlRenderer, tex, nullptr, nullptr);
+    SDL_RenderPresent(mainRenderer.sdlRenderer);
+  }
 
   eventPoller.addListener(SDL_QUIT,
                           [](const SDL_Event& event) { running = false; });
@@ -92,10 +107,14 @@ int main(int argc, char** argv) {
       []() { std::cout << "scheduled event ran" << std::endl; }, 3.0);
   Rect rect = {0, 0, 50, 50};
 
-  File file("./data.txt");
+  File file("../res/data.txt");
   std::cout << "exists " << file.exists() << std::endl;
   std::cout << "file size " << file.getSize() << std::endl;
   std::cout << "contents: " << file.readAsString() << std::endl;
+  auto bytes = file.readBytes();
+  for (int32_t i = 0; i < file.getSize(); i++) {
+    std::cout << "byte:" << bytes[i] << "\n";
+  }
   auto lines = file.readLines();
   for (auto it = lines.begin(); it < lines.end(); it++) {
     std::cout << "line: " << *it << std::endl;
