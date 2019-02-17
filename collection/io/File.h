@@ -23,6 +23,8 @@ class File {
 
   int64_t getSize();
 
+  std::string getExt();
+
   bool exists();
 
   bool write(const std::string& dat);

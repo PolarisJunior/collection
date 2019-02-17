@@ -20,7 +20,9 @@
 #include "../game/RenderSystem.h"
 
 #include "../graphics/Color.h"
+#include "../graphics/Image.h"
 #include "../graphics/Renderer.h"
+#include "../graphics/Texture.h"
 
 #include "../math/geometry/Rect.h"
 #include "../util/EventScheduler.h"
@@ -60,11 +62,18 @@ int main(int argc, char** argv) {
   mainRenderer = window->getRenderer();
 
   {
-    SDL_Surface* surface = IMG_Load("../res/monkey.png");
-    SDL_Texture* tex =
-        SDL_CreateTextureFromSurface(mainRenderer.sdlRenderer, surface);
-    SDL_RenderCopy(mainRenderer.sdlRenderer, tex, nullptr, nullptr);
+    // SDL_Surface* surface = IMG_Load("../res/monkey.png");
+    // SDL_Texture* tex =
+    //     SDL_CreateTextureFromSurface(mainRenderer.sdlRenderer, surface);
+    // SDL_RenderCopy(mainRenderer.sdlRenderer, tex, nullptr, nullptr);
+    // SDL_RenderPresent(mainRenderer.sdlRenderer);
+    Image image("../res/monkey.png");
+    std::cout << "extension: " << image.getType() << std::endl;
+    Texture texture(image);
+    SDL_RenderCopy(mainRenderer.sdlRenderer, texture.sdlTexture, nullptr,
+                   nullptr);
     SDL_RenderPresent(mainRenderer.sdlRenderer);
+    SDL_Delay(3000);
   }
 
   eventPoller.addListener(SDL_QUIT,
@@ -110,15 +119,12 @@ int main(int argc, char** argv) {
   File file("../res/data.txt");
   std::cout << "exists " << file.exists() << std::endl;
   std::cout << "file size " << file.getSize() << std::endl;
-  std::cout << "contents: " << file.readAsString() << std::endl;
   auto bytes = file.readBytes();
   for (int32_t i = 0; i < file.getSize(); i++) {
     std::cout << "byte:" << bytes[i] << "\n";
   }
-  auto lines = file.readLines();
-  for (auto it = lines.begin(); it < lines.end(); it++) {
-    std::cout << "line: " << *it << std::endl;
-  }
+  Image image("../res/monkey.png");
+  std::cout << "image size: " << image.getImageSize() << std::endl;
 
   /* Main Game Loop */
   running = true;
