@@ -1,5 +1,6 @@
 
 #include "TileMap.h"
+
 #include "../math//geometry/Rect.h"
 #include "Renderer.h"
 #include "Texture.h"
@@ -13,10 +14,8 @@ std::unique_ptr<Texture> TileMap::getTexture() {
   std::unique_ptr<Texture> texture = std::make_unique<Texture>(128, 128);
   mainRenderer.setTarget(*texture);
   Texture& tileSetTexture = tileSet->getTexture();
-  // Rect srcRect = {tileSet->xOffsetLeft, tileSet->yOffsetTop,
-  // tileSet->tileWidth,
-  //                 tileSet->tileHeight};
-  Rect srcRect = tileSet->getTileRect(0);
+
+  Rect srcRect = tileSet->getTileRect(19);
   mainRenderer.render(tileSetTexture, &srcRect, nullptr);
   mainRenderer.clearTarget();
   return texture;

@@ -82,7 +82,7 @@ int main(int argc, char** argv) {
   // mainRenderer.render(tileSet.getTexture());
   mainRenderer.render(*level);
   mainRenderer.present();
-  SDL_Delay(3000);
+  SDL_Delay(7000);
 
   eventPoller.addListener(SDL_QUIT,
                           [](const SDL_Event& event) { running = false; });

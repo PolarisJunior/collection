@@ -82,8 +82,8 @@ inline std::pair<int32_t, int32_t> TileSet::getTilePosInTiles(int32_t tileId) {
 
 inline std::pair<int32_t, int32_t> TileSet::getTilePosInPixels(int32_t tileId) {
   auto pos = getTilePosInTiles(tileId);
-  pos.first += tileWidth * pos.first + xOffsetLeft + pos.first * hBorder;
-  pos.second += tileHeight * pos.second + yOffsetTop + pos.second * vBorder;
+  pos.first = tileWidth * pos.first + xOffsetLeft + pos.first * hBorder;
+  pos.second = tileHeight * pos.second + yOffsetTop + pos.second * vBorder;
   return pos;
 }
 
