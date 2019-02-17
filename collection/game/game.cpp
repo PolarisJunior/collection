@@ -63,12 +63,6 @@ int main(int argc, char** argv) {
   mainRenderer = Renderer(mainWindow);
 
   TileSet tileSet("../res/medieval_tilesheet.png", 64, 64, 32, 32, 32, 32);
-  std::cout << tileSet.getTilesPerRow() << " tiles horiz" << std::endl;
-  std::cout << tileSet.getTilesPerCol() << " tiles vert" << std::endl;
-  {
-    auto pair = tileSet.getTilePosInTiles(7);
-    printf("(%d, %d)\n", pair.first, pair.second);
-  }
 
   TileMap tileMap;
   tileMap.setTileSet(tileSet);
@@ -82,7 +76,7 @@ int main(int argc, char** argv) {
   // mainRenderer.render(tileSet.getTexture());
   mainRenderer.render(*level);
   mainRenderer.present();
-  SDL_Delay(7000);
+  SDL_Delay(1000);
 
   eventPoller.addListener(SDL_QUIT,
                           [](const SDL_Event& event) { running = false; });
@@ -92,9 +86,17 @@ int main(int argc, char** argv) {
   actor.x = 0;
   actor.y = 0;
   mainCamera.moveCamera(0, 0);
-  Component component;
+  mainCamera.attachToActor(&actor);
+  mainCamera.setAttachOffset(Vector2(100, 100));
+
   RenderComponent renderComp;
   actor.attachComponent(&renderComp);
+
+  Actor actor2;
+  actor2.x = -50;
+  actor2.y = -50;
+  RenderComponent renderComp2;
+  actor2.attachComponent(&renderComp2);
 
   eventPoller.addListener(SDL_KEYDOWN, [](const SDL_Event& event) {
     switch (event.key.keysym.sym) {

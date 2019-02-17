@@ -1,0 +1,6 @@
+
+classes that should be revised for error handling
+Texture
+Image
+TileSet
+TileMap
