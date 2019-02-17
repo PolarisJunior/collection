@@ -66,6 +66,11 @@ int main(int argc, char** argv) {
   TileMap tileMap;
   tileMap.setTileSet(tileSet);
   auto level = tileMap.getTexture();
+  {
+    Texture tex("../res/medieval_tilesheet.png");
+    std::cout << "img dims " << tex.getWidth() << ", " << tex.getHeight()
+              << std::endl;
+  }
 
   // mainRenderer.render(tileSet.getTexture());
   mainRenderer.render(*level);
