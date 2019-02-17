@@ -13,7 +13,7 @@ std::unique_ptr<Texture> TileMap::getTexture() {
   std::unique_ptr<Texture> texture = std::make_unique<Texture>(128, 128);
   mainRenderer.setTarget(*texture);
   Texture& tileSetTexture = tileSet->getTexture();
-  Rect srcRect = {tileSet->xOffset, tileSet->yOffset, tileSet->tileWidth,
+  Rect srcRect = {tileSet->xOffsetLeft, tileSet->yOffsetTop, tileSet->tileWidth,
                   tileSet->tileHeight};
   mainRenderer.render(tileSetTexture, &srcRect, nullptr);
   mainRenderer.clearTarget();

@@ -13,18 +13,34 @@ class TileSet {
           uint32_t h = 32,
           uint32_t hBorder = 0,
           uint32_t vBorder = 0,
-          uint32_t xOffset = 0,
-          uint32_t yOffset = 0);
+          uint32_t xOffsetLeft = 0,
+          uint32_t yOffsetTop = 0,
+          uint32_t xOffsetRight = 0,
+          uint32_t yOffsetBottom = 0);
 
   TileSet(const Image& image,
           uint32_t w = 32,
           uint32_t h = 32,
           uint32_t hBorder = 0,
           uint32_t vBorder = 0,
-          uint32_t xOffset = 0,
-          uint32_t yOffset = 0);
+
+          uint32_t xOffsetLeft = 0,
+          uint32_t yOffsetRight = 0,
+          uint32_t xOffsetRight = 0,
+          uint32_t yOffsetBottom = 0);
 
   Texture& getTexture();
+
+  int32_t getTileId(int32_t col, int32_t row);
+  int32_t getTilePos(int32_t tileId);
+
+  int32_t getWidthInPixels();
+  int32_t getWidthInTiles();
+
+  int32_t getHeightInPixels();
+  int32_t getHeightInTiles();
+
+  int32_t getNumTiles();
 
   uint32_t tileWidth;
   uint32_t tileHeight;
@@ -32,9 +48,21 @@ class TileSet {
   uint32_t hBorder;
   uint32_t vBorder;
 
-  uint32_t xOffset;
-  uint32_t yOffset;
+  uint32_t xOffsetLeft;
+  uint32_t xOffsetRight;
+
+  uint32_t yOffsetTop;
+  uint32_t yOffsetBottom;
 
  private:
   std::unique_ptr<Texture> texture;
 };
+
+inline int32_t TileSet::getNumTiles() {
+  return getWidthInTiles() * getHeightInTiles();
+}
+
+inline int32_t TileSet::getTileId(int32_t col, int32_t row) {
+  int32_t numTiles = getNumTiles();
+  return col + row * getWidthInTiles();
+}

@@ -63,6 +63,8 @@ int main(int argc, char** argv) {
   mainRenderer = Renderer(mainWindow);
 
   TileSet tileSet("../res/medieval_tilesheet.png", 64, 64, 32, 32, 32, 32);
+  std::cout << tileSet.getWidthInTiles() << " tiles horiz" << std::endl;
+  std::cout << tileSet.getHeightInTiles() << " tiles vert" << std::endl;
   TileMap tileMap;
   tileMap.setTileSet(tileSet);
   auto level = tileMap.getTexture();
