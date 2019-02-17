@@ -68,7 +68,6 @@ inline int32_t TileSet::getNumTiles() {
 }
 
 inline int32_t TileSet::getTileId(int32_t col, int32_t row) {
-  int32_t numTiles = getNumTiles();
   return col + row * getTilesPerRow();
 }
 

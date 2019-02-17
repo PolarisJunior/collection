@@ -64,7 +64,8 @@ int main(int argc, char** argv) {
 
   TileSet tileSet("../res/medieval_tilesheet.png", 64, 64, 32, 32, 32, 32);
 
-  TileMap tileMap;
+  std::vector<int32_t> vec = {1, 2, 3, 4};
+  TileMap tileMap(vec);
   tileMap.setTileSet(tileSet);
   auto level = tileMap.getTexture();
   {
@@ -76,7 +77,7 @@ int main(int argc, char** argv) {
   // mainRenderer.render(tileSet.getTexture());
   mainRenderer.render(*level);
   mainRenderer.present();
-  SDL_Delay(1000);
+  SDL_Delay(10000);
 
   eventPoller.addListener(SDL_QUIT,
                           [](const SDL_Event& event) { running = false; });
