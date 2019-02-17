@@ -7,6 +7,7 @@ struct Renderer;
 
 class Window {
  public:
+  Window() = default;
   Window(std::string& title, int x, int y, int w, int h, uint32_t flags);
   ~Window();
 
@@ -16,8 +17,13 @@ class Window {
   int32_t getWidth();
   int32_t getHeight();
 
+  Window& operator=(Window&& other);
+  friend void swap(Window& first, Window& second);
+
  private:
   SDL_Window* sdlWindow;
 
   std::string title;
 };
+
+extern Window mainWindow;

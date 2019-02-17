@@ -27,6 +27,10 @@ Renderer Window::getRenderer() {
     SDL_LogError(SDL_LOG_CATEGORY_RENDER, SDL_GetError());
     exit(EXIT_FAILURE);
   }
+
+  // Renderer o(r);
+  // return o;
+  // NOTE notice this doesn't call copy constructor
   return Renderer(r);
 }
 
@@ -40,4 +44,15 @@ int32_t Window::getHeight() {
   int32_t h;
   SDL_GetWindowSize(sdlWindow, nullptr, &h);
   return h;
+}
+
+Window& Window::operator=(Window&& other) {
+  swap(*this, other);
+  return *this;
+}
+
+void swap(Window& first, Window& second) {
+  using std::swap;
+  swap(first.sdlWindow, second.sdlWindow);
+  swap(first.title, second.title);
 }

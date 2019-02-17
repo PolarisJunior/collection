@@ -52,7 +52,6 @@ WindowBuilder& WindowBuilder::setResizable() {
   return *this;
 }
 
-Window* WindowBuilder::getWindow() {
-  Window* window = new Window(this->title, xPos, yPos, width, height, flags);
-  return window;
+Window WindowBuilder::getWindow() {
+  return Window(this->title, xPos, yPos, width, height, flags);
 }

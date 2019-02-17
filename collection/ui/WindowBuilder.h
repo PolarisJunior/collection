@@ -1,8 +1,7 @@
 #pragma once
 
 #include <string>
-
-class Window;
+#include "Window.h"
 
 class WindowBuilder {
  public:
@@ -21,7 +20,7 @@ class WindowBuilder {
   WindowBuilder& setResizable();
   WindowBuilder& setVisible();
 
-  Window* getWindow();
+  Window getWindow();
 
  private:
   std::string title = "untitled";

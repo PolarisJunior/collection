@@ -12,8 +12,8 @@ class Image {
   std::string getType() const;
 
   std::unique_ptr<char[]> buf;
-  uint32_t bufSize;
 
  private:
   std::string type;
+  uint32_t bufSize;
 };

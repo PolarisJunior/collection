@@ -1,11 +1,23 @@
 
 #include "Renderer.h"
 #include <SDL.h>
+#include <iostream>
 #include "../math/geometry/Rect.h"
+#include "../ui/Window.h"
 #include "Color.h"
 #include "Texture.h"
 
-// Renderer mainRenderer;
+Renderer::Renderer(Window& window) : Renderer(window.getRenderer()) {}
+
+Renderer::~Renderer() {
+  // std::cout << "deconstructing addr:" << sdlRenderer << std::endl;
+  SDL_DestroyRenderer(sdlRenderer);
+}
+
+Renderer::Renderer(Renderer&& other) {
+  // std::cout << "construct" << std::endl;
+  swap(*this, other);
+}
 
 void Renderer::present() {
   SDL_RenderPresent(sdlRenderer);
@@ -33,4 +45,25 @@ void Renderer::setColor(const Color& color) {
 
 void Renderer::drawRect(const Rect& rect) {
   SDL_RenderDrawRect(sdlRenderer, reinterpret_cast<const SDL_Rect*>(&rect));
+}
+
+SDL_Texture* Renderer::createTextureFromSurface(SDL_Surface* surface) {
+  SDL_Texture* tex = SDL_CreateTextureFromSurface(getSdlRenderer(), surface);
+  return tex;
+}
+
+Renderer& Renderer::operator=(Renderer other) {
+  swap(*this, other);
+  return *this;
+}
+
+// Renderer& Renderer::operator=(Renderer&& other) {
+//   std::cout << "option 2" << std::endl;
+//   swap(*this, other);
+//   return *this;
+// }
+
+void swap(Renderer& first, Renderer& second) {
+  using std::swap;
+  swap(first.sdlRenderer, second.sdlRenderer);
 }

@@ -23,6 +23,7 @@
 #include "../graphics/Image.h"
 #include "../graphics/Renderer.h"
 #include "../graphics/Texture.h"
+#include "../graphics/TileSet.h"
 
 #include "../math/geometry/Rect.h"
 #include "../util/EventScheduler.h"
@@ -41,6 +42,7 @@ static Actor actor;
 Camera2 mainCamera;
 EventScheduler eventScheduler;
 Renderer mainRenderer;
+Window mainWindow;
 
 int main(int argc, char** argv) {
   if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO)) {
@@ -56,33 +58,24 @@ int main(int argc, char** argv) {
   WindowBuilder windowBuilder;
   windowBuilder.setTitle("Game").setDims(800, 600).setVisible();
 
-  std::unique_ptr<Window> window =
-      std::unique_ptr<Window>(windowBuilder.getWindow());
+  mainWindow = windowBuilder.getWindow();
 
-  mainRenderer = window->getRenderer();
+  // Window* window = &mainWindow;
+  mainRenderer = Renderer(mainWindow);
 
-  {
-    // SDL_Surface* surface = IMG_Load("../res/monkey.png");
-    // SDL_Texture* tex =
-    //     SDL_CreateTextureFromSurface(mainRenderer.sdlRenderer, surface);
-    // SDL_RenderCopy(mainRenderer.sdlRenderer, tex, nullptr, nullptr);
-    // SDL_RenderPresent(mainRenderer.sdlRenderer);
-    Image image("../res/monkey.png");
-    std::cout << "extension: " << image.getType() << std::endl;
-    Texture texture(image);
-    mainRenderer.render(texture);
-    mainRenderer.present();
-    SDL_Delay(3000);
-  }
+  TileSet tileSet("../res/medieval_tilesheet.png");
+  mainRenderer.render(*tileSet.texture);
+  mainRenderer.present();
+  SDL_Delay(3000);
 
   eventPoller.addListener(SDL_QUIT,
                           [](const SDL_Event& event) { running = false; });
-  mainCamera.width = window->getWidth();
-  mainCamera.height = window->getHeight();
+  mainCamera.width = mainWindow.getWidth();
+  mainCamera.height = mainWindow.getHeight();
 
   actor.x = 0;
   actor.y = 0;
-  mainCamera.moveCamera(-10, -10);
+  mainCamera.moveCamera(0, 0);
   Component component;
   RenderComponent renderComp;
   actor.attachComponent(&renderComp);
@@ -113,17 +106,6 @@ int main(int argc, char** argv) {
 
   eventScheduler.scheduleEvent(
       []() { std::cout << "scheduled event ran" << std::endl; }, 3.0);
-  Rect rect = {0, 0, 50, 50};
-
-  File file("../res/data.txt");
-  std::cout << "exists " << file.exists() << std::endl;
-  std::cout << "file size " << file.getSize() << std::endl;
-  auto bytes = file.readBytes();
-  for (int32_t i = 0; i < file.getSize(); i++) {
-    std::cout << "byte:" << bytes[i] << "\n";
-  }
-  Image image("../res/monkey.png");
-  std::cout << "image size: " << image.getImageSize() << std::endl;
 
   /* Main Game Loop */
   running = true;
@@ -149,7 +131,7 @@ int main(int argc, char** argv) {
     mainRenderer.clear();
     renderSystem.renderAll(interpolation);
     mainRenderer.setColor(Colors::WHITE);
-    mainRenderer.drawRect(rect);
+
     mainRenderer.present();
   }
 
