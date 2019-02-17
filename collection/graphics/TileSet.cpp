@@ -48,7 +48,7 @@ int32_t TileSet::getWidthInPixels() {
   return texture->getWidth();
 }
 // s = wx + by, x - 1 = y, so y=(s-w)/(w+b)
-int32_t TileSet::getWidthInTiles() {
+int32_t TileSet::getTilesPerRow() {
   int32_t totalTilesWidth = getWidthInPixels() - (xOffsetLeft + xOffsetRight);
   return (totalTilesWidth - tileWidth) / (tileWidth + hBorder) + 1;
 }
@@ -57,7 +57,7 @@ int32_t TileSet::getHeightInPixels() {
   return texture->getHeight();
 }
 
-int32_t TileSet::getHeightInTiles() {
+int32_t TileSet::getTilesPerCol() {
   int32_t totalTilesHeight = getHeightInPixels() - yOffsetTop - yOffsetBottom;
   return (totalTilesHeight - tileHeight) / (tileHeight + vBorder) + 1;
 }

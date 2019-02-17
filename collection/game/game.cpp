@@ -63,8 +63,8 @@ int main(int argc, char** argv) {
   mainRenderer = Renderer(mainWindow);
 
   TileSet tileSet("../res/medieval_tilesheet.png", 64, 64, 32, 32, 32, 32);
-  std::cout << tileSet.getWidthInTiles() << " tiles horiz" << std::endl;
-  std::cout << tileSet.getHeightInTiles() << " tiles vert" << std::endl;
+  std::cout << tileSet.getTilesPerRow() << " tiles horiz" << std::endl;
+  std::cout << tileSet.getTilesPerCol() << " tiles vert" << std::endl;
   {
     auto pair = tileSet.getTilePosInTiles(7);
     printf("(%d, %d)\n", pair.first, pair.second);
