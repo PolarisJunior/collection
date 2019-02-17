@@ -62,7 +62,7 @@ int main(int argc, char** argv) {
   mainWindow = windowBuilder.getWindow();
   mainRenderer = Renderer(mainWindow);
 
-  TileSet tileSet("../res/medieval_tilesheet.png");
+  TileSet tileSet("../res/medieval_tilesheet.png", 64, 64, 32, 32, 32, 32);
   TileMap tileMap;
   tileMap.setTileSet(tileSet);
   auto level = tileMap.getTexture();
