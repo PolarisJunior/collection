@@ -70,9 +70,8 @@ int main(int argc, char** argv) {
     Image image("../res/monkey.png");
     std::cout << "extension: " << image.getType() << std::endl;
     Texture texture(image);
-    SDL_RenderCopy(mainRenderer.sdlRenderer, texture.sdlTexture, nullptr,
-                   nullptr);
-    SDL_RenderPresent(mainRenderer.sdlRenderer);
+    mainRenderer.render(texture);
+    mainRenderer.present();
     SDL_Delay(3000);
   }
 

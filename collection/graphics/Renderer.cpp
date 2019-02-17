@@ -3,6 +3,7 @@
 #include <SDL.h>
 #include "../math/geometry/Rect.h"
 #include "Color.h"
+#include "Texture.h"
 
 // Renderer mainRenderer;
 
@@ -12,6 +13,18 @@ void Renderer::present() {
 
 void Renderer::clear() {
   SDL_RenderClear(sdlRenderer);
+}
+
+void Renderer::render(const Texture& texture,
+                      const Rect& src,
+                      const Rect& dst) {
+  SDL_RenderCopy(sdlRenderer, texture.sdlTexture,
+                 reinterpret_cast<const SDL_Rect*>(&src),
+                 reinterpret_cast<const SDL_Rect*>(&dst));
+}
+
+void Renderer::render(const Texture& texture) {
+  SDL_RenderCopy(sdlRenderer, texture.sdlTexture, nullptr, nullptr);
 }
 
 void Renderer::setColor(const Color& color) {

@@ -11,6 +11,7 @@ class Texture {
   Texture(char* buf, int32_t bufSize, const std::string& type);
   Texture(const Image& image);
   ~Texture();
+
   SDL_Texture* sdlTexture;
 
  private:
