@@ -17,6 +17,8 @@ class Window {
   int32_t getWidth();
   int32_t getHeight();
 
+  uint32_t getPixelFormat();
+
   Window& operator=(Window&& other);
   friend void swap(Window& first, Window& second);
 

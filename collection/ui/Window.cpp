@@ -46,6 +46,10 @@ int32_t Window::getHeight() {
   return h;
 }
 
+uint32_t Window::getPixelFormat() {
+  return SDL_GetWindowPixelFormat(getSdlWindow());
+}
+
 Window& Window::operator=(Window&& other) {
   swap(*this, other);
   return *this;

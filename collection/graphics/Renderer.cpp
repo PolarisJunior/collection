@@ -27,20 +27,32 @@ void Renderer::clear() {
   SDL_RenderClear(sdlRenderer);
 }
 
-void Renderer::render(const Texture& texture,
-                      const Rect& src,
-                      const Rect& dst) {
-  SDL_RenderCopy(sdlRenderer, texture.sdlTexture,
+void Renderer::render(Texture& texture, const Rect& src, const Rect& dst) {
+  SDL_RenderCopy(sdlRenderer, texture.getSdlTexture(),
                  reinterpret_cast<const SDL_Rect*>(&src),
                  reinterpret_cast<const SDL_Rect*>(&dst));
 }
 
-void Renderer::render(const Texture& texture) {
-  SDL_RenderCopy(sdlRenderer, texture.sdlTexture, nullptr, nullptr);
+void Renderer::render(Texture& texture, Rect* src, Rect* dst) {
+  SDL_RenderCopy(sdlRenderer, texture.getSdlTexture(),
+                 reinterpret_cast<SDL_Rect*>(src),
+                 reinterpret_cast<SDL_Rect*>(dst));
+}
+
+void Renderer::render(Texture& texture) {
+  SDL_RenderCopy(sdlRenderer, texture.getSdlTexture(), nullptr, nullptr);
 }
 
 void Renderer::setColor(const Color& color) {
   SDL_SetRenderDrawColor(sdlRenderer, color.r, color.g, color.b, color.a);
+}
+
+void Renderer::setTarget(Texture& targ) {
+  SDL_SetRenderTarget(getSdlRenderer(), targ.getSdlTexture());
+}
+
+void Renderer::clearTarget() {
+  SDL_SetRenderTarget(getSdlRenderer(), nullptr);
 }
 
 void Renderer::drawRect(const Rect& rect) {

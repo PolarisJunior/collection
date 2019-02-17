@@ -2,8 +2,15 @@
 #include "Texture.h"
 #include <SDL.h>
 #include <SDL_image.h>
+#include "../ui/Window.h"
 #include "Image.h"
 #include "Renderer.h"
+
+Texture::Texture(int32_t w, int32_t h) {
+  sdlTexture = SDL_CreateTexture(mainRenderer.getSdlRenderer(),
+                                 mainWindow.getPixelFormat(),
+                                 SDL_TEXTUREACCESS_TARGET, w, h);
+}
 
 Texture::Texture(char* buf, int32_t bufSize, const std::string& type) {
   SDL_RWops* rw = SDL_RWFromConstMem(buf, bufSize);
@@ -17,8 +24,6 @@ Texture::Texture(char* buf, int32_t bufSize, const std::string& type) {
 
 Texture::Texture(const Image& image)
     : Texture(image.buf.get(), image.getImageSize(), image.getType()) {}
-
-Texture::Texture(int32_t w, int32_t h) {}
 
 Texture::~Texture() {
   SDL_DestroyTexture(sdlTexture);

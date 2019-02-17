@@ -24,11 +24,14 @@ struct Renderer {
   void clear();
 
   void setColor(const Color& color);
+  void setTarget(Texture& texture);
+  void clearTarget();
 
   void drawRect(const Rect& rect);
 
-  void render(const Texture& texture, const Rect& src, const Rect& dst);
-  void render(const Texture& texture);
+  void render(Texture& texture, const Rect& src, const Rect& dst);
+  void render(Texture& texture, Rect* src, Rect* dst);
+  void render(Texture& texture);
 
   SDL_Renderer* getSdlRenderer();
 

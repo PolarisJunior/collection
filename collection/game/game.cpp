@@ -23,6 +23,7 @@
 #include "../graphics/Image.h"
 #include "../graphics/Renderer.h"
 #include "../graphics/Texture.h"
+#include "../graphics/TileMap.h"
 #include "../graphics/TileSet.h"
 
 #include "../math/geometry/Rect.h"
@@ -59,12 +60,15 @@ int main(int argc, char** argv) {
   windowBuilder.setTitle("Game").setDims(800, 600).setVisible();
 
   mainWindow = windowBuilder.getWindow();
-
-  // Window* window = &mainWindow;
   mainRenderer = Renderer(mainWindow);
 
   TileSet tileSet("../res/medieval_tilesheet.png");
-  mainRenderer.render(*tileSet.texture);
+  TileMap tileMap;
+  tileMap.setTileSet(tileSet);
+  auto level = tileMap.getTexture();
+
+  // mainRenderer.render(tileSet.getTexture());
+  mainRenderer.render(*level);
   mainRenderer.present();
   SDL_Delay(3000);
 
