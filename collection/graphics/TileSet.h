@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <memory>
 #include <string>
+#include <utility>
 
 class Image;
 class Texture;
@@ -32,12 +33,15 @@ class TileSet {
   Texture& getTexture();
 
   int32_t getTileId(int32_t col, int32_t row);
-  int32_t getTilePos(int32_t tileId);
+  std::pair<int32_t, int32_t> getTilePosInPixels(int32_t tileId);
+  std::pair<int32_t, int32_t> getTilePosInTiles(int32_t tileId);
 
   int32_t getWidthInPixels();
+  // ignores borders, maybe rename to getNumTilesInRow
   int32_t getWidthInTiles();
 
   int32_t getHeightInPixels();
+  // ignores borders
   int32_t getHeightInTiles();
 
   int32_t getNumTiles();
@@ -65,4 +69,19 @@ inline int32_t TileSet::getNumTiles() {
 inline int32_t TileSet::getTileId(int32_t col, int32_t row) {
   int32_t numTiles = getNumTiles();
   return col + row * getWidthInTiles();
+}
+
+inline std::pair<int32_t, int32_t> TileSet::getTilePosInTiles(int32_t tileId) {
+  std::pair<int32_t, int32_t> pos;
+
+  pos.first = tileId % getWidthInTiles();
+  pos.second = tileId / getWidthInTiles();
+  return pos;
+}
+
+inline std::pair<int32_t, int32_t> TileSet::getTilePosInPixels(int32_t tileId) {
+  auto pos = getTilePosInTiles(tileId);
+  pos.first *= tileWidth;
+  pos.second *= tileHeight;
+  return pos;
 }
