@@ -21,8 +21,10 @@ SDL_Window* Window::getSdlWindow() {
 }
 
 Renderer Window::getRenderer() {
-  SDL_Renderer* r = SDL_CreateRenderer(
-      sdlWindow, -1, SDL_RENDERER_TARGETTEXTURE | SDL_RENDERER_ACCELERATED);
+  SDL_Renderer* r =
+      SDL_CreateRenderer(sdlWindow, -1,
+                         SDL_RENDERER_TARGETTEXTURE | SDL_RENDERER_ACCELERATED |
+                             SDL_RENDERER_PRESENTVSYNC);
   if (!r) {
     SDL_LogError(SDL_LOG_CATEGORY_RENDER, SDL_GetError());
     exit(EXIT_FAILURE);

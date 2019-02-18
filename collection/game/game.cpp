@@ -31,6 +31,10 @@
 
 #include "../io/File.h"
 
+#include "../network/ClientSocket.h"
+#include "../network/ServerSocket.h"
+#include "../network/Socket.h"
+
 static bool running;
 static SdlEventPoller eventPoller;
 
@@ -55,6 +59,9 @@ int main(int argc, char** argv) {
       SDL_LogError(SDL_LOG_CATEGORY_ERROR, IMG_GetError());
     }
   }
+  Socket::initSocketSystem();
+  ClientSocket clientSocket;
+  // ServerSocket socket;
 
   WindowBuilder windowBuilder;
   windowBuilder.setTitle("Game").setDims(800, 600).setVisible();
@@ -68,13 +75,7 @@ int main(int argc, char** argv) {
   TileMap tileMap(vec);
   tileMap.setTileSet(tileSet);
   auto level = tileMap.getTexture();
-  {
-    Texture tex("../res/medieval_tilesheet.png");
-    std::cout << "img dims " << tex.getWidth() << ", " << tex.getHeight()
-              << std::endl;
-  }
 
-  // mainRenderer.render(tileSet.getTexture());
   mainRenderer.render(*level);
   mainRenderer.present();
   SDL_Delay(10000);
