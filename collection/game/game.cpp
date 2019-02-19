@@ -60,8 +60,8 @@ int main(int argc, char** argv) {
     }
   }
   Socket::initSocketSystem();
-  ClientSocket clientSocket;
-  // ServerSocket socket;
+  // ClientSocket clientSocket;
+  ServerSocket socket;
 
   WindowBuilder windowBuilder;
   windowBuilder.setTitle("Game").setDims(800, 600).setVisible();

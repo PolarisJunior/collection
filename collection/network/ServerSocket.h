@@ -3,8 +3,13 @@
 
 #include <cstdint>
 
+typedef uint64_t SOCKET;
+
 class ServerSocket {
  public:
   ServerSocket();
-  ~ServerSocket() = default;
+  ~ServerSocket();
+
+ private:
+  SOCKET listenSocket;
 };

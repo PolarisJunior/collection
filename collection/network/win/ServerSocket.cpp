@@ -9,23 +9,23 @@
 // add Ws2_32.lib in visual studio
 // #pragma comment(lib, "Ws2_32.lib")
 ServerSocket::ServerSocket() {
-  struct addrinfo* result = nullptr;
-  struct addrinfo hints;
+  struct addrinfo *result = NULL, *ptr = NULL, hints;
 
-  memset(&hints, 0, sizeof(hints));
-  int32_t r = getaddrinfo(nullptr, "27015", &hints, &result);
-
+  ZeroMemory(&hints, sizeof(hints));
+  // int32_t r = getaddrinfo(nullptr, "27015", &hints, &result);
+  int32_t r = getaddrinfo("127.0.0.1", "27015", &hints, &result);
   hints.ai_family = AF_INET;
   hints.ai_socktype = SOCK_STREAM;
-  hints.ai_protocol = IPPROTO_TCP;
-  hints.ai_flags = AI_PASSIVE;
+  hints.ai_protocol = 0;
+  // hints.ai_protocol = IPPROTO_TCP;
+  // hints.ai_flags = 0;
 
   if (r != 0) {
     printf("getaddrinfo failed\n");
     WSACleanup();
   }
 
-  SOCKET listenSocket = INVALID_SOCKET;
+  listenSocket = INVALID_SOCKET;
 
   listenSocket =
       socket(result->ai_family, result->ai_socktype, result->ai_protocol);
@@ -62,4 +62,8 @@ ServerSocket::ServerSocket() {
     WSACleanup();
   }
   printf("client connected\n");
+}
+
+ServerSocket::~ServerSocket() {
+  WSACleanup();
 }
