@@ -5,6 +5,6 @@
 
 class ClientSocket : public Socket {
  public:
-  ClientSocket() = default;
+  ClientSocket();
   ~ClientSocket() = default;
 };
