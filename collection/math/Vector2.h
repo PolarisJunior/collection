@@ -1,7 +1,7 @@
 #pragma once
 
 #include <math.h>
-#include <stdio.h>
+#include <ostream>
 
 class Vector2 {
  public:
@@ -30,8 +30,7 @@ class Vector2 {
 
   float dot(const Vector2& other);
 
-  void print();
-  void println();
+  friend std::ostream& operator<<(std::ostream& out, const Vector2& vec);
 
   static Vector2 zero();
   static Vector2 right();
@@ -107,12 +106,9 @@ inline bool Vector2::equals(const Vector2& other, float delta) {
   return fabs(this->x - other.x) + fabs(this->y - other.y) < delta;
 }
 
-inline void Vector2::print() {
-  printf("(%f, %f)", x, y);
-}
-
-inline void Vector2::println() {
-  printf("(%f, %f)\n", x, y);
+inline std::ostream& operator<<(std::ostream& out, const Vector2& vec) {
+  out << "(" << vec.x << ", " << vec.y << ")";
+  return out;
 }
 
 inline Vector2 Vector2::zero() {

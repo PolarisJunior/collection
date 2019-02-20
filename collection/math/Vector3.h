@@ -2,7 +2,7 @@
 #pragma once
 
 #include <math.h>
-#include <stdio.h>
+#include <ostream>
 
 class Vector3 {
  public:
@@ -24,15 +24,14 @@ class Vector3 {
 
   bool operator==(const Vector3& other);
 
+  friend std::ostream& operator<<(std::ostream& out, const Vector3& vec);
+
   Vector3 normalized();
   Vector3& normalize();
   float length();
   bool equals(const Vector3& other, float delta = 0.00001);
 
   float dot(const Vector3& other);
-
-  void print();
-  void println();
 
   static Vector3 zero();
   static Vector3 right();
@@ -115,12 +114,9 @@ inline float Vector3::dot(const Vector3& other) {
   return this->x * other.x + this->y * other.y + this->z * other.z;
 }
 
-inline void Vector3::print() {
-  printf("(%f, %f, %f)", x, y, z);
-}
-
-inline void Vector3::println() {
-  printf("(%f, %f, %f)\n", x, y, z);
+inline std::ostream& operator<<(std::ostream& out, const Vector3& vec) {
+  out << "(" << vec.x << ", " << vec.y << ", " << vec.z << ")";
+  return out;
 }
 
 inline Vector3 Vector3::zero() {
