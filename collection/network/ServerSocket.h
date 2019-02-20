@@ -2,14 +2,23 @@
 #pragma once
 
 #include <cstdint>
+#include <memory>
+#include "Socket.h"
 
-typedef uint64_t SOCKET;
-
-class ServerSocket {
+class ServerSocket : public Socket {
  public:
   ServerSocket();
   ~ServerSocket();
 
+  std::unique_ptr<Socket> acceptConnection();
+
+  bool isValid();
+
  private:
-  SOCKET listenSocket;
+  // uint64_t socketId;
+  bool valid;
 };
+
+inline bool ServerSocket::isValid() {
+  return valid;
+}

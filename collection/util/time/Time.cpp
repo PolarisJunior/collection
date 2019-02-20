@@ -1,6 +1,7 @@
 #include "Time.h"
 
 #include <SDL.h>
+#include <chrono>
 
 uint32_t Time::getMs() {
   return SDL_GetTicks();

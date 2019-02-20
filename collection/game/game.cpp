@@ -59,9 +59,10 @@ int main(int argc, char** argv) {
       SDL_LogError(SDL_LOG_CATEGORY_ERROR, IMG_GetError());
     }
   }
-  Socket::initSocketSystem();
+
   // ClientSocket clientSocket;
   ServerSocket socket;
+  std::unique_ptr<Socket> sock = socket.acceptConnection();
 
   WindowBuilder windowBuilder;
   windowBuilder.setTitle("Game").setDims(800, 600).setVisible();

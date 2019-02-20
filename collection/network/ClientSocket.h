@@ -1,8 +1,10 @@
 
 #pragma once
 
-class ClientSocket {
+#include "Socket.h"
+
+class ClientSocket : public Socket {
  public:
-  ClientSocket();
+  ClientSocket() = default;
   ~ClientSocket() = default;
 };
