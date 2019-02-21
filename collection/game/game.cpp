@@ -61,8 +61,9 @@ int main(int argc, char** argv) {
   }
 
   // ClientSocket clientSocket;
-  ServerSocket socket;
-  std::unique_ptr<Socket> sock = socket.acceptConnection();
+
+  // ServerSocket socket;
+  // std::unique_ptr<Socket> sock = socket.acceptConnection();
 
   WindowBuilder windowBuilder;
   windowBuilder.setTitle("Game").setDims(800, 600).setVisible();
@@ -130,9 +131,11 @@ int main(int argc, char** argv) {
 
   /* Main Game Loop */
   running = true;
-  uint32_t lastUpdate = Time::getMs();
+  uint32_t lastUpdate = Time::getTicks();
+  // std::chrono::milliseconds lastUpdate = Time::getMs();
   while (running) {
-    uint32_t currentMs = Time::getMs();
+    uint32_t currentMs = Time::getTicks();
+    // std::chrono::milliseconds currentMs = Time::getMs();
     uint32_t frameTime = 0;
     uint32_t numLoops = 0;
 
