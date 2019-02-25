@@ -14,8 +14,14 @@ class Socket {
   SocketId getSocketId();
 
   std::string receive();
-  void sendMsg(std::string& msg);
+  void sendMsg(const std::string& msg);
   void sendMsg(const char* msg, int32_t msgLength);
+
+  /* sets timeout in ms */
+  void setSendTimeout(int32_t to);
+  void setRecvTimeout(int32_t to);
+
+  bool isValid();
 
   static int32_t initSocketSystem();
   static int32_t endSocketSystem();
@@ -24,6 +30,7 @@ class Socket {
  protected:
   static bool initialized;
   SocketId socketId;
+  bool valid;
 };
 
 inline bool Socket::isInitialized() {
@@ -34,6 +41,10 @@ inline SocketId Socket::getSocketId() {
   return socketId;
 }
 
-inline void Socket::sendMsg(std::string& msg) {
+inline void Socket::sendMsg(const std::string& msg) {
   sendMsg(msg.c_str(), msg.length());
+}
+
+inline bool Socket::isValid() {
+  return valid;
 }

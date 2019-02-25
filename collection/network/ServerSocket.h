@@ -12,12 +12,6 @@ class ServerSocket : public Socket {
 
   std::unique_ptr<Socket> acceptConnection();
 
-  bool isValid();
-
  private:
   bool valid;
 };
-
-inline bool ServerSocket::isValid() {
-  return valid;
-}
