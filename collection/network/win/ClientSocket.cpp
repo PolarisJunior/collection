@@ -20,26 +20,27 @@ ClientSocket::ClientSocket() {
     WSACleanup();
   }
 
-  SOCKET connectSocket = INVALID_SOCKET;
+  // SOCKET connectSocket = INVALID_SOCKET;
+  socketId = INVALID_SOCKET;
 
   ptr = result;
-  connectSocket = socket(ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol);
+  socketId = socket(ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol);
 
-  if (connectSocket == INVALID_SOCKET) {
+  if (socketId == INVALID_SOCKET) {
     printf("error connect socket\n");
     freeaddrinfo(result);
     WSACleanup();
   }
 
-  iResult = connect(connectSocket, ptr->ai_addr, (int)ptr->ai_addrlen);
+  iResult = connect(socketId, ptr->ai_addr, (int)ptr->ai_addrlen);
   if (iResult == SOCKET_ERROR) {
-    closesocket(connectSocket);
-    connectSocket = INVALID_SOCKET;
+    closesocket(socketId);
+    socketId = INVALID_SOCKET;
   }
 
   freeaddrinfo(result);
 
-  if (connectSocket == INVALID_SOCKET) {
+  if (socketId == INVALID_SOCKET) {
     printf("unable to connect\n");
     WSACleanup();
   }

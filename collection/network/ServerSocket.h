@@ -15,7 +15,6 @@ class ServerSocket : public Socket {
   bool isValid();
 
  private:
-  // uint64_t socketId;
   bool valid;
 };
 
