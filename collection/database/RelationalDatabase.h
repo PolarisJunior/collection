@@ -8,11 +8,14 @@ struct sqlite3;
 
 class RelationalDatabase {
  public:
+  ~RelationalDatabase();
+  explicit RelationalDatabase(sqlite3** sql);
+
   static std::optional<RelationalDatabase> loadDatabase(
       const std::string& dbName);
 
-  ~RelationalDatabase();
-  RelationalDatabase(sqlite3** sql);
+  bool createTable();
+  bool exec();
 
  private:
   sqlite3* db;
