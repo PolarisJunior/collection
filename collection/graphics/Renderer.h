@@ -13,7 +13,7 @@ class Window;
 struct SDL_Texture;
 struct SDL_Surface;
 
-struct Renderer {
+class Renderer {
  public:
   Renderer() = default;
   Renderer(SDL_Renderer* r);
