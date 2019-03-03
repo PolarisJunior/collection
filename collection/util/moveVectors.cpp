@@ -1,9 +1,9 @@
 
 #include "moveVectors.h"
 
-Vector2 dirToVecMap[] = {Vector2(0, -1), Vector2(1, 0), Vector2(0, 1),
-                         Vector2(-1, 0)};
+Vector2<float> dirToVecMap[] = {Vector2(0.0f, -1.0f), Vector2(1.0f, 0.0f),
+                                Vector2(0.f, 1.f), Vector2(-1.f, 0.f)};
 
-Vector2 dirToVec(Direction dir) {
+Vector2<float> dirToVec(Direction dir) {
   return dirToVecMap[dir];
 }

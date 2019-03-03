@@ -1,7 +1,7 @@
 #include "Camera2.h"
 #include "Actor.h"
 
-Vector2 Camera2::getPosition() {
+Vector2<float> Camera2::getPosition() {
   if (attachedActor) {
     return Vector2(attachedActor->x, attachedActor->y) + this->attachOffset;
   } else {

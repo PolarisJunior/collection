@@ -4,7 +4,7 @@
 #include <string>
 #include "../math/Vector2.h"
 
-int test(int argc, char** argv) {
+inline int test(int argc, char** argv) {
   Vector2 vec1(1.0f, 1.0f);
   Vector2 vec2(2.0f, 2.0f);
 
@@ -15,9 +15,9 @@ int test(int argc, char** argv) {
 
   vec1 *= 2.0;
   assert(vec1.equals(vec2));
-  vec2 -= Vector2::right() + Vector2::down();
-  assert(vec2.equals(Vector2::right() + Vector2::down()));
+  vec2 -= Vector2<float>::right() + Vector2<float>::down();
+  assert(vec2.equals(Vector2<float>::right() + Vector2<float>::down()));
   std::cout << "done" << std::endl;
 
-    return EXIT_SUCCESS;
+  return EXIT_SUCCESS;
 }

@@ -11,34 +11,35 @@ class Camera2 {
   Camera2();
   Camera2(float w, float h);
 
-  void moveCamera(Vector2 newPos);
+  void moveCamera(Vector2<float> newPos);
   void moveCamera(float x, float y);
 
-  void smoothMoveCamera(Vector2 newPos, uint32_t ms);
+  void smoothMoveCamera(Vector2<float> newPos, uint32_t ms);
 
-  Vector2 getMidPoint();
-  Vector2 getPosition();
+  Vector2<float> getMidPoint();
+  Vector2<float> getPosition();
 
-  Vector2 toScreenCoords(const Vector2& worldPos);
-  Vector2 toWorldCoords(const Vector2& screenPos);
+  Vector2<float> toScreenCoords(const Vector2<float>& worldPos);
+  Vector2<float> toWorldCoords(const Vector2<float>& screenPos);
 
   void attachToActor(Actor* actor);
   void unAttach();
 
-  void setAttachOffset(Vector2 offset);
+  void setAttachOffset(Vector2<float> offset);
 
  protected:
   Actor* attachedActor = nullptr;
-  Vector2 position;
-  Vector2 attachOffset;
+  Vector2<float> position;
+  Vector2<float> attachOffset;
 };
 
-inline Camera2::Camera2() : position(Vector2(0, 0)), width(1), height(1) {}
+inline Camera2::Camera2()
+    : position(Vector2<float>(0, 0)), width(1), height(1) {}
 
 inline Camera2::Camera2(float w, float h)
-    : position(Vector2(0, 0)), width(w), height(h) {}
+    : position(Vector2(0.0f, 0.0f)), width(w), height(h) {}
 
-inline void Camera2::moveCamera(Vector2 newPos) {
+inline void Camera2::moveCamera(Vector2<float> newPos) {
   position = newPos;
 }
 
@@ -47,22 +48,22 @@ inline void Camera2::moveCamera(float x, float y) {
   position.y = y;
 }
 
-inline void Camera2::setAttachOffset(Vector2 offset) {
+inline void Camera2::setAttachOffset(Vector2<float> offset) {
   this->attachOffset = offset;
 }
 
-inline Vector2 Camera2::getMidPoint() {
+inline Vector2<float> Camera2::getMidPoint() {
   return Vector2(width / 2, height / 2);
 }
 
-inline Vector2 Camera2::toScreenCoords(const Vector2& worldPos) {
+inline Vector2<float> Camera2::toScreenCoords(const Vector2<float>& worldPos) {
   Vector2 midpoint = getMidPoint();
   Vector2 pos = getPosition();
   return Vector2(midpoint.x + worldPos.x - pos.x,
                  midpoint.y + worldPos.y - pos.y);
 }
 
-inline Vector2 Camera2::toWorldCoords(const Vector2& screenPos) {
+inline Vector2<float> Camera2::toWorldCoords(const Vector2<float>& screenPos) {
   Vector2 midpoint = getMidPoint();
   Vector2 pos = getPosition();
   return Vector2(screenPos.x + pos.x - midpoint.x,
