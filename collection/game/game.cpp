@@ -18,6 +18,7 @@
 #include "../game/Component.h"
 #include "../game/RenderComponent.h"
 #include "../game/RenderSystem.h"
+#include "../game/Stage.h"
 
 #include "../graphics/Color.h"
 #include "../graphics/Image.h"
@@ -34,6 +35,13 @@
 #include "../network/ClientSocket.h"
 #include "../network/ServerSocket.h"
 #include "../network/Socket.h"
+
+#include "../sys/System.h"
+
+#include "../math/Vector3.h"
+
+#include "../database/RelationalDatabase.h"
+#include "../io/FileInputStream.h"
 
 static bool running;
 static SdlEventPoller eventPoller;
@@ -60,10 +68,28 @@ int main(int argc, char** argv) {
     }
   }
 
+  // std::optional<RelationalDatabase> db =
+  //   RelationalDatabase::loadDatabase("test2.db");
+  // if (db) {
+  //   printf("create\n");
+  //   db->createTable();
+  // } else {
+  //   printf("not create\n");
+  // }
+
   // ClientSocket clientSocket;
+  // clientSocket.setRecvTimeout(std::chrono::seconds(5));
+  // std::string str = clientSocket.receive();
+
+  // std::cout << "received: " << str << std::endl;
+
+  // std::string ourMsg = "hello network";
+  // clientSocket.sendMsg(ourMsg);
 
   // ServerSocket socket;
   // std::unique_ptr<Socket> sock = socket.acceptConnection();
+  // std::string myMsg = "frappucino";
+  // sock->sendMsg(myMsg);
 
   WindowBuilder windowBuilder;
   windowBuilder.setTitle("Game").setDims(800, 600).setVisible();
@@ -72,26 +98,37 @@ int main(int argc, char** argv) {
   mainRenderer = Renderer(mainWindow);
 
   TileSet tileSet("../res/medieval_tilesheet.png", 64, 64, 32, 32, 32, 32);
+  TileSet rogueSet("../res/roguelikeSheet_transparent.png", 15, 15, 2, 2, 0, 0,
+                   0, 0);
+  std::optional<TileMap> rogueMap =
+      TileMap::loadMapFromCsv("../res/rogue_map.csv");
+  if (rogueMap) {
+    std::cout << "rogue map exists" << std::endl;
+    rogueMap->setTileSet(rogueSet);
+  }
 
-  std::vector<int32_t> vec = {1, 2, 3, 4};
-  TileMap tileMap(vec);
-  tileMap.setTileSet(tileSet);
-  auto level = tileMap.getTexture();
+  Stage stage;
+  stage.setTileMap(*rogueMap);
 
-  mainRenderer.render(*level);
+  auto level = rogueMap->getTexture();
+
+  Rect<int32_t> dst{0, 0, level->getWidth(), level->getHeight()};
+
+  mainRenderer.render(*level, nullptr, &dst);
   mainRenderer.present();
-  SDL_Delay(10000);
+
+  System::delay(std::chrono::milliseconds(60000));
 
   eventPoller.addListener(SDL_QUIT,
                           [](const SDL_Event& event) { running = false; });
-  mainCamera.width = mainWindow.getWidth();
-  mainCamera.height = mainWindow.getHeight();
+  mainCamera.width = static_cast<float>(mainWindow.getWidth());
+  mainCamera.height = static_cast<float>(mainWindow.getHeight());
 
   actor.x = 0;
   actor.y = 0;
   mainCamera.moveCamera(0, 0);
   mainCamera.attachToActor(&actor);
-  mainCamera.setAttachOffset(Vector2(100, 100));
+  mainCamera.setAttachOffset(Vector2(100.0f, 100.0f));
 
   RenderComponent renderComp;
   actor.attachComponent(&renderComp);
@@ -121,7 +158,8 @@ int main(int argc, char** argv) {
 
   eventPoller.addListener(SDL_MOUSEBUTTONDOWN, [](const SDL_Event& event) {
     Vector2 worldPos =
-        mainCamera.toWorldCoords(Vector2(event.button.x, event.button.y));
+        mainCamera.toWorldCoords(Vector2(static_cast<float>(event.button.x),
+                                         static_cast<float>(event.button.y)));
     printf("screen coords: (%d, %d), world coords: (%.3f, %.3f)\n",
            event.button.x, event.button.y, worldPos.x, worldPos.y);
   });
@@ -132,10 +170,8 @@ int main(int argc, char** argv) {
   /* Main Game Loop */
   running = true;
   uint32_t lastUpdate = Time::getTicks();
-  // std::chrono::milliseconds lastUpdate = Time::getMs();
   while (running) {
     uint32_t currentMs = Time::getTicks();
-    // std::chrono::milliseconds currentMs = Time::getMs();
     uint32_t frameTime = 0;
     uint32_t numLoops = 0;
 

@@ -3,6 +3,7 @@
 #include <memory>
 
 struct SDL_Renderer;
+template <typename T>
 struct Rect;
 struct Color;
 
@@ -27,10 +28,12 @@ struct Renderer {
   void setTarget(Texture& texture);
   void clearTarget();
 
-  void drawRect(const Rect& rect);
+  void drawRect(const Rect<int32_t>& rect);
 
-  void render(Texture& texture, const Rect& src, const Rect& dst);
-  void render(Texture& texture, Rect* src, Rect* dst);
+  void render(Texture& texture,
+              const Rect<int32_t>& src,
+              const Rect<int32_t>& dst);
+  void render(Texture& texture, Rect<int32_t>* src, Rect<int32_t>* dst);
   void render(Texture& texture);
 
   SDL_Renderer* getSdlRenderer();

@@ -1,7 +1,11 @@
 
 #include "TileMap.h"
 
+#include <algorithm>
+#include <vector>
+#include "../io/FileInputStream.h"
 #include "../math//geometry/Rect.h"
+#include "../util/stringUtils.h"
 #include "Renderer.h"
 #include "Texture.h"
 #include "TileSet.h"
@@ -25,11 +29,45 @@ std::unique_ptr<Texture> TileMap::getTexture() {
       if (tableIdx >= tiles.size()) {
         break;
       }
-      Rect srcRect = tileSet->getTileRect(tiles[tableIdx]);
-      Rect dstRect = {col * tileWidth, row * tileHeight, tileWidth, tileHeight};
+      Rect<int32_t> srcRect = tileSet->getTileRect(tiles[tableIdx]);
+      Rect<int32_t> dstRect = {col * tileWidth, row * tileHeight, tileWidth,
+                               tileHeight};
+
       mainRenderer.render(tileSetTexture, &srcRect, &dstRect);
     }
   }
   mainRenderer.clearTarget();
   return texture;
+}
+
+std::optional<TileMap> TileMap::loadMapFromCsv(const std::string& filePath) {
+  std::optional<FileInputStream> inputStream =
+      FileInputStream::getStream(filePath);
+
+  std::vector<int32_t> tiles;
+  if (inputStream) {
+    std::string line = inputStream->readLine();
+    std::vector<std::string> tokens = stringSplit(line, ',');
+    int32_t width = static_cast<int32_t>(tokens.size());
+
+    if (width < 1) {
+      return std::nullopt;
+    }
+
+    for (auto& s : tokens) {
+      tiles.push_back(std::stoi(s));
+    }
+
+    while (inputStream->hasNext()) {
+      line = inputStream->readLine();
+      tokens = stringSplit(line, ',');
+      for (auto& s : tokens) {
+        tiles.push_back(std::stoi(s));
+      }
+    }
+
+    int32_t height = tiles.size() / width;
+    return std::optional<TileMap>(TileMap(tiles, width, height));
+  }
+  return std::nullopt;
 }

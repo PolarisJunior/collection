@@ -13,8 +13,8 @@ void RenderComponent::render(float interpolation) {
 
   Vector2 screenPos = mainCamera.toScreenCoords(Vector2(real_x, real_y));
 
-  Rect rect = {static_cast<int32_t>(screenPos.x),
-               static_cast<int32_t>(screenPos.y), 200, 200};
+  Rect<int32_t> rect = {static_cast<int32_t>(screenPos.x),
+                        static_cast<int32_t>(screenPos.y), 200, 200};
   mainRenderer.setColor(Colors::WHITE);
   mainRenderer.drawRect(rect);
 }

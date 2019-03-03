@@ -27,13 +27,17 @@ void Renderer::clear() {
   SDL_RenderClear(sdlRenderer);
 }
 
-void Renderer::render(Texture& texture, const Rect& src, const Rect& dst) {
+void Renderer::render(Texture& texture,
+                      const Rect<int32_t>& src,
+                      const Rect<int32_t>& dst) {
   SDL_RenderCopy(sdlRenderer, texture.getSdlTexture(),
                  reinterpret_cast<const SDL_Rect*>(&src),
                  reinterpret_cast<const SDL_Rect*>(&dst));
 }
 
-void Renderer::render(Texture& texture, Rect* src, Rect* dst) {
+void Renderer::render(Texture& texture,
+                      Rect<int32_t>* src,
+                      Rect<int32_t>* dst) {
   SDL_RenderCopy(sdlRenderer, texture.getSdlTexture(),
                  reinterpret_cast<SDL_Rect*>(src),
                  reinterpret_cast<SDL_Rect*>(dst));
@@ -55,7 +59,7 @@ void Renderer::clearTarget() {
   SDL_SetRenderTarget(getSdlRenderer(), nullptr);
 }
 
-void Renderer::drawRect(const Rect& rect) {
+void Renderer::drawRect(const Rect<int32_t>& rect) {
   SDL_RenderDrawRect(sdlRenderer, reinterpret_cast<const SDL_Rect*>(&rect));
 }
 

@@ -36,7 +36,7 @@ class TileSet {
   int32_t getTileId(int32_t col, int32_t row);
   std::pair<int32_t, int32_t> getTilePosInPixels(int32_t tileId);
   std::pair<int32_t, int32_t> getTilePosInTiles(int32_t tileId);
-  Rect getTileRect(int32_t tileId);
+  Rect<int32_t> getTileRect(int32_t tileId);
 
   int32_t getWidthInPixels();
   int32_t getTilesPerRow();
@@ -86,7 +86,7 @@ inline std::pair<int32_t, int32_t> TileSet::getTilePosInPixels(int32_t tileId) {
   return pos;
 }
 
-inline Rect TileSet::getTileRect(int32_t tileId) {
+inline Rect<int32_t> TileSet::getTileRect(int32_t tileId) {
   auto pos = getTilePosInPixels(tileId);
   return {(int32_t)pos.first, (int32_t)pos.second, (int32_t)tileWidth,
           (int32_t)tileHeight};

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <optional>
 #include <string>
 #include <vector>
 #include "../math/Tabular.h"
@@ -13,6 +14,8 @@ class Texture;
  */
 class TileMap {
  public:
+  /* nRowTiles = number of tiles per row or width
+     ncolTiles = number of tiles per column or height */
   TileMap(int32_t nRowTiles = 2, int32_t nColTiles = 2);
 
   TileMap(TileSet* tileSet, int32_t nRowTiles = 2, int32_t nColTiles = 2);
@@ -31,6 +34,10 @@ class TileMap {
   int32_t getNumTilesPerRow();
   int32_t getNumTilesPerCol();
   int32_t getTotalTiles();
+
+  /* Loads a TileMap from a CSV file where each line is one row of the tilemap
+   */
+  static std::optional<TileMap> loadMapFromCsv(const std::string& filePath);
 
  private:
   Tabular tabular;
