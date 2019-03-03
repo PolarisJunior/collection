@@ -13,7 +13,6 @@ class Camera2;
 class Stage {
  public:
   void setTileMap(const TileMap& tm) { tileMap = tm; }
-
   void render(Renderer& renderer, Camera2& camera);
 
  private:
