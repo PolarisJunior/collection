@@ -1,16 +1,18 @@
 #pragma once
 #include <cstdint>
+#include <string>
+#include <vector>
 
 class InputStream {
  public:
-  InputStream();
-  virtual ~InputStream();
+  InputStream() = default;
+  virtual ~InputStream() = default;
 
-  virtual int32_t read(char* outBuf, int32_t numBytes);
+  virtual std::vector<char> read(int32_t numBytes) = 0;
+  /* Reads one char from the stream */
+  virtual char read() = 0;
+  virtual bool hasNext() = 0;
 
-  int32_t readByte(char* out);
+  std::string readAsString(int32_t numBytes);
+  std::string readAsString();
 };
-
-inline int32_t InputStream::readByte(char* out) {
-  return read(out, 1);
-}
