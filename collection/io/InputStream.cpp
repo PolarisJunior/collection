@@ -2,6 +2,7 @@
 #include "InputStream.h"
 
 #include <sstream>
+#include <string>
 
 std::string InputStream::readAsString(int32_t numBytes) {
   std::stringstream ss;

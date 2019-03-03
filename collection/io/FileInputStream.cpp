@@ -30,6 +30,12 @@ bool FileInputStream::hasNext() {
   return !stream->eof();
 }
 
+std::string FileInputStream::readLine() {
+  std::string out;
+  std::getline(*stream, out);
+  return out;
+}
+
 std::optional<FileInputStream> FileInputStream::getStream(
     const std::string& filePath) {
   File file(filePath);

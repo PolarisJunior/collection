@@ -15,6 +15,7 @@ class FileInputStream : public InputStream {
   std::vector<char> read(int32_t numBytes) override;
   char read() override;
   bool hasNext() override;
+  std::string readLine() override;
 
   static std::optional<FileInputStream> getStream(const std::string& filePath);
 
