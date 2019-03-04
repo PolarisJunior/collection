@@ -2,15 +2,18 @@
 #pragma once
 
 #include <math.h>
+#include <cstdint>
 #include <ostream>
 
+template <class Numeric>
 class Vector3 {
  public:
-  float x;
-  float y;
-  float z;
+  Numeric x;
+  Numeric y;
+  Numeric z;
 
-  Vector3(float x, float y, float z);
+  Vector3() = default;
+  Vector3(Numeric x, Numeric y, Numeric z);
 
   Vector3 operator+(const Vector3& other);
   Vector3 operator-(const Vector3& other);
@@ -42,107 +45,135 @@ class Vector3 {
   static Vector3 back();
 };
 
-inline Vector3::Vector3(float x, float y, float z) : x(x), y(y), z(z) {}
+template <class Numeric>
+inline Vector3<Numeric>::Vector3(Numeric x, Numeric y, Numeric z)
+    : x(x), y(y), z(z) {}
 
-inline Vector3 Vector3::operator+(const Vector3& other) {
+template <class Numeric>
+inline Vector3<Numeric> Vector3<Numeric>::operator+(
+    const Vector3<Numeric>& other) {
   return Vector3(this->x + other.x, this->y + other.y, this->z + other.z);
 }
 
-inline Vector3 Vector3::operator-(const Vector3& other) {
+template <class Numeric>
+inline Vector3<Numeric> Vector3<Numeric>::operator-(
+    const Vector3<Numeric>& other) {
   return Vector3(this->x - other.x, this->y - other.y, this->z - other.z);
 }
 
-inline Vector3 Vector3::operator*(float scale) {
+template <class Numeric>
+inline Vector3<Numeric> Vector3<Numeric>::operator*(float scale) {
   return Vector3(this->x * scale, this->y * scale, this->z * scale);
 }
 
-inline Vector3 Vector3::operator/(float divisor) {
+template <class Numeric>
+inline Vector3<Numeric> Vector3<Numeric>::operator/(float divisor) {
   return Vector3(this->x / divisor, this->y / divisor, this->z / divisor);
 }
 
-inline Vector3& Vector3::operator+=(const Vector3& other) {
+template <class Numeric>
+inline Vector3<Numeric>& Vector3<Numeric>::operator+=(
+    const Vector3<Numeric>& other) {
   this->x += other.x;
   this->y += other.y;
   this->z += other.z;
   return *this;
 }
 
-inline Vector3& Vector3::operator-=(const Vector3& other) {
+template <class Numeric>
+inline Vector3<Numeric>& Vector3<Numeric>::operator-=(
+    const Vector3<Numeric>& other) {
   this->x -= other.x;
   this->y -= other.y;
   this->z -= other.z;
   return *this;
 }
 
-inline Vector3& Vector3::operator*=(float scale) {
+template <class Numeric>
+inline Vector3<Numeric>& Vector3<Numeric>::operator*=(float scale) {
   this->x *= scale;
   this->y *= scale;
   this->z *= scale;
   return *this;
 }
 
-inline Vector3& Vector3::operator/=(float divisor) {
+template <class Numeric>
+inline Vector3<Numeric>& Vector3<Numeric>::operator/=(float divisor) {
   this->x /= divisor;
   this->y /= divisor;
   this->z /= divisor;
   return *this;
 }
 
-inline bool Vector3::operator==(const Vector3& other) {
+template <class Numeric>
+inline bool Vector3<Numeric>::operator==(const Vector3<Numeric>& other) {
   return this->x == other.x && this->y == other.y && this->z == other.z;
 }
 
-inline Vector3 Vector3::normalized() {
+template <class Numeric>
+inline Vector3<Numeric> Vector3<Numeric>::normalized() {
   return *this / length();
 }
 
-inline Vector3& Vector3::normalize() {
+template <class Numeric>
+inline Vector3<Numeric>& Vector3<Numeric>::normalize() {
   *this /= length();
 }
 
-inline float Vector3::length() {
+template <class Numeric>
+inline float Vector3<Numeric>::length() {
   return static_cast<float>(sqrt(dot(*this)));
 }
 
-inline bool Vector3::equals(const Vector3& other, float delta = 0.00001) {
+template <class Numeric>
+inline bool Vector3<Numeric>::equals(const Vector3<Numeric>& other,
+                                     float delta) {
   return fabs(this->x - other.x) + fabs(this->y - other.y) +
              fabs(this->z - other.z) <
          delta;
 }
 
-inline float Vector3::dot(const Vector3& other) {
+template <class Numeric>
+inline float Vector3<Numeric>::dot(const Vector3<Numeric>& other) {
   return this->x * other.x + this->y * other.y + this->z * other.z;
 }
 
-inline std::ostream& operator<<(std::ostream& out, const Vector3& vec) {
-  out << "(" << vec.x << ", " << vec.y << ", " << vec.z << ")";
-  return out;
+template <class Numeric>
+inline std::ostream& operator<<(std::ostream& out,
+                                const Vector3<Numeric>& vec) {
+  return out << "(" << vec.x << ", " << vec.y << ", " << vec.z << ")";
 }
 
-inline Vector3 Vector3::zero() {
+inline Vector3<float> Vector3<float>::zero() {
   return Vector3(0, 0, 0);
 }
 
-inline Vector3 Vector3::right() {
+template <typename Numeric>
+inline Vector3<Numeric> Vector3<Numeric>::right() {
   return Vector3(1, 0, 0);
 }
 
-inline Vector3 Vector3::left() {
+template <typename Numeric>
+inline Vector3<Numeric> Vector3<Numeric>::left() {
   return Vector3(-1, 0, 0);
 }
 
-inline Vector3 Vector3::up() {
+template <typename Numeric>
+inline Vector3<Numeric> Vector3<Numeric>::up() {
   return Vector3(0, -1, 0);
 }
 
-inline Vector3 Vector3::down() {
+template <typename Numeric>
+inline Vector3<Numeric> Vector3<Numeric>::down() {
   return Vector3(0, 1, 0);
 }
 
-inline Vector3 Vector3::back() {
+template <typename Numeric>
+inline Vector3<Numeric> Vector3<Numeric>::back() {
   return Vector3(0, 0, -1);
 }
 
-inline Vector3 Vector3::front() {
+template <typename Numeric>
+inline Vector3<Numeric> Vector3<Numeric>::front() {
   return Vector3(0, 0, 1);
 }
