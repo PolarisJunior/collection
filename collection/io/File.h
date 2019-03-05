@@ -10,6 +10,8 @@ namespace std::filesystem {
 class path;
 }
 
+typedef struct _iobuf FILE;
+
 class File {
  public:
   File() = default;
@@ -41,4 +43,5 @@ class File {
  private:
   std::string pathString;
   std::filesystem::path* filePath;
+  std::unique_ptr<FILE> actualFile;
 };

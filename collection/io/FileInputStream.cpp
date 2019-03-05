@@ -9,6 +9,11 @@ FileInputStream::FileInputStream(const std::string& filePath) {
   stream = std::make_unique<std::ifstream>(filePath);
 }
 
+FileInputStream::FileInputStream(FileInputStream&& other) {
+  actualFile.swap(other.actualFile);
+  stream.swap(other.stream);
+}
+
 FileInputStream::~FileInputStream() {}
 
 std::vector<char> FileInputStream::read(int32_t numBytes) {
@@ -40,7 +45,7 @@ std::optional<FileInputStream> FileInputStream::getStream(
     const std::string& filePath) {
   File file(filePath);
   if (file.exists()) {
-    return std::optional<FileInputStream>(filePath);
+    return std::optional<FileInputStream>(FileInputStream(filePath));
   }
   return {};
 }
