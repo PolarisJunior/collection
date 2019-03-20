@@ -38,6 +38,10 @@ void Texture::render(int32_t x, int32_t y, Renderer& renderer) {
   renderer.render(*this, x, y);
 }
 
+void Texture::render(int32_t x, int32_t y) {
+  this->render(x, y, mainRenderer);
+}
+
 Texture::~Texture() {
   SDL_DestroyTexture(sdlTexture);
 }

@@ -4,18 +4,18 @@
 
 class Actor;
 
-enum ComponentId { UNDEFINED, RENDERABLE };
-
 class Component {
  public:
-  const int32_t componentId = ComponentId::UNDEFINED;
+  /* attaches self to an actor, if notify is true, actor
+      also becomes aware of the component */
   void attachToActor(Actor* actor, bool notify = true);
 
+  /* What to do when attached to actor */
   virtual void onAttached(Actor* actor);
+  /* What to do when unattached from actor */
   virtual void onUnattached(Actor* actor);
 
   // virtual void update();
-
  protected:
   Actor* attachedActor;
 };

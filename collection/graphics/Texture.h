@@ -19,6 +19,7 @@ class Texture {
 
   /* Render texture onto the screen */
   void render(int32_t x, int32_t y, Renderer& renderer);
+  void render(int32_t x, int32_t y);
 
   ~Texture();
 
