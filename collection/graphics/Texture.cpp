@@ -34,6 +34,10 @@ Texture::Texture(const Image& image)
 
 Texture::Texture(const std::string& filePath) : Texture(Image(filePath)) {}
 
+void Texture::render(int32_t x, int32_t y, Renderer& renderer) {
+  renderer.render(*this, x, y);
+}
+
 Texture::~Texture() {
   SDL_DestroyTexture(sdlTexture);
 }

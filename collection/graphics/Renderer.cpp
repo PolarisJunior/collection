@@ -43,6 +43,11 @@ void Renderer::render(Texture& texture,
                  reinterpret_cast<SDL_Rect*>(dst));
 }
 
+void Renderer::render(Texture& texture, int32_t x, int32_t y) {
+  Rect<int32_t> dstRect = {x, y, texture.getWidth(), texture.getHeight()};
+  render(texture, nullptr, &dstRect);
+}
+
 void Renderer::render(Texture& texture) {
   SDL_RenderCopy(sdlRenderer, texture.getSdlTexture(), nullptr, nullptr);
 }

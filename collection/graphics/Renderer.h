@@ -35,6 +35,8 @@ class Renderer {
               const Rect<int32_t>& dst);
   void render(Texture& texture, Rect<int32_t>* src, Rect<int32_t>* dst);
   void render(Texture& texture);
+  /* Renders the texture at x, y screen coords */
+  void render(Texture& texture, int32_t x, int32_t y);
 
   SDL_Renderer* getSdlRenderer();
 

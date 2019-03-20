@@ -6,12 +6,19 @@
 struct SDL_Texture;
 class Image;
 
+class Renderer;
+
 class Texture {
  public:
+  /* Texture from pixel buffer */
   Texture(char* buf, int32_t bufSize, const std::string& type = "png");
   Texture(const Image& image);
+  /* Texture from image file */
   Texture(const std::string& filePath);
   Texture(int32_t w, int32_t h);
+
+  /* Render texture onto the screen */
+  void render(int32_t x, int32_t y, Renderer& renderer);
 
   ~Texture();
 
