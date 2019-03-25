@@ -27,7 +27,9 @@ class Vector3 {
 
   bool operator==(const Vector3& other);
 
-  friend std::ostream& operator<<(std::ostream& out, const Vector3& vec);
+  friend std::ostream& operator<<(std::ostream& out, const Vector3& vec) {
+    return out << "(" << vec.x << ", " << vec.y << ", " << vec.z << ")";
+  }
 
   Vector3 normalized();
   Vector3& normalize();
@@ -136,12 +138,6 @@ inline bool Vector3<Numeric>::equals(const Vector3<Numeric>& other,
 template <class Numeric>
 inline float Vector3<Numeric>::dot(const Vector3<Numeric>& other) {
   return this->x * other.x + this->y * other.y + this->z * other.z;
-}
-
-template <class Numeric>
-inline std::ostream& operator<<(std::ostream& out,
-                                const Vector3<Numeric>& vec) {
-  return out << "(" << vec.x << ", " << vec.y << ", " << vec.z << ")";
 }
 
 inline Vector3<float> Vector3<float>::zero() {

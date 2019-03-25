@@ -31,7 +31,11 @@ class Vector2 {
 
   float dot(const Vector2& other);
 
-  friend std::ostream& operator<<(std::ostream& out, const Vector2& vec);
+  // Needs to be inlined to work with templates
+  friend std::ostream& operator<<(std::ostream& out, const Vector2& vec) {
+    out << "(" << vec.x << ", " << vec.y << ")";
+    return out;
+  }
 
   static Vector2 zero();
   static Vector2 right();
@@ -120,12 +124,6 @@ inline Vector2<T>& Vector2<T>::normalize() {
 template <typename T>
 inline bool Vector2<T>::equals(const Vector2& other, float delta) {
   return fabs(this->x - other.x) + fabs(this->y - other.y) < delta;
-}
-
-template <typename T>
-inline std::ostream& operator<<(std::ostream& out, const Vector2<T>& vec) {
-  out << "(" << vec.x << ", " << vec.y << ")";
-  return out;
 }
 
 template <typename T>
