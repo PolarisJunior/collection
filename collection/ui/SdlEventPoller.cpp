@@ -1,6 +1,7 @@
 
 #include "SdlEventPoller.h"
 #include <SDL.h>
+#include <functional>
 
 typedef void (*Callback)(const SDL_Event&);
 
@@ -14,6 +15,8 @@ void SdlEventPoller::pollEvents() {
   }
 }
 
-void SdlEventPoller::addListener(uint32_t eventType, Callback callback) {
+void SdlEventPoller::addListener(
+    uint32_t eventType,
+    std::function<void(const SDL_Event&)> callback) {
   listeners[eventType] = callback;
 }
