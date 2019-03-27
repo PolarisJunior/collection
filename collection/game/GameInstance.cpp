@@ -1,6 +1,7 @@
 
 #include "GameInstance.h"
 #include "../ui/Keyboard.h"
+#include "../ui/Mouse.h"
 
 // static or not here?
 static GameInstance currentInstance;
@@ -11,6 +12,10 @@ GameInstance::GameInstance() {
 
 Keyboard& GameInstance::keyboard() {
   return *this->kbd;
+}
+
+Mouse& GameInstance::mouse() {
+  return *this->mouse_;
 }
 
 GameInstance& GameInstance::instance() {
