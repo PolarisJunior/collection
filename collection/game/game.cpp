@@ -19,10 +19,14 @@
 #include "../game/RenderComponent.h"
 #include "../game/RenderSystem.h"
 #include "../game/Stage.h"
+#include "../game/ecs/EntityManager.h"
+#include "../game/ecs/PositionManager.h"
+#include "../game/ecs/SpriteManager.h"
 
 #include "../graphics/Color.h"
 #include "../graphics/Image.h"
 #include "../graphics/Renderer.h"
+#include "../graphics/Sprite.h"
 #include "../graphics/Texture.h"
 #include "../graphics/TileMap.h"
 #include "../graphics/TileSet.h"
@@ -109,20 +113,13 @@ int main(int argc, char** argv) {
 
   Stage stage;
   stage.setTileMap(*rogueMap);
-
-  auto level = rogueMap->getTexture();
-
-  Rect<int32_t> dst{0, 0, level->getWidth(), level->getHeight()};
-
-  mainRenderer.render(*level, nullptr, &dst);
-  mainRenderer.present();
-
-  System::delay(std::chrono::milliseconds(60000));
+  stage.setMapOffset({10, 10});
 
   eventPoller.addListener(SDL_QUIT,
                           [](const SDL_Event& event) { running = false; });
-  mainCamera.width = static_cast<float>(mainWindow.getWidth());
-  mainCamera.height = static_cast<float>(mainWindow.getHeight());
+
+  mainCamera.setWidth(static_cast<float>(mainWindow.getWidth()));
+  mainCamera.setHeight(static_cast<float>(mainWindow.getHeight()));
 
   actor.x = 0;
   actor.y = 0;
@@ -131,7 +128,9 @@ int main(int argc, char** argv) {
   mainCamera.setAttachOffset(Vector2(100.0f, 100.0f));
 
   RenderComponent renderComp;
-  actor.attachComponent(&renderComp);
+  Sprite playerSprite("../res/monkey.png");
+  actor.attachComponent(renderComp);
+  actor.attachComponent(playerSprite);
 
   Actor actor2;
   actor2.x = -50;
@@ -139,19 +138,60 @@ int main(int argc, char** argv) {
   RenderComponent renderComp2;
   actor2.attachComponent(&renderComp2);
 
-  eventPoller.addListener(SDL_KEYDOWN, [](const SDL_Event& event) {
+  EntityManager manager(256);
+  std::cout << "alive? idx 0 " << manager.isAlive(0) << std::endl;
+  uint32_t entityId = manager.addEntity();
+  std::cout << "Created Entity " << entityId << std::endl;
+  std::cout << "alive? idx 0 " << manager.isAlive(0) << std::endl;
+  PositionManager posManager;
+  posManager.registerEntity(entityId, {5.0f, 3.0f});
+  std::cout << "nice: " << posManager.getPosition(entityId)
+            << "size:" << posManager.dataArray.size() << std::endl;
+  SpriteManager spriteManager(posManager, mainCamera);
+  Texture monkey("../res/monkey.png");
+  spriteManager.registerEntity(entityId, monkey);
+  mainCamera.setPositionManager(posManager);
+  mainCamera.attachToEntity(entityId);
+
+  Vector2<float> velocity;
+  eventPoller.addListener(SDL_KEYDOWN, [&](const SDL_Event& event) {
+    if (event.key.repeat) {
+      return;
+    }
+    Vector2<float>& pos = posManager.get(entityId);
     switch (event.key.keysym.sym) {
       case SDLK_UP:
-        actor.y += -1;
+        pos.y += -10;
+        velocity.y += -10;
         break;
       case SDLK_RIGHT:
-        actor.x += 1;
+        pos.x += 10;
+        velocity.x += 10;
         break;
       case SDLK_DOWN:
-        actor.y += 1;
+        pos.y += 10;
+        velocity.y += 10;
         break;
       case SDLK_LEFT:
-        actor.x -= 1;
+        pos.x -= 10;
+        velocity.x += -10;
+        break;
+    }
+  });
+
+  eventPoller.addListener(SDL_KEYUP, [&](const SDL_Event& event) {
+    switch (event.key.keysym.sym) {
+      case SDLK_UP:
+        velocity.y += 10;
+        break;
+      case SDLK_RIGHT:
+        velocity.x += -10;
+        break;
+      case SDLK_DOWN:
+        velocity.y += -10;
+        break;
+      case SDLK_LEFT:
+        velocity.x += 10;
         break;
     }
   });
@@ -189,7 +229,9 @@ int main(int argc, char** argv) {
 
     mainRenderer.setColor(Colors::BLACK);
     mainRenderer.clear();
+    stage.render(mainRenderer, mainCamera);
     renderSystem.renderAll(interpolation);
+    spriteManager.renderAll(interpolation);
     mainRenderer.setColor(Colors::WHITE);
 
     mainRenderer.present();
