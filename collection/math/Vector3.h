@@ -114,12 +114,17 @@ inline bool Vector3<Numeric>::operator==(const Vector3<Numeric>& other) {
 
 template <class Numeric>
 inline Vector3<Numeric> Vector3<Numeric>::normalized() {
-  return *this / length();
+  Vector3<Numeric> ret = *this;
+  ret.normalize();
+  return ret;
 }
 
 template <class Numeric>
 inline Vector3<Numeric>& Vector3<Numeric>::normalize() {
-  *this /= length();
+  if (length() > 0) {
+    *this /= length();
+  }
+  return *this;
 }
 
 template <class Numeric>

@@ -25,6 +25,7 @@ class Vector2 {
   bool operator==(const Vector2& other);
 
   Vector2 normalized();
+  // normalizes the vector in place
   Vector2& normalize();
   float length();
   bool equals(const Vector2& other, float delta = 0.00001);
@@ -112,12 +113,16 @@ inline float Vector2<T>::length() {
 
 template <typename T>
 inline Vector2<T> Vector2<T>::normalized() {
-  return *this / length();
+  Vector2<T> ret = *this;
+  ret.normalize();
+  return ret;
 }
 
 template <typename T>
 inline Vector2<T>& Vector2<T>::normalize() {
-  *this /= length();
+  if (length() > 0) {
+    *this /= length();
+  }
   return *this;
 }
 
