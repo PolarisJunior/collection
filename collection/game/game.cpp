@@ -1,13 +1,22 @@
 
+#include <gl/glew.h>
+
 #include <SDL.h>
 #include <SDL_image.h>
+#include <SDL_opengl.h>
+#include <SDL_ttf.h>
+// #include <gl/GLU.h>
+
 #include <iostream>
 #include <memory>
 
+// Note instead of using relative paths, set the include directories
 #include "../datastructures/Trie.h"
 #include "../misc/arrayHopper.h"
 
 #include "../ui/Input.h"
+#include "../ui/Keyboard.h"
+#include "../ui/Mouse.h"
 #include "../ui/SdlEventPoller.h"
 #include "../ui/Window.h"
 #include "../ui/WindowBuilder.h"
@@ -16,6 +25,7 @@
 #include "../game/Actor.h"
 #include "../game/Camera2.h"
 #include "../game/Component.h"
+#include "../game/GameInstance.h"
 #include "../game/RenderComponent.h"
 #include "../game/RenderSystem.h"
 #include "../game/Stage.h"
@@ -32,6 +42,7 @@
 #include "../graphics/TileSet.h"
 
 #include "../math/geometry/Rect.h"
+#include "../util/Dir2d.h"
 #include "../util/EventScheduler.h"
 
 #include "../io/File.h"
@@ -62,14 +73,24 @@ Renderer mainRenderer;
 Window mainWindow;
 
 int main(int argc, char** argv) {
-  if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO)) {
-    SDL_LogError(SDL_LOG_CATEGORY_ERROR, SDL_GetError());
+  SDL_LogError(SDL_LOG_CATEGORY_ERROR, "how now");
+  if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0) {
+    printf("%s 1\n", SDL_GetError());
+    // SDL_LogError(SDL_LOG_CATEGORY_ERROR, SDL_GetError());
+    exit(EXIT_FAILURE);
   }
   {
     uint32_t flags = IMG_INIT_PNG | IMG_INIT_JPG | IMG_INIT_TIF;
     if (IMG_Init(flags) != flags) {
-      SDL_LogError(SDL_LOG_CATEGORY_ERROR, IMG_GetError());
+      printf("%s 2\n", IMG_GetError());
+      // SDL_LogError(SDL_LOG_CATEGORY_ERROR, IMG_GetError());
+      exit(EXIT_FAILURE);
     }
+  }
+  if (TTF_Init() != 0) {
+    printf("%s 3\n", TTF_GetError());
+    // SDL_LogError(SDL_LOG_CATEGORY_ERROR, TTF_GetError());
+    exit(EXIT_FAILURE);
   }
 
   // std::optional<RelationalDatabase> db =
@@ -99,7 +120,122 @@ int main(int argc, char** argv) {
   windowBuilder.setTitle("Game").setDims(800, 600).setVisible();
 
   mainWindow = windowBuilder.getWindow();
-  mainRenderer = Renderer(mainWindow);
+
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+  SDL_GLContext context = SDL_GL_CreateContext(mainWindow.getSdlWindow());
+  if (context == nullptr) {
+    std::cout << "failed to create gl context: " << SDL_GetError() << std::endl;
+    exit(-1);
+  }
+
+  GLenum glewError = glewInit();
+  if (glewError != GLEW_OK) {
+    std::cout << "Error initializing glew: " << glewGetErrorString(glewError)
+              << std::endl;
+    exit(-1);
+  }
+
+  if (SDL_GL_SetSwapInterval(1) < 0) {
+    std::cout << "Unable to set VSync: " << SDL_GetError() << std::endl;
+  }
+
+  GLuint gProgramId = glCreateProgram();
+  GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
+  const GLchar* vertexShaderSource[] = {
+      "#version 140\nin vec2 LVertexPos2D; void main() { gl_Position = vec4( "
+      "LVertexPos2D.x, LVertexPos2D.y, 0, 1 ); }"};
+
+  glShaderSource(vertexShader, 1, vertexShaderSource, nullptr);
+  glCompileShader(vertexShader);
+
+  GLint vShaderCompiled = GL_FALSE;
+  glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &vShaderCompiled);
+  if (vShaderCompiled != GL_TRUE) {
+    std::cout << "unable to compile vertex shader: " << vertexShader
+              << std::endl;
+  }
+
+  glAttachShader(gProgramId, vertexShader);
+
+  GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+  const GLchar* fragmentShaderSource[] = {
+      "#version 140\nout vec4 LFragment; void main() { LFragment = vec4( 1.0, "
+      "1.0, 1.0, 1.0 ); }"};
+
+  glShaderSource(fragmentShader, 1, fragmentShaderSource, nullptr);
+  glCompileShader(fragmentShader);
+
+  GLint fShaderCompiled = GL_FALSE;
+  glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &fShaderCompiled);
+  if (fShaderCompiled != GL_TRUE) {
+    std::cout << "Unable to compile fragment shader" << fragmentShader
+              << std::endl;
+  }
+
+  glAttachShader(gProgramId, fragmentShader);
+  glLinkProgram(gProgramId);
+  GLint programSuccess = GL_TRUE;
+  glGetProgramiv(gProgramId, GL_LINK_STATUS, &programSuccess);
+  if (programSuccess != GL_TRUE) {
+    printf("Error linking program %d!\n", gProgramId);
+  }
+  GLint gVertexPos2DLocation = glGetAttribLocation(gProgramId, "LVertexPos2D");
+  if (gVertexPos2DLocation == -1) {
+    printf("LVertexPos2D is not a valid glsl program variable!\n");
+  }
+
+  // Initialize clear color
+  glClearColor(1.f, 0.f, 0.f, 1.f);
+
+  // VBO data
+  GLfloat vertexData[] = {-0.5f, -0.5f, 0.5f, -0.5f, 0.5f, 0.5f, -0.5f, 0.5f};
+
+  // IBO data
+  GLuint indexData[] = {0, 1, 2, 3};
+
+  GLuint gVBO = 0;
+  GLuint gIBO = 0;
+
+  // Create VBO
+  glGenBuffers(1, &gVBO);
+  glBindBuffer(GL_ARRAY_BUFFER, gVBO);
+  glBufferData(GL_ARRAY_BUFFER, 2 * 4 * sizeof(GLfloat), vertexData,
+               GL_STATIC_DRAW);
+
+  // Create IBO
+  glGenBuffers(1, &gIBO);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gIBO);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, 4 * sizeof(GLuint), indexData,
+               GL_STATIC_DRAW);
+
+  glClear(GL_COLOR_BUFFER_BIT);
+  // Bind program
+  glUseProgram(gProgramId);
+
+  // Enable vertex position
+  glEnableVertexAttribArray(gVertexPos2DLocation);
+
+  // Set vertex data
+  glBindBuffer(GL_ARRAY_BUFFER, gVBO);
+  glVertexAttribPointer(gVertexPos2DLocation, 2, GL_FLOAT, GL_FALSE,
+                        2 * sizeof(GLfloat), NULL);
+
+  // Set index data and render
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gIBO);
+  glDrawElements(GL_TRIANGLE_FAN, 4, GL_UNSIGNED_INT, NULL);
+
+  // Disable vertex position
+  glDisableVertexAttribArray(gVertexPos2DLocation);
+
+  // Unbind program
+  glUseProgram(NULL);
+  SDL_GL_SwapWindow(mainWindow.getSdlWindow());
+
+  System::delay(5000);
+
+  mainRenderer = mainWindow.getRenderer(true);
 
   TileSet tileSet("../res/medieval_tilesheet.png", 64, 64, 32, 32, 32, 32);
   TileSet rogueSet("../res/roguelikeSheet_transparent.png", 15, 15, 2, 2, 0, 0,
@@ -132,49 +268,51 @@ int main(int argc, char** argv) {
   actor.attachComponent(renderComp);
   actor.attachComponent(playerSprite);
 
-  Actor actor2;
-  actor2.x = -50;
-  actor2.y = -50;
-  RenderComponent renderComp2;
-  actor2.attachComponent(&renderComp2);
-
-  EntityManager manager(256);
-  std::cout << "alive? idx 0 " << manager.isAlive(0) << std::endl;
+  EntityManager& manager = GameInstance::instance().entityManager();
   uint32_t entityId = manager.addEntity();
-  std::cout << "Created Entity " << entityId << std::endl;
-  std::cout << "alive? idx 0 " << manager.isAlive(0) << std::endl;
-  PositionManager posManager;
+
+  PositionManager& posManager = GameInstance::instance().posManager();
   posManager.registerEntity(entityId, {5.0f, 3.0f});
-  std::cout << "nice: " << posManager.getPosition(entityId)
-            << "size:" << posManager.dataArray.size() << std::endl;
+
   SpriteManager spriteManager(posManager, mainCamera);
   Texture monkey("../res/monkey.png");
   spriteManager.registerEntity(entityId, monkey);
   mainCamera.setPositionManager(posManager);
   mainCamera.attachToEntity(entityId);
 
-  Vector2<float> velocity;
+  TTF_Font* font = TTF_OpenFont("../res/ROCK.ttf", 28);
+  SDL_Color color = {34, 34, 34, 255};
+  SDL_Surface* surface = TTF_RenderText_Solid(font, "foo bar", color);
+  SDL_Texture* tex =
+      SDL_CreateTextureFromSurface(mainRenderer.getSdlRenderer(), surface);
+  SDL_RenderCopy(mainRenderer.getSdlRenderer(), tex, nullptr, nullptr);
+  mainRenderer.present();
+  // mainRenderer.getSdlRenderer();
+  System::delay(5000);
+  TTF_CloseFont(font);
+
+  Vector2<float>& pos = posManager.get(entityId);
   eventPoller.addListener(SDL_KEYDOWN, [&](const SDL_Event& event) {
     if (event.key.repeat) {
       return;
     }
-    Vector2<float>& pos = posManager.get(entityId);
+
     switch (event.key.keysym.sym) {
       case SDLK_UP:
-        pos.y += -10;
-        velocity.y += -10;
+        // pos.y += -10;
+        // velocity.y += -10;
         break;
       case SDLK_RIGHT:
-        pos.x += 10;
-        velocity.x += 10;
+        // pos.x += 10;
+        // velocity.x += 10;
         break;
       case SDLK_DOWN:
-        pos.y += 10;
-        velocity.y += 10;
+        // pos.y += 10;
+        // velocity.y += 10;
         break;
       case SDLK_LEFT:
-        pos.x -= 10;
-        velocity.x += -10;
+        // pos.x -= 10;
+        // velocity.x += -10;
         break;
     }
   });
@@ -182,16 +320,16 @@ int main(int argc, char** argv) {
   eventPoller.addListener(SDL_KEYUP, [&](const SDL_Event& event) {
     switch (event.key.keysym.sym) {
       case SDLK_UP:
-        velocity.y += 10;
+        // velocity.y += 10;
         break;
       case SDLK_RIGHT:
-        velocity.x += -10;
+        // velocity.x += -10;
         break;
       case SDLK_DOWN:
-        velocity.y += -10;
+        // velocity.y += -10;
         break;
       case SDLK_LEFT:
-        velocity.x += 10;
+        // velocity.x += 10;
         break;
     }
   });
@@ -207,6 +345,9 @@ int main(int argc, char** argv) {
   eventScheduler.scheduleEvent(
       []() { std::cout << "scheduled event ran" << std::endl; }, 3.0);
 
+  std::string fpsText = "";
+  uint32_t lastRender = Time::getTicks();
+  uint32_t renderCount = 0;
   /* Main Game Loop */
   running = true;
   uint32_t lastUpdate = Time::getTicks();
@@ -217,6 +358,27 @@ int main(int argc, char** argv) {
 
     while ((currentMs - lastUpdate) > UPDATE_PERIOD && numLoops < MAX_LOOPS) {
       eventScheduler.runUpTo(lastUpdate);
+
+      // game code
+      Vector2<float> velocity{0.0f, 0.0f};
+      int32_t speed = 10;
+      Keyboard& keyboard = GameInstance::instance().keyboard();
+      if (keyboard.keyDown(SDL_SCANCODE_UP)) {
+        velocity += Dir2d::dirVectors[Dir2d::UP];
+      }
+      if (keyboard.keyDown(SDL_SCANCODE_RIGHT)) {
+        velocity += Dir2d::dirVectors[Dir2d::RIGHT];
+      }
+      if (keyboard.keyDown(SDL_SCANCODE_LEFT)) {
+        velocity += Dir2d::dirVectors[Dir2d::LEFT];
+      }
+      if (keyboard.keyDown(SDL_SCANCODE_DOWN)) {
+        velocity += Dir2d::dirVectors[Dir2d::DOWN];
+      }
+
+      velocity.normalize() *= speed;
+      pos += velocity;
+      // game code end
 
       lastUpdate += UPDATE_PERIOD;
       frameTime += UPDATE_PERIOD;
@@ -235,6 +397,18 @@ int main(int argc, char** argv) {
     mainRenderer.setColor(Colors::WHITE);
 
     mainRenderer.present();
+
+    // For calculating FPS
+    renderCount++;
+    if (renderCount % 100 == 0) {
+      uint32_t msSinceLastFpsCalc = Time::getTicks() - lastRender;
+      std::cout << 100 * 1000 / msSinceLastFpsCalc << "fps" << std::endl;
+      uint32_t curFps = 100 * 1000 / msSinceLastFpsCalc;
+      fpsText = std::to_string(curFps);
+      lastRender += msSinceLastFpsCalc;
+      // 100 / msSinceLastFpsCalc = renders per ms
+      // 1000*100/ msSinceLastFpsCount = renders per second
+    }
   }
 
   return EXIT_SUCCESS;
