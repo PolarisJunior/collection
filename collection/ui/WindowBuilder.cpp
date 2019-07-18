@@ -6,7 +6,7 @@
 WindowBuilder::WindowBuilder() {
   xPos = SDL_WINDOWPOS_UNDEFINED;
   yPos = SDL_WINDOWPOS_UNDEFINED;
-  flags = SDL_WINDOW_SHOWN;
+  flags = SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL;
 }
 
 WindowBuilder& WindowBuilder::setTitle(const std::string& title) {

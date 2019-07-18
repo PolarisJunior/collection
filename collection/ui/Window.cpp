@@ -1,11 +1,14 @@
 
 #include "Window.h"
 #include <SDL.h>
-#include "../graphics/Renderer.h"
+#include "graphics/Renderer.h"
+#include "ui/WindowBuilder.h"
+
+Window Window::mainWindow;
 
 Window::Window(std::string& title, int x, int y, int w, int h, uint32_t flags)
-    : title(title) {
-  sdlWindow = SDL_CreateWindow(this->title.c_str(), x, y, w, h, flags);
+    : title(title),
+      sdlWindow(SDL_CreateWindow(title.c_str(), x, y, w, h, flags)) {
   if (!sdlWindow) {
     SDL_LogError(SDL_LOG_CATEGORY_ERROR, SDL_GetError());
     exit(EXIT_FAILURE);
@@ -13,18 +16,20 @@ Window::Window(std::string& title, int x, int y, int w, int h, uint32_t flags)
 }
 
 Window::~Window() {
-  SDL_DestroyWindow(sdlWindow);
-}
+  delete sdlWindow;
+};
 
 SDL_Window* Window::getSdlWindow() {
   return sdlWindow;
 }
 
-Renderer Window::getRenderer() {
-  SDL_Renderer* r =
-      SDL_CreateRenderer(sdlWindow, -1,
-                         SDL_RENDERER_TARGETTEXTURE | SDL_RENDERER_ACCELERATED |
-                             SDL_RENDERER_PRESENTVSYNC);
+Renderer Window::getRenderer(bool vSync) {
+  uint32_t flags = SDL_RENDERER_TARGETTEXTURE | SDL_RENDERER_ACCELERATED;
+  if (vSync) {
+    flags |= SDL_RENDERER_PRESENTVSYNC;
+  }
+  SDL_Renderer* r = SDL_CreateRenderer(sdlWindow, -1, flags);
+
   if (!r) {
     SDL_LogError(SDL_LOG_CATEGORY_RENDER, SDL_GetError());
     exit(EXIT_FAILURE);
@@ -61,4 +66,19 @@ void swap(Window& first, Window& second) {
   using std::swap;
   swap(first.sdlWindow, second.sdlWindow);
   swap(first.title, second.title);
+}
+
+void Window::initMainWindow(WindowBuilder& builder) {
+  // This works because builder immediately returns after calling the
+  // constructor
+  Window::mainWindow = builder.getWindow();
+}
+
+// It is unintuitive if we cannabalize the window passed in
+// void Window::setMainWindow(Window& window) {
+//   Window::mainWindow = std::move(window);
+// }
+
+Window& Window::getMainWindow() {
+  return Window::mainWindow;
 }

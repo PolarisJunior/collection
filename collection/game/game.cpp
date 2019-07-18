@@ -11,52 +11,54 @@
 #include <memory>
 
 // Note instead of using relative paths, set the include directories
-#include "../datastructures/Trie.h"
-#include "../misc/arrayHopper.h"
+#include "datastructures/Trie.h"
+#include "misc/arrayHopper.h"
 
-#include "../ui/Input.h"
-#include "../ui/Keyboard.h"
-#include "../ui/Mouse.h"
-#include "../ui/SdlEventPoller.h"
-#include "../ui/Window.h"
-#include "../ui/WindowBuilder.h"
-#include "../util/time/Time.h"
+#include "graphics/GlLoader.h"
 
-#include "../game/Actor.h"
-#include "../game/Camera2.h"
-#include "../game/Component.h"
-#include "../game/GameInstance.h"
-#include "../game/RenderComponent.h"
-#include "../game/RenderSystem.h"
-#include "../game/Stage.h"
-#include "../game/ecs/EntityManager.h"
-#include "../game/ecs/PositionManager.h"
-#include "../game/ecs/SpriteManager.h"
+#include "ui/Input.h"
+#include "ui/Keyboard.h"
+#include "ui/Mouse.h"
+#include "ui/SdlEventPoller.h"
+#include "ui/Window.h"
+#include "ui/WindowBuilder.h"
+#include "util/time/Time.h"
 
-#include "../graphics/Color.h"
-#include "../graphics/Image.h"
-#include "../graphics/Renderer.h"
-#include "../graphics/Sprite.h"
-#include "../graphics/Texture.h"
-#include "../graphics/TileMap.h"
-#include "../graphics/TileSet.h"
+#include "game/Actor.h"
+#include "game/Camera2.h"
+#include "game/Component.h"
+#include "game/GameInstance.h"
+#include "game/RenderComponent.h"
+#include "game/RenderSystem.h"
+#include "game/Stage.h"
+#include "game/ecs/EntityManager.h"
+#include "game/ecs/PositionManager.h"
+#include "game/ecs/SpriteManager.h"
 
-#include "../math/geometry/Rect.h"
-#include "../util/Dir2d.h"
-#include "../util/EventScheduler.h"
+#include "graphics/Color.h"
+#include "graphics/Image.h"
+#include "graphics/Renderer.h"
+#include "graphics/Sprite.h"
+#include "graphics/Texture.h"
+#include "graphics/TileMap.h"
+#include "graphics/TileSet.h"
 
-#include "../io/File.h"
+#include "math/geometry/Rect.h"
+#include "util/Dir2d.h"
+#include "util/EventScheduler.h"
 
-#include "../network/ClientSocket.h"
-#include "../network/ServerSocket.h"
-#include "../network/Socket.h"
+#include "io/File.h"
 
-#include "../sys/System.h"
+#include "network/ClientSocket.h"
+#include "network/ServerSocket.h"
+#include "network/Socket.h"
 
-#include "../math/Vector3.h"
+#include "sys/System.h"
 
-#include "../database/RelationalDatabase.h"
-#include "../io/FileInputStream.h"
+#include "math/Vector3.h"
+
+#include "database/RelationalDatabase.h"
+#include "io/FileInputStream.h"
 
 static bool running;
 static SdlEventPoller eventPoller;
@@ -70,7 +72,6 @@ static Actor actor;
 Camera2 mainCamera;
 EventScheduler eventScheduler;
 Renderer mainRenderer;
-Window mainWindow;
 
 int main(int argc, char** argv) {
   SDL_LogError(SDL_LOG_CATEGORY_ERROR, "how now");
@@ -118,28 +119,9 @@ int main(int argc, char** argv) {
 
   WindowBuilder windowBuilder;
   windowBuilder.setTitle("Game").setDims(800, 600).setVisible();
+  Window::initMainWindow(windowBuilder);
 
-  mainWindow = windowBuilder.getWindow();
-
-  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
-  SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-  SDL_GLContext context = SDL_GL_CreateContext(mainWindow.getSdlWindow());
-  if (context == nullptr) {
-    std::cout << "failed to create gl context: " << SDL_GetError() << std::endl;
-    exit(-1);
-  }
-
-  GLenum glewError = glewInit();
-  if (glewError != GLEW_OK) {
-    std::cout << "Error initializing glew: " << glewGetErrorString(glewError)
-              << std::endl;
-    exit(-1);
-  }
-
-  if (SDL_GL_SetSwapInterval(1) < 0) {
-    std::cout << "Unable to set VSync: " << SDL_GetError() << std::endl;
-  }
+  GlLoader::initialize();
 
   GLuint gProgramId = glCreateProgram();
   GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -231,11 +213,11 @@ int main(int argc, char** argv) {
 
   // Unbind program
   glUseProgram(NULL);
-  SDL_GL_SwapWindow(mainWindow.getSdlWindow());
+  SDL_GL_SwapWindow(Window::getMainWindow().getSdlWindow());
 
   System::delay(5000);
 
-  mainRenderer = mainWindow.getRenderer(true);
+  mainRenderer = Window::getMainWindow().getRenderer(true);
 
   TileSet tileSet("../res/medieval_tilesheet.png", 64, 64, 32, 32, 32, 32);
   TileSet rogueSet("../res/roguelikeSheet_transparent.png", 15, 15, 2, 2, 0, 0,
@@ -254,8 +236,8 @@ int main(int argc, char** argv) {
   eventPoller.addListener(SDL_QUIT,
                           [](const SDL_Event& event) { running = false; });
 
-  mainCamera.setWidth(static_cast<float>(mainWindow.getWidth()));
-  mainCamera.setHeight(static_cast<float>(mainWindow.getHeight()));
+  mainCamera.setWidth(static_cast<float>(Window::getMainWindow().getWidth()));
+  mainCamera.setHeight(static_cast<float>(Window::getMainWindow().getHeight()));
 
   actor.x = 0;
   actor.y = 0;
