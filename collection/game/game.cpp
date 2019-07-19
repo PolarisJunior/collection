@@ -15,6 +15,7 @@
 #include "misc/arrayHopper.h"
 
 #include "graphics/GlLoader.h"
+#include "loaders/SdlLoader.h"
 
 #include "ui/Input.h"
 #include "ui/Keyboard.h"
@@ -72,26 +73,10 @@ static Actor actor;
 EventScheduler eventScheduler;
 
 int main(int argc, char** argv) {
-  SDL_LogError(SDL_LOG_CATEGORY_ERROR, "how now");
-  if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0) {
-    printf("%s 1\n", SDL_GetError());
-    // SDL_LogError(SDL_LOG_CATEGORY_ERROR, SDL_GetError());
-    exit(EXIT_FAILURE);
-  }
   {
-    uint32_t flags = IMG_INIT_PNG | IMG_INIT_JPG | IMG_INIT_TIF;
-    if (IMG_Init(flags) != flags) {
-      printf("%s 2\n", IMG_GetError());
-      // SDL_LogError(SDL_LOG_CATEGORY_ERROR, IMG_GetError());
-      exit(EXIT_FAILURE);
-    }
+    SdlLoader sdlLoader;
+    sdlLoader.load();
   }
-  if (TTF_Init() != 0) {
-    printf("%s 3\n", TTF_GetError());
-    // SDL_LogError(SDL_LOG_CATEGORY_ERROR, TTF_GetError());
-    exit(EXIT_FAILURE);
-  }
-
   // std::optional<RelationalDatabase> db =
   //   RelationalDatabase::loadDatabase("test2.db");
   // if (db) {
