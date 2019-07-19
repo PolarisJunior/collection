@@ -1,8 +1,8 @@
 
 #include "RenderComponent.h"
 #include "Actor.h"
-#include "Camera2.h"
 #include "RenderSystem.h"
+#include "game/Camera.h"
 #include "graphics/Color.h"
 #include "graphics/Renderer.h"
 #include "math/geometry/Rect.h"

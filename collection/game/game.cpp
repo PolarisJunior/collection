@@ -25,7 +25,7 @@
 #include "util/time/Time.h"
 
 #include "game/Actor.h"
-#include "game/Camera2.h"
+#include "game/Camera.h"
 #include "game/Component.h"
 #include "game/GameInstance.h"
 #include "game/RenderComponent.h"
@@ -69,7 +69,7 @@ static const uint32_t MAX_LOOPS = 10;
 
 static Actor actor;
 
-Camera2 mainCamera;
+Camera mainCamera;
 EventScheduler eventScheduler;
 
 int main(int argc, char** argv) {

@@ -5,10 +5,10 @@
 class Actor;
 class PositionManager;
 
-class Camera2 {
+class Camera {
  public:
-  Camera2();
-  Camera2(float w, float h);
+  Camera();
+  Camera(float w, float h);
 
   void moveCamera(Vector2<float> newPos);
   void moveCamera(float x, float y);
@@ -50,52 +50,53 @@ class Camera2 {
   float height;
 };
 
-inline Camera2::Camera2()
-    : position(Vector2<float>(0, 0)), width(1), height(1) {}
+inline Camera::Camera() : position(Vector2<float>(0, 0)), width(1), height(1) {}
 
-inline Camera2::Camera2(float w, float h)
+inline Camera::Camera(float w, float h)
     : position(Vector2(0.0f, 0.0f)), width(w), height(h) {}
 
-inline void Camera2::moveCamera(Vector2<float> newPos) {
+inline void Camera::moveCamera(Vector2<float> newPos) {
   position = newPos;
 }
 
-inline void Camera2::moveCamera(float x, float y) {
+inline void Camera::moveCamera(float x, float y) {
   position.x = x;
   position.y = y;
 }
 
-inline void Camera2::setAttachOffset(Vector2<float> offset) {
+inline void Camera::setAttachOffset(Vector2<float> offset) {
   this->attachOffset = offset;
 }
 
-inline void Camera2::attachToEntity(uint32_t eid) {
+inline void Camera::attachToEntity(uint32_t eid) {
   attachedEntity = eid;
   isAttachedToEntity = true;
 }
 
-inline void Camera2::unAttachFromEntity() {
+inline void Camera::unAttachFromEntity() {
   isAttachedToEntity = false;
 }
 
-inline void Camera2::setPositionManager(PositionManager& posManager) {
+inline void Camera::setPositionManager(PositionManager& posManager) {
   positionManager = &posManager;
 }
 
-inline Vector2<float> Camera2::getShape() {
+inline Vector2<float> Camera::getShape() {
   return Vector2(width, height);
 }
 
-inline Vector2<float> Camera2::toScreenCoords(const Vector2<float>& worldPos) {
+inline Vector2<float> Camera::toScreenCoords(const Vector2<float>& worldPos) {
   Vector2 midpoint = getShape() / 2;
   Vector2 pos = getPosition();
   return Vector2(midpoint.x + worldPos.x - pos.x,
                  midpoint.y + worldPos.y - pos.y);
 }
 
-inline Vector2<float> Camera2::toWorldCoords(const Vector2<float>& screenPos) {
+inline Vector2<float> Camera::toWorldCoords(const Vector2<float>& screenPos) {
   Vector2 midpoint = getShape() / 2;
   Vector2 pos = getPosition();
   return Vector2(screenPos.x + pos.x - midpoint.x,
                  screenPos.y + pos.y - midpoint.y);
 }
+
+extern Camera mainCamera;

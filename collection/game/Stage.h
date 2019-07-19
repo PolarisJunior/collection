@@ -8,12 +8,12 @@
 class Actor;
 class TileMap;
 class Renderer;
-class Camera2;
+class Camera;
 
 class Stage {
  public:
   void setTileMap(const TileMap& tm) { tileMap = tm; }
-  void render(Renderer& renderer, Camera2& camera);
+  void render(Renderer& renderer, Camera& camera);
 
   void setMapOffset(Vector2<int32_t> offset) { mapOffset = offset; }
 

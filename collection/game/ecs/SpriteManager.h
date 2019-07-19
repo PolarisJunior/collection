@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../../graphics/Texture.h"
-#include "../Camera2.h"
-#include "ComponentManager.h"
-#include "PositionManager.h"
+#include "game/Camera.h"
+#include "game/ecs/ComponentManager.h"
+#include "game/ecs/PositionManager.h"
+#include "graphics/Texture.h"
 
 // struct Sprite {
 //   Texture& texture;
@@ -11,10 +11,10 @@
 
 class SpriteManager : public ComponentManager<Texture> {
   PositionManager& positionManager;
-  Camera2& camera;
+  Camera& camera;
 
  public:
-  SpriteManager(PositionManager& pManager, Camera2& cam)
+  SpriteManager(PositionManager& pManager, Camera& cam)
       : positionManager(pManager), camera(cam) {}
 
   void renderAll(float interpolation) {

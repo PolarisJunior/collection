@@ -1,12 +1,12 @@
 
 #include "Stage.h"
 #include <algorithm>
-#include "game/Camera2.h"
+#include "game/Camera.h"
 #include "graphics/Renderer.h"
 #include "graphics/Texture.h"
 #include "math/geometry/Rect.h"
 
-void Stage::render(Renderer& renderer, Camera2& camera) {
+void Stage::render(Renderer& renderer, Camera& camera) {
   std::unique_ptr<Texture> tex = tileMap.getTexture();
   if (tex) {
     Vector2 posInScreen = camera.toScreenCoords(Vector2(
