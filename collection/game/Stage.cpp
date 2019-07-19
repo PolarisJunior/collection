@@ -1,10 +1,10 @@
 
 #include "Stage.h"
 #include <algorithm>
-#include "../game/Camera2.h"
-#include "../graphics/Renderer.h"
-#include "../graphics/Texture.h"
-#include "../math/geometry/Rect.h"
+#include "game/Camera2.h"
+#include "graphics/Renderer.h"
+#include "graphics/Texture.h"
+#include "math/geometry/Rect.h"
 
 void Stage::render(Renderer& renderer, Camera2& camera) {
   std::unique_ptr<Texture> tex = tileMap.getTexture();

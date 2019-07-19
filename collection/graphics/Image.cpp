@@ -1,6 +1,6 @@
 
 #include "Image.h"
-#include "../io/File.h"
+#include "io/File.h"
 
 Image::Image(const std::string& filePath) {
   File file(filePath);
@@ -13,6 +13,6 @@ std::string Image::getType() const {
   return type;
 }
 
-uint32_t Image::getImageSize() const {
+int64_t Image::getImageSize() const {
   return bufSize;
 }

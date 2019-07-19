@@ -71,7 +71,6 @@ static Actor actor;
 
 Camera2 mainCamera;
 EventScheduler eventScheduler;
-Renderer mainRenderer;
 
 int main(int argc, char** argv) {
   SDL_LogError(SDL_LOG_CATEGORY_ERROR, "how now");
@@ -215,9 +214,8 @@ int main(int argc, char** argv) {
   glUseProgram(NULL);
   SDL_GL_SwapWindow(Window::getMainWindow().getSdlWindow());
 
-  System::delay(5000);
-
-  mainRenderer = Window::getMainWindow().getRenderer(true);
+  System::delay(500);
+  Renderer& mainRenderer = Window::getMainRenderer();
 
   TileSet tileSet("../res/medieval_tilesheet.png", 64, 64, 32, 32, 32, 32);
   TileSet rogueSet("../res/roguelikeSheet_transparent.png", 15, 15, 2, 2, 0, 0,

@@ -74,6 +74,7 @@ void swap(Window& first, Window& second) {
   using std::swap;
   swap(first.sdlWindow, second.sdlWindow);
   swap(first.title, second.title);
+  swap(first.windowRenderer, second.windowRenderer);
 }
 
 void Window::initMainWindow(WindowBuilder& builder) {

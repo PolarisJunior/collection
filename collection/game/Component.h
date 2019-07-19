@@ -15,6 +15,8 @@ class Component {
   /* What to do when unattached from actor */
   virtual void onUnattached(Actor* actor);
 
+  bool isAttached() { return attachedActor != nullptr; }
+
   // virtual void update();
  protected:
   Actor* attachedActor;

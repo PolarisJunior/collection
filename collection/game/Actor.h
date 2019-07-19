@@ -1,6 +1,7 @@
 
 #pragma once
-#include <unordered_map>
+#include <algorithm>
+#include <set>
 
 class Component;
 
@@ -8,19 +9,25 @@ class Actor {
  public:
   float x;
   float y;
+  /* Attach component to this actor, if notify is true then component becomes
+   * aware */
   void attachComponent(Component* component, bool notify = true);
-
-  bool hasComponent(int32_t componentId);
+  void attachComponent(Component& component, bool notify = true);
+  bool hasComponent(Component* comp);
 
   int32_t getId();
 
  private:
-  std::unordered_map<int32_t, Component*> components;
+  std::set<Component*> components;
   int32_t actorId;
 };
 
-inline bool Actor::hasComponent(int32_t componentId) {
-  return components.count(componentId) > 0;
+inline void Actor::attachComponent(Component& comp, bool notify) {
+  attachComponent(&comp, notify);
+}
+
+inline bool Actor::hasComponent(Component* comp) {
+  return components.find(comp) != components.end();
 }
 
 inline int32_t Actor::getId() {

@@ -3,6 +3,7 @@
 #include "../math/Vector2.h"
 
 class Actor;
+class PositionManager;
 
 class Camera2 {
  public:
@@ -30,10 +31,17 @@ class Camera2 {
   void attachToActor(Actor* actor);
   void unAttach();
 
+  void attachToEntity(uint32_t eid);
+  void unAttachFromEntity();
+  void setPositionManager(PositionManager& posManager);
+
   void setAttachOffset(Vector2<float> offset);
 
  protected:
   Actor* attachedActor = nullptr;
+  uint32_t attachedEntity = 0;
+  PositionManager* positionManager;
+  bool isAttachedToEntity = false;
 
   Vector2<float> position;
   Vector2<float> attachOffset;
@@ -59,6 +67,19 @@ inline void Camera2::moveCamera(float x, float y) {
 
 inline void Camera2::setAttachOffset(Vector2<float> offset) {
   this->attachOffset = offset;
+}
+
+inline void Camera2::attachToEntity(uint32_t eid) {
+  attachedEntity = eid;
+  isAttachedToEntity = true;
+}
+
+inline void Camera2::unAttachFromEntity() {
+  isAttachedToEntity = false;
+}
+
+inline void Camera2::setPositionManager(PositionManager& posManager) {
+  positionManager = &posManager;
 }
 
 inline Vector2<float> Camera2::getShape() {

@@ -1,8 +1,8 @@
-#include "Actor.h"
-#include "Component.h"
+#include "game/Actor.h"
+#include "game/Component.h"
 
 void Actor::attachComponent(Component* component, bool notify) {
-  components[component->componentId] = component;
+  components.insert(component);
   if (notify) {
     component->attachToActor(this, false);
   }

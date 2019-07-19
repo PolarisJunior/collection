@@ -1,7 +1,11 @@
 #include "Camera2.h"
 #include "Actor.h"
+#include "game/ecs/PositionManager.h"
 
 Vector2<float> Camera2::getPosition() {
+  if (isAttachedToEntity) {
+    return positionManager->get(attachedEntity) + this->attachOffset;
+  }
   if (attachedActor) {
     return Vector2(attachedActor->x, attachedActor->y) + this->attachOffset;
   } else {

@@ -1,8 +1,8 @@
 
 #pragma once
 #include <vector>
-#include "../graphics/TileMap.h"
-#include "../math/Vector2.h"
+#include "graphics/TileMap.h"
+#include "math/Vector2.h"
 // #include "../math/Vector2.h"
 
 class Actor;
@@ -14,6 +14,8 @@ class Stage {
  public:
   void setTileMap(const TileMap& tm) { tileMap = tm; }
   void render(Renderer& renderer, Camera2& camera);
+
+  void setMapOffset(Vector2<int32_t> offset) { mapOffset = offset; }
 
  private:
   std::vector<Actor*> actors;

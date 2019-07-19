@@ -1,6 +1,7 @@
 
-#include "stringUtils.h"
+#include "util/stringUtils.h"
 #include <sstream>
+#include <vector>
 
 std::vector<std::string> stringSplit(const std::string& s, char delim) {
   std::stringstream ss(s);

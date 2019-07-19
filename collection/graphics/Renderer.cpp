@@ -1,7 +1,6 @@
 
 #include "Renderer.h"
 #include <SDL.h>
-#include <iostream>
 #include "Color.h"
 #include "Texture.h"
 #include "math/geometry/Rect.h"
@@ -10,12 +9,10 @@
 // Renderer::Renderer(Window& window) : Renderer(window.getRenderer()) {}
 
 Renderer::~Renderer() {
-  // std::cout << "deconstructing addr:" << sdlRenderer << std::endl;
   SDL_DestroyRenderer(sdlRenderer);
 }
 
 Renderer::Renderer(Renderer&& other) {
-  // std::cout << "construct" << std::endl;
   swap(*this, other);
 }
 

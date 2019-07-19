@@ -18,6 +18,7 @@ Texture::Texture(char* buf, int32_t bufSize, const std::string& type) {
   SDL_RWops* rw = SDL_RWFromConstMem(buf, bufSize);
   // putting 1 as arg makes it automatically free
   SDL_Surface* surface = IMG_LoadTyped_RW(rw, 1, type.c_str());
+
   sdlTexture = Window::getMainRenderer().createTextureFromSurface(surface);
 
   if (surface) {
