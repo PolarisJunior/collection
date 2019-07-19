@@ -47,7 +47,7 @@ inline SocketId Socket::getSocketId() {
 }
 
 inline void Socket::sendMsg(const std::string& msg) {
-  sendMsg(msg.c_str(), msg.length());
+  sendMsg(msg.c_str(), static_cast<int32_t>(msg.length()));
 }
 
 inline bool Socket::isValid() {
@@ -55,11 +55,11 @@ inline bool Socket::isValid() {
 }
 
 inline void Socket::setSendTimeout(std::chrono::milliseconds ms) {
-  setSendTimeout(ms.count());
+  setSendTimeout(static_cast<int32_t>(ms.count()));
 }
 
 inline void Socket::setRecvTimeout(std::chrono::milliseconds ms) {
-  setRecvTimeout(ms.count());
+  setRecvTimeout(static_cast<int32_t>(ms.count()));
 }
 
 inline void Socket::setSendTimeout(std::chrono::seconds s) {

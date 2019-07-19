@@ -5,7 +5,7 @@
 
 class Mouse {
  public:
-  Mouse();
+  Mouse() = default;
 
   // true if right mouse button down
   bool right();

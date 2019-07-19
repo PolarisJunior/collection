@@ -3,6 +3,8 @@
 #include "Actor.h"
 #include "game/ecs/PositionManager.h"
 
+Camera* Camera::mainCamera;
+
 Vector2<float> Camera::getPosition() {
   if (isAttachedToEntity) {
     return positionManager->get(attachedEntity) + this->attachOffset;
@@ -24,4 +26,12 @@ void Camera::unAttach() {
     position.y = attachedActor->y;
     attachedActor = nullptr;
   }
+}
+
+Camera& Camera::getMainCamera() {
+  return *Camera::mainCamera;
+}
+
+void Camera::setMainCamera(Camera& cam) {
+  mainCamera = &cam;
 }

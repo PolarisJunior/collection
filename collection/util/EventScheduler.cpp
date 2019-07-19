@@ -26,7 +26,7 @@ void EventScheduler::scheduleEvent(void (*f)(), double s) {
 
 /* TODO find a non intrusive way to put these on the stack */
 void EventScheduler::scheduleEvent(void (*f)(), uint32_t ms) {
-  ScheduledEvent* event = new ScheduledEvent(f, ms + Time::getMs());
+  ScheduledEvent* event = new ScheduledEvent(f, ms + Time::getTicks());
   scheduledEventQueue.push(event);
 }
 

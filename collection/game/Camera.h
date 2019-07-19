@@ -1,6 +1,6 @@
 #pragma once
 #include <cstdint>
-#include "../math/Vector2.h"
+#include "math/Vector2.h"
 
 class Actor;
 class PositionManager;
@@ -37,6 +37,9 @@ class Camera {
 
   void setAttachOffset(Vector2<float> offset);
 
+  static void setMainCamera(Camera& cam);
+  static Camera& getMainCamera();
+
  protected:
   Actor* attachedActor = nullptr;
   uint32_t attachedEntity = 0;
@@ -48,6 +51,8 @@ class Camera {
 
   float width;
   float height;
+
+  static Camera* mainCamera;
 };
 
 inline Camera::Camera() : position(Vector2<float>(0, 0)), width(1), height(1) {}
@@ -98,5 +103,3 @@ inline Vector2<float> Camera::toWorldCoords(const Vector2<float>& screenPos) {
   return Vector2(screenPos.x + pos.x - midpoint.x,
                  screenPos.y + pos.y - midpoint.y);
 }
-
-extern Camera mainCamera;

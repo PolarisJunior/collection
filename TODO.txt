@@ -7,4 +7,8 @@ TileMap
 
 adhere to C++ Core Guidelines https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md#Ri-typed
 
-template vectors
+template vectors with template specialization
+
+use https://en.cppreference.com/w/cpp/chrono/duration for timing
+
+finish SpriteSystem

@@ -69,7 +69,6 @@ static const uint32_t MAX_LOOPS = 10;
 
 static Actor actor;
 
-Camera mainCamera;
 EventScheduler eventScheduler;
 
 int main(int argc, char** argv) {
@@ -234,6 +233,9 @@ int main(int argc, char** argv) {
   eventPoller.addListener(SDL_QUIT,
                           [](const SDL_Event& event) { running = false; });
 
+  Camera mainCamera;
+  Camera::setMainCamera(mainCamera);
+
   mainCamera.setWidth(static_cast<float>(Window::getMainWindow().getWidth()));
   mainCamera.setHeight(static_cast<float>(Window::getMainWindow().getHeight()));
 
@@ -315,9 +317,9 @@ int main(int argc, char** argv) {
   });
 
   eventPoller.addListener(SDL_MOUSEBUTTONDOWN, [](const SDL_Event& event) {
-    Vector2 worldPos =
-        mainCamera.toWorldCoords(Vector2(static_cast<float>(event.button.x),
-                                         static_cast<float>(event.button.y)));
+    Vector2 worldPos = Camera::getMainCamera().toWorldCoords(
+        Vector2(static_cast<float>(event.button.x),
+                static_cast<float>(event.button.y)));
     printf("screen coords: (%d, %d), world coords: (%.3f, %.3f)\n",
            event.button.x, event.button.y, worldPos.x, worldPos.y);
   });
