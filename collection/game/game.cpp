@@ -14,7 +14,7 @@
 #include "datastructures/Trie.h"
 #include "misc/arrayHopper.h"
 
-#include "graphics/GlLoader.h"
+#include "loaders/GlLoader.h"
 #include "loaders/SdlLoader.h"
 
 #include "ui/Input.h"
@@ -75,7 +75,11 @@ EventScheduler eventScheduler;
 int main(int argc, char** argv) {
   {
     SdlLoader sdlLoader;
-    sdlLoader.load();
+    auto res = sdlLoader.load();
+    if (!res.first) {
+      std::cout << "Failed to load SDL because of: " << res.second << std::endl;
+      exit(EXIT_FAILURE);
+    }
   }
   // std::optional<RelationalDatabase> db =
   //   RelationalDatabase::loadDatabase("test2.db");
@@ -104,7 +108,13 @@ int main(int argc, char** argv) {
   windowBuilder.setTitle("Game").setDims(800, 600).setVisible();
   Window::initMainWindow(windowBuilder);
 
-  GlLoader::initialize();
+  {
+    GlLoader loader;
+    std::string res = loader.load();
+    if (!res.empty()) {
+      std::cout << "Could not load OpenGL because of: " << res << std::endl;
+    }
+  }
 
   GLuint gProgramId = glCreateProgram();
   GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);

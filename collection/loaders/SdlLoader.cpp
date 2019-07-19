@@ -24,7 +24,7 @@ std::pair<bool, std::string> SdlLoader::load() {
       goto fail;
     }
   }
-
+  return std::pair(true, msg);
 fail:
   return std::pair(false, msg);
 }

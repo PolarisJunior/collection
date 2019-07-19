@@ -8,7 +8,7 @@
 
 #include "ui/Window.h"
 
-void GlLoader::initialize() {
+std::string GlLoader::load() {
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
@@ -16,18 +16,18 @@ void GlLoader::initialize() {
   SDL_GLContext context =
       SDL_GL_CreateContext(Window::getMainWindow().getSdlWindow());
   if (context == nullptr) {
-    std::cout << "failed to create gl context: " << SDL_GetError() << std::endl;
-    exit(-1);
+    return std::string(SDL_GetError());
   }
 
   GLenum glewError = glewInit();
+
   if (glewError != GLEW_OK) {
-    std::cout << "Error initializing glew: " << glewGetErrorString(glewError)
-              << std::endl;
-    exit(-1);
+    return std::string(reinterpret_cast<const char*>((glewGetErrorString(glewError))));
   }
 
   if (SDL_GL_SetSwapInterval(1) < 0) {
-    std::cout << "Unable to set VSync: " << SDL_GetError() << std::endl;
+    return std::string(SDL_GetError());
   }
+
+  return "";
 }
