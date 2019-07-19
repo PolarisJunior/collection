@@ -10,7 +10,7 @@
 
 std::string GlLoader::load() {
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
   SDL_GLContext context =
@@ -22,7 +22,8 @@ std::string GlLoader::load() {
   GLenum glewError = glewInit();
 
   if (glewError != GLEW_OK) {
-    return std::string(reinterpret_cast<const char*>((glewGetErrorString(glewError))));
+    return std::string(
+        reinterpret_cast<const char*>((glewGetErrorString(glewError))));
   }
 
   if (SDL_GL_SetSwapInterval(1) < 0) {

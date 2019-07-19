@@ -32,6 +32,8 @@ class Window {
   SDL_Window* getSdlWindow();
   Renderer& getRenderer();
 
+  void swapBufferWindow();
+
   int32_t getWidth();
   int32_t getHeight();
 

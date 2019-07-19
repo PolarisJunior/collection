@@ -178,3 +178,5 @@ template <typename Numeric>
 inline Vector3<Numeric> Vector3<Numeric>::front() {
   return Vector3(0, 0, 1);
 }
+
+using Vec3 = Vector3<float>;

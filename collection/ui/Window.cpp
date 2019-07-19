@@ -49,6 +49,10 @@ Renderer& Window::getRenderer() {
   return *windowRenderer;
 }
 
+void Window::swapBufferWindow() {
+  SDL_GL_SwapWindow(getSdlWindow());
+}
+
 int32_t Window::getWidth() {
   int32_t w;
   SDL_GetWindowSize(sdlWindow, &w, nullptr);
