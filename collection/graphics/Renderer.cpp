@@ -2,12 +2,12 @@
 #include "Renderer.h"
 #include <SDL.h>
 #include <iostream>
-#include "../math/geometry/Rect.h"
-#include "../ui/Window.h"
 #include "Color.h"
 #include "Texture.h"
+#include "math/geometry/Rect.h"
+#include "ui/Window.h"
 
-Renderer::Renderer(Window& window) : Renderer(window.getRenderer()) {}
+// Renderer::Renderer(Window& window) : Renderer(window.getRenderer()) {}
 
 Renderer::~Renderer() {
   // std::cout << "deconstructing addr:" << sdlRenderer << std::endl;

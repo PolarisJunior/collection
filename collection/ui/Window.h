@@ -19,11 +19,18 @@ class Window {
   // in the cpp file
   // Window();
   Window() = default;
-  Window(std::string& title, int x, int y, int w, int h, uint32_t flags);
+  Window(std::string& title,
+         int x,
+         int y,
+         int w,
+         int h,
+         uint32_t flags,
+         bool initRenderer = true,
+         bool vSync = true);
   ~Window();
 
   SDL_Window* getSdlWindow();
-  Renderer getRenderer(bool vSync = false);
+  Renderer& getRenderer();
 
   int32_t getWidth();
   int32_t getHeight();
@@ -36,10 +43,13 @@ class Window {
   static void initMainWindow(WindowBuilder& builder);
   // static void setMainWindow(Window& window);
   static Window& getMainWindow();
+  static Renderer& getMainRenderer();
   // interestingly this works
   static Window mainWindow;
 
  private:
   SDL_Window* sdlWindow;
   std::string title;
+
+  std::unique_ptr<Renderer> windowRenderer;
 };

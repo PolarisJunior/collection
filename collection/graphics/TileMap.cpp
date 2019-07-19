@@ -3,12 +3,13 @@
 
 #include <algorithm>
 #include <vector>
-#include "../io/FileInputStream.h"
-#include "../math//geometry/Rect.h"
-#include "../util/stringUtils.h"
-#include "Renderer.h"
-#include "Texture.h"
-#include "TileSet.h"
+#include "graphics/Renderer.h"
+#include "graphics/Texture.h"
+#include "graphics/TileSet.h"
+#include "io/FileInputStream.h"
+#include "math/geometry/Rect.h"
+#include "ui/Window.h"
+#include "util/stringUtils.h"
 
 std::unique_ptr<Texture> TileMap::getTexture() {
   if (!tileSet) {
@@ -22,7 +23,7 @@ std::unique_ptr<Texture> TileMap::getTexture() {
       tileWidth * getNumTilesPerRow(), tileHeight * getNumTilesPerCol());
   Texture& tileSetTexture = tileSet->getTexture();
 
-  mainRenderer.setTarget(*texture);
+  Window::getMainRenderer().setTarget(*texture);
   for (int32_t row = 0; row < getNumTilesPerCol(); row++) {
     for (int32_t col = 0; col < getNumTilesPerRow(); col++) {
       int32_t tableIdx = tabular.getIndex(col, row);
@@ -33,10 +34,10 @@ std::unique_ptr<Texture> TileMap::getTexture() {
       Rect<int32_t> dstRect = {col * tileWidth, row * tileHeight, tileWidth,
                                tileHeight};
 
-      mainRenderer.render(tileSetTexture, &srcRect, &dstRect);
+      Window::getMainRenderer().render(tileSetTexture, &srcRect, &dstRect);
     }
   }
-  mainRenderer.clearTarget();
+  Window::getMainRenderer().clearTarget();
   return texture;
 }
 

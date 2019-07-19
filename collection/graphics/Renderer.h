@@ -17,7 +17,7 @@ class Renderer {
  public:
   Renderer() = default;
   Renderer(SDL_Renderer* r);
-  Renderer(Window& window);
+  // Renderer(Window& window);
   Renderer(Renderer&& other);
   ~Renderer();
 
@@ -59,5 +59,3 @@ inline Renderer::Renderer(SDL_Renderer* r) {
 inline SDL_Renderer* Renderer::getSdlRenderer() {
   return sdlRenderer;
 }
-
-extern Renderer mainRenderer;

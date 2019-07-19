@@ -6,12 +6,34 @@
 
 Window Window::mainWindow;
 
-Window::Window(std::string& title, int x, int y, int w, int h, uint32_t flags)
+Window::Window(std::string& title,
+               int x,
+               int y,
+               int w,
+               int h,
+               uint32_t flags,
+               bool initRenderer,
+               bool vSync)
     : title(title),
       sdlWindow(SDL_CreateWindow(title.c_str(), x, y, w, h, flags)) {
   if (!sdlWindow) {
     SDL_LogError(SDL_LOG_CATEGORY_ERROR, SDL_GetError());
     exit(EXIT_FAILURE);
+  }
+
+  if (initRenderer) {
+    uint32_t flags = SDL_RENDERER_TARGETTEXTURE | SDL_RENDERER_ACCELERATED;
+    if (vSync) {
+      flags |= SDL_RENDERER_PRESENTVSYNC;
+    }
+
+    SDL_Renderer* r = SDL_CreateRenderer(sdlWindow, -1, flags);
+    if (!r) {
+      SDL_LogError(SDL_LOG_CATEGORY_RENDER, SDL_GetError());
+      exit(EXIT_FAILURE);
+    }
+
+    windowRenderer = std::make_unique<Renderer>(r);
   }
 }
 
@@ -23,22 +45,8 @@ SDL_Window* Window::getSdlWindow() {
   return sdlWindow;
 }
 
-Renderer Window::getRenderer(bool vSync) {
-  uint32_t flags = SDL_RENDERER_TARGETTEXTURE | SDL_RENDERER_ACCELERATED;
-  if (vSync) {
-    flags |= SDL_RENDERER_PRESENTVSYNC;
-  }
-  SDL_Renderer* r = SDL_CreateRenderer(sdlWindow, -1, flags);
-
-  if (!r) {
-    SDL_LogError(SDL_LOG_CATEGORY_RENDER, SDL_GetError());
-    exit(EXIT_FAILURE);
-  }
-
-  // Renderer o(r);
-  // return o;
-  // NOTE notice this doesn't call copy constructor
-  return Renderer(r);
+Renderer& Window::getRenderer() {
+  return *windowRenderer;
 }
 
 int32_t Window::getWidth() {
@@ -81,4 +89,8 @@ void Window::initMainWindow(WindowBuilder& builder) {
 
 Window& Window::getMainWindow() {
   return Window::mainWindow;
+}
+
+Renderer& Window::getMainRenderer() {
+  return getMainWindow().getRenderer();
 }
