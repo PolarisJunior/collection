@@ -60,6 +60,8 @@
 
 #include "sys/System.h"
 
+#include "math/Mat4.h"
+#include "math/Mathf.h"
 #include "math/Vector3.h"
 
 #include "database/RelationalDatabase.h"
@@ -241,8 +243,18 @@ int main(int argc, char** argv) {
 
   GlClient glClient;
 
+  Mat4 model = Mat4::translate(Vec3(-.1f, -.1f, -.1f)) *
+               Mat4::scale(Vec3(1.5f, 1.5f, 1.5f)) *
+               Mat4::rotate(Mathf::pi_4, Vec3(0, 0, 1.0f));
+  std::cout << Mat4::scale(1.5, 2.5, 3.5).getRow3(0) << std::endl;
+
   Vec3 vs[] = {Vec3(0.5f, 0.5f, 0.0f), Vec3(0.5f, -0.5f, 0.0f),
                Vec3(-0.5f, -0.5f, 0.0f), Vec3(-0.5f, 0.5f, 0.0f)};
+
+  for (auto it = std::begin(vs); it < std::end(vs); it++) {
+    *it = model * (*it);
+  }
+
   std::vector<int32_t> is = {
       0, 1, 3,  // first Triangle
       1, 2, 3   // second Triangle
@@ -264,7 +276,7 @@ int main(int argc, char** argv) {
   glClear(GL_COLOR_BUFFER_BIT);
 
   // draw our first triangle
-  glUseProgram(prog->getProgramHandle());
+  prog->useProgram();
   glBindVertexArray(
       vao);  // seeing as we only have a single VAO there's no need to bind it
              // every time, but we'll do so to keep things a bit more organized
@@ -444,7 +456,7 @@ int main(int argc, char** argv) {
     renderCount++;
     if (renderCount % 100 == 0) {
       uint32_t msSinceLastFpsCalc = Time::getTicks() - lastRender;
-      std::cout << 100 * 1000 / msSinceLastFpsCalc << "fps" << std::endl;
+      // std::cout << 100 * 1000 / msSinceLastFpsCalc << "fps" << std::endl;
       uint32_t curFps = 100 * 1000 / msSinceLastFpsCalc;
       fpsText = std::to_string(curFps);
       lastRender += msSinceLastFpsCalc;

@@ -53,6 +53,10 @@ void ShaderProgram::finalizeProgram() {
   }
 }
 
+void ShaderProgram::useProgram() {
+  glUseProgram(this->getProgramHandle());
+}
+
 std::optional<ShaderProgram> ShaderProgram::createProgram() {
   int32_t handle = glCreateProgram();
   if (handle) {

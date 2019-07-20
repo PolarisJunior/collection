@@ -16,6 +16,8 @@ class ShaderProgram {
 
   void finalizeProgram();
 
+  void useProgram();
+
   int32_t getProgramHandle() { return programHandle; }
 
   static std::optional<ShaderProgram> createProgram();
