@@ -11,9 +11,6 @@
 #include <memory>
 
 // Note instead of using relative paths, set the include directories
-#include "datastructures/Trie.h"
-#include "misc/arrayHopper.h"
-
 #include "loaders/GlLoader.h"
 #include "loaders/SdlLoader.h"
 
@@ -35,6 +32,8 @@
 #include "game/ecs/EntityManager.h"
 #include "game/ecs/PositionManager.h"
 #include "game/ecs/SpriteManager.h"
+
+#include "game/ecs/Transform.h"
 
 #include "graphics/Color.h"
 #include "graphics/Image.h"
@@ -123,108 +122,6 @@ int main(int argc, char** argv) {
       std::cout << "Could not load OpenGL because of: " << res << std::endl;
     }
   }
-
-  // GLuint gProgramId = glCreateProgram();
-  // GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-  // const GLchar* vertexShaderSource[] = {
-  //     "#version 330 core\nlayout (location = 0) in vec2 LVertexPos2D; void "
-  //     "main() { gl_Position = "
-  //     "vec4( "
-  //     "LVertexPos2D.x, LVertexPos2D.y, 0, 1 ); }"};
-  // // const GLchar* vertexShaderSource[] = {
-  // //     "#version 330 core\nin ; void main() { gl_Position = "
-  // //     "vec4( "
-  // //     "LVertexPos2D.x, LVertexPos2D.y, 0, 1 ); }"};
-
-  // glShaderSource(vertexShader, 1, vertexShaderSource, nullptr);
-  // glCompileShader(vertexShader);
-
-  // GLint vShaderCompiled = GL_FALSE;
-  // glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &vShaderCompiled);
-  // if (vShaderCompiled != GL_TRUE) {
-  //   std::cout << "unable to compile vertex shader: " << vertexShader
-  //             << std::endl;
-  // }
-
-  // glAttachShader(gProgramId, vertexShader);
-
-  // GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-  // const GLchar* fragmentShaderSource[] = {
-  //     "#version 330 core\nout vec4 FragColor; void main() { FragColor = vec4(
-  //     " "1.0, " "1.0, 1.0, 1.0 ); }"};
-
-  // glShaderSource(fragmentShader, 1, fragmentShaderSource, nullptr);
-  // glCompileShader(fragmentShader);
-
-  // GLint fShaderCompiled = GL_FALSE;
-  // glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &fShaderCompiled);
-  // if (fShaderCompiled != GL_TRUE) {
-  //   std::cout << "Unable to compile fragment shader" << fragmentShader
-  //             << std::endl;
-  // }
-
-  // glAttachShader(gProgramId, fragmentShader);
-  // glLinkProgram(gProgramId);
-  // GLint programSuccess = GL_TRUE;
-  // glGetProgramiv(gProgramId, GL_LINK_STATUS, &programSuccess);
-  // if (programSuccess != GL_TRUE) {
-  //   printf("Error linking program %d!\n", gProgramId);
-  // }
-  // GLint gVertexPos2DLocation = glGetAttribLocation(gProgramId,
-  // "LVertexPos2D"); if (gVertexPos2DLocation == -1) {
-  //   printf("LVertexPos2D is not a valid glsl program variable!\n");
-  // }
-
-  // // Done setting up shaders
-
-  // // Initialize clear color
-  // glClearColor(1.f, 0.f, 0.f, 1.f);
-
-  // // VBO data
-  // GLfloat vertexData[] = {-0.5f, -0.5f, 0.0f, 0.5f, -0.5f,
-  //                         0.0f,  0.0f,  0.5f, 0.0f};
-
-  // // IBO data
-  // GLuint indexData[] = {0, 1, 2, 3};
-
-  // GLuint gVBO = 0;
-  // GLuint gIBO = 0;
-
-  // // Create VBO
-  // glGenBuffers(1, &gVBO);
-  // glBindBuffer(GL_ARRAY_BUFFER, gVBO);
-  // glBufferData(GL_ARRAY_BUFFER, 2 * 4 * sizeof(GLfloat), vertexData,
-  //              GL_STATIC_DRAW);
-
-  // // Create IBO
-  // glGenBuffers(1, &gIBO);
-  // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gIBO);
-  // glBufferData(GL_ELEMENT_ARRAY_BUFFER, 4 * sizeof(GLuint), indexData,
-  //              GL_STATIC_DRAW);
-
-  // glClear(GL_COLOR_BUFFER_BIT);
-  // // Bind program
-  // glUseProgram(gProgramId);
-
-  // // Enable vertex position
-  // glEnableVertexAttribArray(gVertexPos2DLocation);
-
-  // // Set vertex data
-  // glBindBuffer(GL_ARRAY_BUFFER, gVBO);
-  // glVertexAttribPointer(gVertexPos2DLocation, 2, GL_FLOAT, GL_FALSE,
-  //                       2 * sizeof(GLfloat), NULL);
-
-  // // Set index data and render
-  // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gIBO);
-  // glDrawElements(GL_TRIANGLE_FAN, 4, GL_UNSIGNED_INT, NULL);
-
-  // // Disable vertex position
-  // glDisableVertexAttribArray(gVertexPos2DLocation);
-
-  // // Unbind program
-  // glUseProgram(NULL);
-  // build and compile our shader program
-  // ------------------------------------
   // examples::glHelloWorld();
   const char* vertexShaderSource =
       "#version 330 core\n"
@@ -243,10 +140,18 @@ int main(int argc, char** argv) {
 
   GlClient glClient;
 
-  Mat4 model = Mat4::translate(Vec3(-.1f, -.1f, -.1f)) *
-               Mat4::scale(Vec3(1.5f, 1.5f, 1.5f)) *
-               Mat4::rotate(Mathf::pi_4, Vec3(0, 0, 1.0f));
-  std::cout << Mat4::scale(1.5, 2.5, 3.5).getRow3(0) << std::endl;
+  Transform transform;
+  std::cout << "yikes" << transform.localPosition() << std::endl;
+  transform.translate(Vec3(-.3, -.3, -.3));
+  std::cout << "yikes" << transform.localPosition() << std::endl;
+  // transform.scale(Vec3(2, 2, 2));
+
+  // Mat4 model = Mat4::translate(Vec3(-.1f, -.1f, -.1f)) *
+  //              Mat4::scale(Vec3(1.5f, 1.5f, 1.5f)) *
+  //              Mat4::rotate(Mathf::pi_4, Vec3(0, 0, 1.0f));
+  Mat4 model = transform.getModelMatrix();
+  std::cout << model << std::endl;
+  std::cout << transform.localPosition() << std::endl;
 
   Vec3 vs[] = {Vec3(0.5f, 0.5f, 0.0f), Vec3(0.5f, -0.5f, 0.0f),
                Vec3(-0.5f, -0.5f, 0.0f), Vec3(-0.5f, 0.5f, 0.0f)};

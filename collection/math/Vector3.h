@@ -8,20 +8,21 @@
 template <class Numeric>
 class Vector3 {
  public:
-  Numeric x;
-  Numeric y;
-  Numeric z;
+  Numeric x = 0;
+  Numeric y = 0;
+  Numeric z = 0;
 
   Vector3() = default;
   Vector3(Numeric x, Numeric y, Numeric z);
 
-  Vector3 operator+(const Vector3& other);
-  Vector3 operator-(const Vector3& other);
-  Vector3 operator*(float scale);
-  Vector3 operator/(float divisor);
+  Vector3 operator+(const Vector3& other) const;
+  Vector3 operator-(const Vector3& other) const;
+  Vector3 operator*(float scale) const;
+  Vector3 operator/(float divisor) const;
 
   Vector3& operator+=(const Vector3& other);
   Vector3& operator-=(const Vector3& other);
+  Vector3& operator*=(const Vector3& other);
   Vector3& operator*=(float scale);
   Vector3& operator/=(float divisor);
 
@@ -39,6 +40,7 @@ class Vector3 {
   float dot(const Vector3& other);
 
   static Vector3 zero();
+  static Vector3 one();
   static Vector3 right();
   static Vector3 left();
   static Vector3 up();
@@ -53,23 +55,23 @@ inline Vector3<Numeric>::Vector3(Numeric x, Numeric y, Numeric z)
 
 template <class Numeric>
 inline Vector3<Numeric> Vector3<Numeric>::operator+(
-    const Vector3<Numeric>& other) {
+    const Vector3<Numeric>& other) const {
   return Vector3(this->x + other.x, this->y + other.y, this->z + other.z);
 }
 
 template <class Numeric>
 inline Vector3<Numeric> Vector3<Numeric>::operator-(
-    const Vector3<Numeric>& other) {
+    const Vector3<Numeric>& other) const {
   return Vector3(this->x - other.x, this->y - other.y, this->z - other.z);
 }
 
 template <class Numeric>
-inline Vector3<Numeric> Vector3<Numeric>::operator*(float scale) {
+inline Vector3<Numeric> Vector3<Numeric>::operator*(float scale) const {
   return Vector3(this->x * scale, this->y * scale, this->z * scale);
 }
 
 template <class Numeric>
-inline Vector3<Numeric> Vector3<Numeric>::operator/(float divisor) {
+inline Vector3<Numeric> Vector3<Numeric>::operator/(float divisor) const {
   return Vector3(this->x / divisor, this->y / divisor, this->z / divisor);
 }
 
@@ -96,6 +98,15 @@ inline Vector3<Numeric>& Vector3<Numeric>::operator*=(float scale) {
   this->x *= scale;
   this->y *= scale;
   this->z *= scale;
+  return *this;
+}
+
+template <class Numeric>
+inline Vector3<Numeric>& Vector3<Numeric>::operator*=(
+    const Vector3<Numeric>& other) {
+  this->x *= other.x;
+  this->y *= other.y;
+  this->z *= other.z;
   return *this;
 }
 
@@ -147,6 +158,10 @@ inline float Vector3<Numeric>::dot(const Vector3<Numeric>& other) {
 
 inline Vector3<float> Vector3<float>::zero() {
   return Vector3(0, 0, 0);
+}
+
+inline Vector3<float> Vector3<float>::one() {
+  return Vector3(1, 1, 1);
 }
 
 template <typename Numeric>

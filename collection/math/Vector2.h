@@ -6,8 +6,8 @@
 template <typename T>
 class Vector2 {
  public:
-  T x;
-  T y;
+  T x = 0;
+  T y = 0;
 
   Vector2() = default;
   Vector2<T>(T x, T y);
