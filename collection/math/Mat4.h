@@ -9,8 +9,10 @@ class Mat4 {
   Mat4() = default;
   Mat4(const glm::mat4x4& m) { matrix = m; }
 
-  Vec3 getRow3(int r);
-  Vec3 getCol3(int c);
+  Vec3 getRow3(int32_t r);
+  Vec3 getCol3(int32_t c);
+
+  void set(int32_t r, int32_t c, float v);
 
   Vec3 operator*(const Vec3& rhs);
   Mat4 operator*(const Mat4& rhs);
@@ -31,6 +33,8 @@ class Mat4 {
   static Mat4 scale(float x, float y, float z) { return scale(Vec3(x, y, z)); }
 
   friend std::ostream& operator<<(std::ostream& out, const Mat4& mat);
+
+  static const Mat4 zero;
 
  private:
   glm::mat4x4 matrix;

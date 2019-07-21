@@ -27,11 +27,15 @@ class Transform {
 
   void scale(float x, float y, float z) { scale(Vec3(x, y, z)); }
 
-  void rotate(float rad, const Vec3& axis) {}
+  void rotate(float rad, const Vec3& axis) { matrixUpToDate = false; }
   void rotate(float rad, float x, float y, float z) {
     rotate(rad, Vec3(x, y, z));
+    matrixUpToDate = false;
   }
-  void rotate(const Quaternion& quat) { localRotation_ *= quat; }
+  void rotate(const Quaternion& quat) {
+    localRotation_ *= quat;
+    matrixUpToDate = false;
+  }
 
   Mat4 getModelMatrix();
 

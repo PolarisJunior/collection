@@ -32,7 +32,7 @@ class Vector3 {
     return out << "(" << vec.x << ", " << vec.y << ", " << vec.z << ")";
   }
 
-  Vector3 normalized();
+  Vector3 normalized() const;
   Vector3& normalize();
   float length();
   bool equals(const Vector3& other, float delta = 0.00001);
@@ -129,7 +129,7 @@ inline bool Vector3<Numeric>::operator==(const Vector3<Numeric>& other) {
 }
 
 template <class Numeric>
-inline Vector3<Numeric> Vector3<Numeric>::normalized() {
+inline Vector3<Numeric> Vector3<Numeric>::normalized() const {
   Vector3<Numeric> ret = *this;
   ret.normalize();
   return ret;

@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include <string>
+#include "math/Mat4.h"
 #include "math/Mathf.h"
 #include "math/Vector3.h"
 
@@ -11,9 +13,16 @@ class Quaternion {
   float z = 0;
   float w = 1;
 
-  Quaternion();
+  Quaternion() = default;
+  // explicit set values
   Quaternion(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) {}
+
+  // euler radians
   Quaternion(const Vec3& eulerRot);
+  // euler radians
+  Quaternion(float x, float y, float z);
+  // angle axis
+  Quaternion(float rad, const Vec3& axis);
 
   Vec3 eulers() const;
 
@@ -25,6 +34,8 @@ class Quaternion {
     return res;
   }
 
+  Mat4 toMatrix() const;
+
   Vec3 operator*(const Vec3& v) const {
     Vec3 Q(x, y, z);
     Vec3 T = Q.cross(v) * 2.0f;
@@ -34,14 +45,9 @@ class Quaternion {
 
   Quaternion operator*(const Quaternion& rhs) const;
 
-  Quaternion& operator*=(const Quaternion& rhs) {
-    Quaternion q = *this * rhs;
-    this->x = q.x;
-    this->y = q.y;
-    this->z = q.z;
-    this->w = q.w;
-    return *this;
-  }
+  Quaternion& operator*=(const Quaternion& rhs);
+
+  std::string toString() const;
 
   static const Quaternion identity;
 };

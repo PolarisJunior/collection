@@ -3,6 +3,8 @@
 
 #include <glm/gtx/transform.hpp>
 
+const Mat4 Mat4::zero = Mat4(glm::mat4(0));
+
 Vec3 fromGlmVec(const glm::vec4& v) {
   return Vec3(v.x, v.y, v.z);
 }
@@ -15,12 +17,16 @@ glm::vec3 toGlmVec(const Vec3& v) {
   return glm::vec3(v.x, v.y, v.z);
 }
 
-Vec3 Mat4::getRow3(int r) {
+Vec3 Mat4::getRow3(int32_t r) {
   return Vec3(matrix[0][r], matrix[1][r], matrix[2][r]);
 }
 
-Vec3 Mat4::getCol3(int c) {
+Vec3 Mat4::getCol3(int32_t c) {
   return Vec3(matrix[c][0], matrix[c][1], matrix[c][2]);
+}
+
+void Mat4::set(int32_t r, int32_t c, float v) {
+  matrix[c][r] = v;
 }
 
 Mat4 Mat4::identity() {

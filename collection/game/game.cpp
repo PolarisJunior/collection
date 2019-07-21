@@ -141,13 +141,22 @@ int main(int argc, char** argv) {
   GlClient glClient;
 
   Transform transform;
-  transform.translate(Vec3(-.3, -.3, -.3));
-  transform.scale(Vec3(2, 2, 2));
+  // transform.translate(Vec3(-.3, -.3, -.3));
+  // transform.scale(Vec3(2, 2, 2));
+  std::cout << "first quaternion: " << transform.localRotation().toString()
+            << std::endl;
+  // transform.rotate(Quaternion::identity);
+  // transform.rotate(Quaternion(0, 0, Mathf::pi_4));
+  transform.rotate(Quaternion(Mathf::pi_4, Vec3(0, 0, 1)));
+
+  Quaternion q(Mathf::pi_4, Vec3(0, 0, 1));
+  std::cout << "regular rot quaternion: " << q.toString() << std::endl;
+  std::cout << "after rot quaternion: " << transform.localRotation().toString()
+            << std::endl;
+
   transform.rotate(Quaternion::identity);
-  Quaternion rot = Quaternion::identity;
-  rot =
-      Quaternion(Vec3(Mathf::pi_4, 0, 0)) * Quaternion(Vec3(0, Mathf::pi_4, 0));
-  std::cout << "quat: " << rot.x << std::endl;
+  std::cout << "after id quaternion: " << transform.localRotation().toString()
+            << std::endl;
 
   // Mat4 model = Mat4::translate(Vec3(-.1f, -.1f, -.1f)) *
   //              Mat4::scale(Vec3(1.5f, 1.5f, 1.5f)) *
@@ -155,7 +164,6 @@ int main(int argc, char** argv) {
   Mat4 model = transform.getModelMatrix();
   std::cout << "up is: " << transform.up() << " orig: " << Vec3::up()
             << std::endl;
-  std::cout << "eulers: " << rot.eulers() << std::endl;
 
   Vec3 vs[] = {Vec3(0.5f, 0.5f, 0.0f), Vec3(0.5f, -0.5f, 0.0f),
                Vec3(-0.5f, -0.5f, 0.0f), Vec3(-0.5f, 0.5f, 0.0f)};
@@ -194,7 +202,7 @@ int main(int argc, char** argv) {
 
   Window::getMainWindow().swapBufferWindow();
 
-  System::delay(500);
+  System::delay(5000);
   Renderer& mainRenderer = Window::getMainRenderer();
 
   TileSet tileSet("../res/medieval_tilesheet.png", 64, 64, 32, 32, 32, 32);
