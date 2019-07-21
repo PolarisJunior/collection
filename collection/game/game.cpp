@@ -145,7 +145,9 @@ int main(int argc, char** argv) {
   transform.scale(Vec3(2, 2, 2));
   transform.rotate(Quaternion::identity);
   Quaternion rot = Quaternion::identity;
-  rot = Quaternion(Vec3(Mathf::pi_2, 0, 0));
+  rot =
+      Quaternion(Vec3(Mathf::pi_4, 0, 0)) * Quaternion(Vec3(0, Mathf::pi_4, 0));
+  std::cout << "quat: " << rot.x << std::endl;
 
   // Mat4 model = Mat4::translate(Vec3(-.1f, -.1f, -.1f)) *
   //              Mat4::scale(Vec3(1.5f, 1.5f, 1.5f)) *

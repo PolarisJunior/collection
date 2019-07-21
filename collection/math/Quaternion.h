@@ -11,6 +11,7 @@ class Quaternion {
   float z = 0;
   float w = 1;
 
+  Quaternion();
   Quaternion(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) {}
   Quaternion(const Vec3& eulerRot);
 
