@@ -37,7 +37,12 @@ class Vector3 {
   float length();
   bool equals(const Vector3& other, float delta = 0.00001);
 
-  float dot(const Vector3& other);
+  float dot(const Vector3& other) const;
+  Vector3 cross(const Vector3& other) const;
+
+  float pitch() const;
+  float yaw() const;
+  float roll() const;
 
   static Vector3 zero();
   static Vector3 one();
@@ -152,8 +157,30 @@ inline bool Vector3<Numeric>::equals(const Vector3<Numeric>& other,
 }
 
 template <class Numeric>
-inline float Vector3<Numeric>::dot(const Vector3<Numeric>& other) {
+inline float Vector3<Numeric>::dot(const Vector3<Numeric>& other) const {
   return this->x * other.x + this->y * other.y + this->z * other.z;
+}
+
+template <class Numeric>
+inline Vector3<Numeric> Vector3<Numeric>::cross(
+    const Vector3<Numeric>& other) const {
+  return Vector3<Numeric>(y * other.z - z * other.y, z * other.x - x * other.z,
+                          x * other.y - y * other.x);
+}
+
+template <class Numeric>
+float Vector3<Numeric>::pitch() const {
+  return this->x;
+}
+
+template <class Numeric>
+float Vector3<Numeric>::yaw() const {
+  return this->y;
+}
+
+template <class Numeric>
+float Vector3<Numeric>::roll() const {
+  return this->z;
 }
 
 inline Vector3<float> Vector3<float>::zero() {
@@ -176,12 +203,12 @@ inline Vector3<Numeric> Vector3<Numeric>::left() {
 
 template <typename Numeric>
 inline Vector3<Numeric> Vector3<Numeric>::up() {
-  return Vector3(0, -1, 0);
+  return Vector3(0, 1, 0);
 }
 
 template <typename Numeric>
 inline Vector3<Numeric> Vector3<Numeric>::down() {
-  return Vector3(0, 1, 0);
+  return Vector3(0, -1, 0);
 }
 
 template <typename Numeric>

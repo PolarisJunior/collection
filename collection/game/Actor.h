@@ -7,8 +7,8 @@ class Component;
 
 class Actor {
  public:
-  float x;
-  float y;
+  float x = 0;
+  float y = 0;
   /* Attach component to this actor, if notify is true then component becomes
    * aware */
   void attachComponent(Component* component, bool notify = true);
@@ -19,7 +19,7 @@ class Actor {
 
  private:
   std::set<Component*> components;
-  int32_t actorId;
+  int32_t actorId = 0;
 };
 
 inline void Actor::attachComponent(Component& comp, bool notify) {

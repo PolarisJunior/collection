@@ -148,12 +148,12 @@ inline Vector2<T> Vector2<T>::left() {
 
 template <typename T>
 inline Vector2<T> Vector2<T>::up() {
-  return Vector2(0, -1);
+  return Vector2(0, 1);
 }
 
 template <typename T>
 inline Vector2<T> Vector2<T>::down() {
-  return Vector2(0, 1);
+  return Vector2(0, -1);
 }
 
 typedef Vector2<float> Vec2;

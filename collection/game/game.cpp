@@ -141,17 +141,19 @@ int main(int argc, char** argv) {
   GlClient glClient;
 
   Transform transform;
-  std::cout << "yikes" << transform.localPosition() << std::endl;
   transform.translate(Vec3(-.3, -.3, -.3));
-  std::cout << "yikes" << transform.localPosition() << std::endl;
-  // transform.scale(Vec3(2, 2, 2));
+  transform.scale(Vec3(2, 2, 2));
+  transform.rotate(Quaternion::identity);
+  Quaternion rot = Quaternion::identity;
+  rot = Quaternion(Vec3(Mathf::pi_2, 0, 0));
 
   // Mat4 model = Mat4::translate(Vec3(-.1f, -.1f, -.1f)) *
   //              Mat4::scale(Vec3(1.5f, 1.5f, 1.5f)) *
   //              Mat4::rotate(Mathf::pi_4, Vec3(0, 0, 1.0f));
   Mat4 model = transform.getModelMatrix();
-  std::cout << model << std::endl;
-  std::cout << transform.localPosition() << std::endl;
+  std::cout << "up is: " << transform.up() << " orig: " << Vec3::up()
+            << std::endl;
+  std::cout << "eulers: " << rot.eulers() << std::endl;
 
   Vec3 vs[] = {Vec3(0.5f, 0.5f, 0.0f), Vec3(0.5f, -0.5f, 0.0f),
                Vec3(-0.5f, -0.5f, 0.0f), Vec3(-0.5f, 0.5f, 0.0f)};
