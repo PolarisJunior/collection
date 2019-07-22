@@ -2,10 +2,17 @@
 #include "math/Mathf.h"
 
 #include <math.h>
+#include <algorithm>
 #include <cmath>
 
 float Mathf::abs(float v) {
   return fabs(v);
+}
+
+float Mathf::max(float x, float y) {
+  // bugged?
+  // return std::max(x, y);
+  return -1;
 }
 
 float Mathf::mod(float x, float y) {

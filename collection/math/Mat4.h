@@ -19,6 +19,8 @@ class Mat4 {
 
   Mat4 inverse() const;
 
+  float* dataPointer();
+
   static Mat4 translate(const Vec3& offsets);
   static Mat4 translate(float x, float y, float z) {
     return translate(Vec3(x, y, z));
@@ -36,8 +38,8 @@ class Mat4 {
 
   static const Mat4 zero;
   static const Mat4 identity;
-  
+
   glm::mat4x4 matrix = glm::mat4(0.0f);
+
  private:
-  
 };

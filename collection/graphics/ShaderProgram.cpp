@@ -64,3 +64,12 @@ std::optional<ShaderProgram> ShaderProgram::createProgram() {
   }
   return std::nullopt;
 }
+
+void ShaderProgram::uniform(const std::string& name, Mat4& m) {
+  glUniformMatrix4fv(glGetUniformLocation(getProgramHandle(), name.c_str()), 1,
+                     GL_FALSE, m.dataPointer());
+}
+
+void ShaderProgram::uniform(const std::string& name, float f) {
+  glUniform1f(glGetUniformLocation(getProgramHandle(), name.c_str()), f);
+}

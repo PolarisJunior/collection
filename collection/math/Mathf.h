@@ -19,6 +19,7 @@ struct Mathf {
   static float mod(float x, float y);
   static float trunc(float x);
 
+  static float max(float x, float y);
   static float abs(float v);
 
   static float cos(float v);

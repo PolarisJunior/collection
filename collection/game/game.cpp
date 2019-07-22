@@ -7,6 +7,7 @@
 #include <SDL_ttf.h>
 // #include <gl/GLU.h>
 
+#include <algorithm>
 #include <iostream>
 #include <memory>
 
@@ -79,6 +80,8 @@ static Actor actor;
 
 EventScheduler eventScheduler;
 
+void render();
+
 int main(int argc, char** argv) {
   {
     SdlLoader sdlLoader;
@@ -142,48 +145,49 @@ int main(int argc, char** argv) {
   const char* fragmentShaderSource =
       "#version 330 core\n"
       "out vec4 FragColor;\n"
+      "uniform float u_time;"
       "void main()\n"
       "{\n"
-      "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+      "   FragColor = vec4(sin(u_time*.01), 0.5f, 0.2f, 1.0f);\n"
       "}\n\0";
 
   GlClient glClient;
 
   Transform transform;
   transform.translate(Vec3(-.3, -.3, -.3));
-  // transform.scale(Vec3(1.0, 1.0, 1.0));
   transform.rotate(Quaternion(0, 0, Mathf::pi_4 / 2));
   transform.rotate(Quaternion(0, Mathf::pi_4 / 2, 0));
   transform.rotate(Quaternion(Mathf::pi_4 / 2, 0, 0));
-  // transform.rotate(Quaternion(Mathf::pi_4 / 2, Vec3(0, 0, 1)));
+  transform.scale(2, 2, 2);
 
   Mat4 model = transform.getModelMatrix();
 
   Camera::getMainCamera().transform.translate(Vec3(0, 0, -20));
+  std::cout << "before" << mainCamera.transform.front() << "\n";
   Camera::getMainCamera().transform.rotate(Mathf::pi, Vec3(0, 1, 0));
+  std::cout << "after" << mainCamera.transform.front() << "\n";
 
   Mat4 pMatrix = Camera::getMainCamera().getProjectionMatrix();
   Mat4 vMatrix = Camera::getMainCamera().getViewMatrix();
-  std::cout << "vmat" << vMatrix << std::endl;
-  std::cout << "pmat" << pMatrix << std::endl;
 
   std::cout << "up is: " << transform.up() << " orig: " << Vec3::up()
             << std::endl;
 
-  Vec3 vs[] = {Vec3(0.5f, 0.5f, 0.0f), Vec3(0.5f, -0.5f, 0.0f),
-               Vec3(-0.5f, -0.5f, 0.0f), Vec3(-0.5f, 0.5f, 0.0f)};
+  Vec3 vs[] = {Vec3(0.5f, 0.5f, -0.5f),   Vec3(0.5f, -0.5f, -0.5f),
+               Vec3(-0.5f, -0.5f, -0.5f), Vec3(-0.5f, 0.5f, -0.5f),
+               Vec3(0.5, 0.5, 0.5),       Vec3(0.5, -0.5, 0.5),
+               Vec3(-0.5, -0.5, 0.5),     Vec3(-0.5, 0.5, 0.5)};
 
-  for (auto it = std::begin(vs); it < std::end(vs); it++) {
-    std::cout << "pre" << vMatrix * model * (*it) << std::endl;
-    std::cout << "transformed: " << pMatrix * vMatrix * model * (*it)
-              << std::endl;
-    // *it = pMatrix * vMatrix * model * (*it);
-  }
-
-  std::vector<int32_t> is = {
-      0, 1, 3,  // first Triangle
-      1, 2, 3   // second Triangle
-  };
+  std::vector<int32_t> is = {0, 1, 3,  // first Triangle
+                             1, 2, 3,  // second Triangle
+                             4, 5, 7, 5, 6, 7, 3, 7, 4, 3, 4, 0};
+  // float texCoords[] =
+  //     {
+  //         0,
+  //         0,
+  //         1,
+  //         0,
+  //     }
 
   std::optional<ShaderProgram> prog = ShaderProgram::createProgram();
   int32_t vShaderHandle = prog->addVertShader(vertexShaderSource);
@@ -198,32 +202,16 @@ int main(int argc, char** argv) {
   // unsigned int VBO, VAO, EBO;
   uint32_t vao = glClient.sendMesh(quadMesh);
 
-  glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-  glClear(GL_COLOR_BUFFER_BIT);
-
   // draw our first triangle
   prog->useProgram();
-
   glBindVertexArray(
       vao);  // seeing as we only have a single VAO there's no need to bind it
              // every time, but we'll do so to keep things a bit more organized
-  // glDrawArrays(GL_TRIANGLES, 0, 6);
-  // glUniformMatrix4fv(glGetUniformLocation(vShaderHandle, "model"), 1,
-  // GL_FALSE,
-  //                    &model.matrix[0][0]);
-  glUniformMatrix4fv(glGetUniformLocation(prog->getProgramHandle(), "model"), 1,
-                     GL_FALSE, &model.matrix[0][0]);
-  glUniformMatrix4fv(glGetUniformLocation(prog->getProgramHandle(), "view"), 1,
-                     GL_FALSE, &vMatrix.matrix[0][0]);
-  glUniformMatrix4fv(
-      glGetUniformLocation(prog->getProgramHandle(), "projection"), 1, GL_FALSE,
-      &pMatrix.matrix[0][0]);
 
-  glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+  prog->uniform("model", model);
+  prog->uniform("view", vMatrix);
+  prog->uniform("projection", pMatrix);
 
-  Window::getMainWindow().swapBufferWindow();
-
-  System::delay(5000);
   Renderer& mainRenderer = Window::getMainRenderer();
 
   TileSet tileSet("../res/medieval_tilesheet.png", 64, 64, 32, 32, 32, 32);
@@ -276,8 +264,8 @@ int main(int argc, char** argv) {
       SDL_CreateTextureFromSurface(mainRenderer.getSdlRenderer(), surface);
   SDL_RenderCopy(mainRenderer.getSdlRenderer(), tex, nullptr, nullptr);
   mainRenderer.present();
-  // mainRenderer.getSdlRenderer();
-  System::delay(5000);
+
+  System::delay(100);
   TTF_CloseFont(font);
 
   Vector2<float>& pos = posManager.get(entityId);
@@ -352,17 +340,39 @@ int main(int argc, char** argv) {
       Vector2<float> velocity{0.0f, 0.0f};
       int32_t speed = 10;
       Keyboard& keyboard = GameInstance::instance().keyboard();
+
       if (keyboard.keyDown(SDL_SCANCODE_UP)) {
         velocity += Dir2d::dirVectors[Dir2d::UP];
+        Camera::getMainCamera().transform.translate(
+            -mainCamera.transform.front());
       }
       if (keyboard.keyDown(SDL_SCANCODE_RIGHT)) {
         velocity += Dir2d::dirVectors[Dir2d::RIGHT];
+        Camera::getMainCamera().transform.translate(
+            -mainCamera.transform.left());
       }
       if (keyboard.keyDown(SDL_SCANCODE_LEFT)) {
         velocity += Dir2d::dirVectors[Dir2d::LEFT];
+        Camera::getMainCamera().transform.translate(
+            -mainCamera.transform.right());
       }
       if (keyboard.keyDown(SDL_SCANCODE_DOWN)) {
         velocity += Dir2d::dirVectors[Dir2d::DOWN];
+        Camera::getMainCamera().transform.translate(
+            -mainCamera.transform.back());
+      }
+      if (keyboard.keyDown(SDL_SCANCODE_W)) {
+        Camera::getMainCamera().transform.translate(-mainCamera.transform.up());
+      }
+      if (keyboard.keyDown(SDL_SCANCODE_S)) {
+        Camera::getMainCamera().transform.translate(
+            -mainCamera.transform.down());
+      }
+      if (keyboard.keyDown(SDL_SCANCODE_A)) {
+        Camera::getMainCamera().transform.rotate(.05, Vec3::up());
+      }
+      if (keyboard.keyDown(SDL_SCANCODE_D)) {
+        Camera::getMainCamera().transform.rotate(-.05, Vec3::up());
       }
 
       velocity.normalize() *= speed;
@@ -378,23 +388,35 @@ int main(int argc, char** argv) {
     float interpolation =
         fmin(1.f, static_cast<float>(currentMs - lastUpdate) / UPDATE_PERIOD);
 
-    mainRenderer.setColor(Colors::BLACK);
-    mainRenderer.clear();
-    stage.render(mainRenderer, mainCamera);
-    renderSystem.renderAll(interpolation);
-    spriteManager.renderAll(interpolation);
-    mainRenderer.setColor(Colors::WHITE);
+    // mainRenderer.setColor(Colors::BLACK);
+    // mainRenderer.clear();
+    // stage.render(mainRenderer, mainCamera);
+    // renderSystem.renderAll(interpolation);
+    // spriteManager.renderAll(interpolation);
+    // mainRenderer.setColor(Colors::WHITE);
+    // mainRenderer.present();
 
-    mainRenderer.present();
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+    vMatrix = Camera::getMainCamera().getViewMatrix();
+    prog->uniform("view", vMatrix);
+    prog->uniform("u_time", Time::getTicks());
+    glDrawElements(GL_TRIANGLES, 18, GL_UNSIGNED_INT, 0);
+
+    // glDrawArrays(GL_TRIANGLES, 0, 6);
+    Window::getMainWindow().swapBufferWindow();
+    render();
 
     // For calculating FPS
     renderCount++;
     if (renderCount % 100 == 0) {
-      uint32_t msSinceLastFpsCalc = Time::getTicks() - lastRender;
+      uint32_t msSinceLastFpsCalc =
+          std::max<int>(Time::getTicks() - lastRender, 1);
       // std::cout << 100 * 1000 / msSinceLastFpsCalc << "fps" << std::endl;
       uint32_t curFps = 100 * 1000 / msSinceLastFpsCalc;
       fpsText = std::to_string(curFps);
       lastRender += msSinceLastFpsCalc;
+
       // 100 / msSinceLastFpsCalc = renders per ms
       // 1000*100/ msSinceLastFpsCount = renders per second
     }
@@ -402,3 +424,5 @@ int main(int argc, char** argv) {
 
   return EXIT_SUCCESS;
 }
+
+void render() {}

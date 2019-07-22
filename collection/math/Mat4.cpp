@@ -58,6 +58,10 @@ Mat4 Mat4::inverse() const {
   return Mat4(glm::inverse(matrix));
 }
 
+float* Mat4::dataPointer() {
+  return &matrix[0][0];
+}
+
 std::ostream& operator<<(std::ostream& out, const Mat4& mat) {
   out << "[ ";
   for (int i = 0; i < 4; i++) {
