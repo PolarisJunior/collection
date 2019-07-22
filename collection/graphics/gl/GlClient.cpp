@@ -52,12 +52,17 @@ int32_t GlClient::createShaderProgram(const char* vertSource,
 }
 
 uint32_t GlClient::sendMesh(const Mesh& mesh) {
-  unsigned int VBO, VAO, EBO;
+  unsigned int VBO, VAO, EBO, UV;
   glGenVertexArrays(1, &VAO);
   glGenBuffers(1, &VBO);
   glGenBuffers(1, &EBO);
+  glGenBuffers(1, &UV);
 
   glBindVertexArray(VAO);
+
+  glBindBuffer(GL_ARRAY_BUFFER, UV);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(Vec2) * mesh.uvs_.size(),
+               mesh.uvs_.data(), GL_STATIC_DRAW);
 
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
   glBufferData(GL_ARRAY_BUFFER, sizeof(Vec3) * mesh.vertices_.size(),
@@ -70,6 +75,9 @@ uint32_t GlClient::sendMesh(const Mesh& mesh) {
 
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
   glEnableVertexAttribArray(0);
+
+  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+  glEnableVertexAttribArray(1);
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 

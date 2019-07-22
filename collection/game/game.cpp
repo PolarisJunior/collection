@@ -149,9 +149,6 @@ int main(int argc, char** argv) {
   Mat4 pMatrix = Camera::getMainCamera().getProjectionMatrix();
   Mat4 vMatrix = Camera::getMainCamera().getViewMatrix();
 
-  std::cout << "up is: " << transform.up() << " orig: " << Vec3::up()
-            << std::endl;
-
   Vec3 vs[] = {Vec3(0.5f, 0.5f, -0.5f),   Vec3(0.5f, -0.5f, -0.5f),
                Vec3(-0.5f, -0.5f, -0.5f), Vec3(-0.5f, 0.5f, -0.5f),
                Vec3(0.5, 0.5, 0.5),       Vec3(0.5, -0.5, 0.5),
@@ -160,17 +157,12 @@ int main(int argc, char** argv) {
   std::vector<int32_t> is = {0, 1, 3,  // first Triangle
                              1, 2, 3,  // second Triangle
                              4, 5, 7, 5, 6, 7, 3, 7, 4, 3, 4, 0};
-  // float texCoords[] =
-  //     {
-  //         0,
-  //         0,
-  //         1,
-  //         0,
-  //     }
+
+  std::vector<Vec2> texCoords = {Vec2(1, 1), Vec2(1, 0), Vec2(0, 0),
+                                 Vec2(0, 1), Vec2(0, 0), Vec2(1, 0),
+                                 Vec2(1, 1), Vec2(0, 1)};
 
   std::optional<ShaderProgram> prog = ShaderProgram::createProgram();
-  // prog->addVertShader(vertSource);
-  // prog->addFragShader(fragSource);
   prog->loadVertFromFile("../res/simple.vert");
   prog->loadFragFromFile("../res/simple.frag");
 
@@ -179,6 +171,7 @@ int main(int argc, char** argv) {
   Mesh quadMesh;
   quadMesh.setVertices(std::vector<Vec3>(std::begin(vs), std::end(vs)));
   quadMesh.setTriangles(is);
+  quadMesh.setUvs(texCoords);
 
   // unsigned int VBO, VAO, EBO;
   uint32_t vao = glClient.sendMesh(quadMesh);
