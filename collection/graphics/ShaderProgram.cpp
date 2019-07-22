@@ -40,7 +40,7 @@ int32_t ShaderProgram::addShader(const std::string& src, ShaderType type) {
   }
 
   glAttachShader(programHandle, shaderHandle);
-  glDeleteShader(shaderHandle);
+  // glDeleteShader(shaderHandle);
 }
 
 void ShaderProgram::finalizeProgram() {

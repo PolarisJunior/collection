@@ -122,13 +122,22 @@ int main(int argc, char** argv) {
       std::cout << "Could not load OpenGL because of: " << res << std::endl;
     }
   }
+
+  Camera mainCamera;
+  Camera::setMainCamera(mainCamera);
+  // mainCamera.projectionType = Camera::ProjectionType::ORTHOGRAPHIC;
+
   // examples::glHelloWorld();
   const char* vertexShaderSource =
       "#version 330 core\n"
       "layout (location = 0) in vec3 aPos;\n"
+      "uniform mat4 model;"
+      "uniform mat4 view;"
+      "uniform mat4 projection;"
       "void main()\n"
       "{\n"
-      "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+      // "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+      "gl_Position =  projection * view * model * vec4(aPos, 1.0);"
       "}\0";
   const char* fragmentShaderSource =
       "#version 330 core\n"
@@ -141,27 +150,23 @@ int main(int argc, char** argv) {
   GlClient glClient;
 
   Transform transform;
-  // transform.translate(Vec3(-.3, -.3, -.3));
-  // transform.scale(Vec3(2, 2, 2));
-  std::cout << "first quaternion: " << transform.localRotation().toString()
-            << std::endl;
-  // transform.rotate(Quaternion::identity);
-  // transform.rotate(Quaternion(0, 0, Mathf::pi_4));
-  transform.rotate(Quaternion(Mathf::pi_4, Vec3(0, 0, 1)));
+  transform.translate(Vec3(-.3, -.3, -.3));
+  // transform.scale(Vec3(1.0, 1.0, 1.0));
+  transform.rotate(Quaternion(0, 0, Mathf::pi_4 / 2));
+  transform.rotate(Quaternion(0, Mathf::pi_4 / 2, 0));
+  transform.rotate(Quaternion(Mathf::pi_4 / 2, 0, 0));
+  // transform.rotate(Quaternion(Mathf::pi_4 / 2, Vec3(0, 0, 1)));
 
-  Quaternion q(Mathf::pi_4, Vec3(0, 0, 1));
-  std::cout << "regular rot quaternion: " << q.toString() << std::endl;
-  std::cout << "after rot quaternion: " << transform.localRotation().toString()
-            << std::endl;
-
-  transform.rotate(Quaternion::identity);
-  std::cout << "after id quaternion: " << transform.localRotation().toString()
-            << std::endl;
-
-  // Mat4 model = Mat4::translate(Vec3(-.1f, -.1f, -.1f)) *
-  //              Mat4::scale(Vec3(1.5f, 1.5f, 1.5f)) *
-  //              Mat4::rotate(Mathf::pi_4, Vec3(0, 0, 1.0f));
   Mat4 model = transform.getModelMatrix();
+
+  Camera::getMainCamera().transform.translate(Vec3(0, 0, -20));
+  Camera::getMainCamera().transform.rotate(Mathf::pi, Vec3(0, 1, 0));
+
+  Mat4 pMatrix = Camera::getMainCamera().getProjectionMatrix();
+  Mat4 vMatrix = Camera::getMainCamera().getViewMatrix();
+  std::cout << "vmat" << vMatrix << std::endl;
+  std::cout << "pmat" << pMatrix << std::endl;
+
   std::cout << "up is: " << transform.up() << " orig: " << Vec3::up()
             << std::endl;
 
@@ -169,7 +174,10 @@ int main(int argc, char** argv) {
                Vec3(-0.5f, -0.5f, 0.0f), Vec3(-0.5f, 0.5f, 0.0f)};
 
   for (auto it = std::begin(vs); it < std::end(vs); it++) {
-    *it = model * (*it);
+    std::cout << "pre" << vMatrix * model * (*it) << std::endl;
+    std::cout << "transformed: " << pMatrix * vMatrix * model * (*it)
+              << std::endl;
+    // *it = pMatrix * vMatrix * model * (*it);
   }
 
   std::vector<int32_t> is = {
@@ -178,8 +186,9 @@ int main(int argc, char** argv) {
   };
 
   std::optional<ShaderProgram> prog = ShaderProgram::createProgram();
-  prog->addVertShader(vertexShaderSource);
+  int32_t vShaderHandle = prog->addVertShader(vertexShaderSource);
   prog->addFragShader(fragmentShaderSource);
+
   prog->finalizeProgram();
 
   Mesh quadMesh;
@@ -194,10 +203,22 @@ int main(int argc, char** argv) {
 
   // draw our first triangle
   prog->useProgram();
+
   glBindVertexArray(
       vao);  // seeing as we only have a single VAO there's no need to bind it
              // every time, but we'll do so to keep things a bit more organized
   // glDrawArrays(GL_TRIANGLES, 0, 6);
+  // glUniformMatrix4fv(glGetUniformLocation(vShaderHandle, "model"), 1,
+  // GL_FALSE,
+  //                    &model.matrix[0][0]);
+  glUniformMatrix4fv(glGetUniformLocation(prog->getProgramHandle(), "model"), 1,
+                     GL_FALSE, &model.matrix[0][0]);
+  glUniformMatrix4fv(glGetUniformLocation(prog->getProgramHandle(), "view"), 1,
+                     GL_FALSE, &vMatrix.matrix[0][0]);
+  glUniformMatrix4fv(
+      glGetUniformLocation(prog->getProgramHandle(), "projection"), 1, GL_FALSE,
+      &pMatrix.matrix[0][0]);
+
   glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
   Window::getMainWindow().swapBufferWindow();
@@ -221,9 +242,6 @@ int main(int argc, char** argv) {
 
   eventPoller.addListener(SDL_QUIT,
                           [](const SDL_Event& event) { running = false; });
-
-  Camera mainCamera;
-  Camera::setMainCamera(mainCamera);
 
   mainCamera.setWidth(static_cast<float>(Window::getMainWindow().getWidth()));
   mainCamera.setHeight(static_cast<float>(Window::getMainWindow().getHeight()));

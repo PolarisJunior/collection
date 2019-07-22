@@ -4,6 +4,7 @@
 #include <glm/gtx/transform.hpp>
 
 const Mat4 Mat4::zero = Mat4(glm::mat4(0));
+const Mat4 Mat4::identity = Mat4(glm::mat4(1.0f));
 
 Vec3 fromGlmVec(const glm::vec4& v) {
   return Vec3(v.x, v.y, v.z);
@@ -29,10 +30,6 @@ void Mat4::set(int32_t r, int32_t c, float v) {
   matrix[c][r] = v;
 }
 
-Mat4 Mat4::identity() {
-  return Mat4(glm::mat4x4(1.0f));
-}
-
 Mat4 Mat4::translate(const Vec3& offsets) {
   return glm::translate(toGlmVec(offsets));
 }
@@ -55,6 +52,10 @@ Vec3 Mat4::operator*(const Vec3& rhs) {
 
 Mat4 Mat4::operator*(const Mat4& rhs) {
   return Mat4(this->matrix * rhs.matrix);
+}
+
+Mat4 Mat4::inverse() const {
+  return Mat4(glm::inverse(matrix));
 }
 
 std::ostream& operator<<(std::ostream& out, const Mat4& mat) {

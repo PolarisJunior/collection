@@ -17,7 +17,7 @@ class Mat4 {
   Vec3 operator*(const Vec3& rhs);
   Mat4 operator*(const Mat4& rhs);
 
-  static Mat4 identity();
+  Mat4 inverse() const;
 
   static Mat4 translate(const Vec3& offsets);
   static Mat4 translate(float x, float y, float z) {
@@ -35,7 +35,9 @@ class Mat4 {
   friend std::ostream& operator<<(std::ostream& out, const Mat4& mat);
 
   static const Mat4 zero;
-
+  static const Mat4 identity;
+  
+  glm::mat4x4 matrix = glm::mat4(0.0f);
  private:
-  glm::mat4x4 matrix;
+  
 };

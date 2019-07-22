@@ -1,5 +1,7 @@
 #pragma once
 #include <cstdint>
+#include "game/ecs/Transform.h"
+#include "math/Mat4.h"
 #include "math/Vector2.h"
 
 class Actor;
@@ -37,8 +39,16 @@ class Camera {
 
   void setAttachOffset(Vector2<float> offset);
 
+  Mat4 getViewMatrix();
+  Mat4 getProjectionMatrix();
+
   static void setMainCamera(Camera& cam);
   static Camera& getMainCamera();
+
+  enum class ProjectionType { ORTHOGRAPHIC, PERSPECTIVE };
+
+  Transform transform;
+  ProjectionType projectionType = ProjectionType::PERSPECTIVE;
 
  protected:
   Actor* attachedActor = nullptr;
@@ -52,10 +62,11 @@ class Camera {
   float width;
   float height;
 
+  // Field of view in degrees
+  float fieldOfView = 45;
+
   static Camera* mainCamera;
 };
-
-inline Camera::Camera() : position(Vector2<float>(0, 0)), width(1), height(1) {}
 
 inline Camera::Camera(float w, float h)
     : position(Vector2(0.0f, 0.0f)), width(w), height(h) {}

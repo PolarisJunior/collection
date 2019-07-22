@@ -55,41 +55,6 @@ Vec3 Quaternion::eulers() const {
 }
 
 Mat4 Quaternion::toMatrix() const {
-  // Mat4 matrix = Mat4::zero;
-  // float fTx = x + x;
-  // float fTy = y + y;
-  // float fTz = z + z;
-  // float fTwx = fTx * w;
-  // float fTwy = fTy * w;
-  // float fTwz = fTz * w;
-  // float fTxx = fTx * x;
-  // float fTxy = fTy * x;
-  // float fTxz = fTz * x;
-  // float fTyy = fTy * y;
-  // float fTyz = fTz * y;
-  // float fTzz = fTz * z;
-
-  // matrix.set(0, 0, 1.0f - (fTyy + fTzz));
-  // matrix.set(0, 1, fTxy - fTwz);
-  // matrix.set(0, 2, fTxz + fTwy);
-  // matrix.set(1, 0, fTxy + fTwz);
-  // matrix.set(1, 1, 1.0f - (fTxx + fTzz));
-  // matrix.set(1, 2, fTyz - fTwx);
-  // matrix.set(2, 0, fTxz - fTwy);
-  // matrix.set(2, 1, fTyz + fTwx);
-  // matrix.set(2, 2, 1.0f - (fTxx + fTyy));
-
-  // matrix.set(0, 0, 1.0f - (fTyy + fTzz));
-  // matrix.set(1, 0, fTxy - fTwz);
-  // matrix.set(2, 0, fTxz + fTwy);
-  // matrix.set(0, 1, fTxy + fTwz);
-  // matrix.set(1, 1, 1.0f - (fTxx + fTzz));
-  // matrix.set(2, 1, fTyz - fTwx);
-  // matrix.set(0, 2, fTxz - fTwy);
-  // matrix.set(1, 2, fTyz + fTwx);
-  // matrix.set(2, 2, 1.0f - (fTxx + fTyy));
-  // return matrix;
-
   glm::qua gq = toGlmQua(*this);
   glm::mat4x4 m = glm::toMat4(gq);
   return Mat4(m);

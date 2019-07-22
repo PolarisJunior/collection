@@ -22,6 +22,7 @@ class ShaderProgram {
 
   static std::optional<ShaderProgram> createProgram();
 
+
  private:
-  int32_t programHandle;
+int32_t programHandle;  
 };

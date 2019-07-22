@@ -3,7 +3,16 @@
 #include "Actor.h"
 #include "game/ecs/PositionManager.h"
 
+#include "math/Mathf.h"
+
+#include "glm/gtc/matrix_transform.hpp"
+#include "ui/Window.h"
+
 Camera* Camera::mainCamera;
+
+Camera::Camera()
+    : width(Window::getMainWindow().getWidth()),
+      height(Window::getMainWindow().getHeight()) {}
 
 Vector2<float> Camera::getPosition() {
   if (isAttachedToEntity) {
@@ -26,6 +35,22 @@ void Camera::unAttach() {
     position.y = attachedActor->y;
     attachedActor = nullptr;
   }
+}
+
+Mat4 Camera::getProjectionMatrix() {
+  switch (projectionType) {
+    case ProjectionType::PERSPECTIVE:
+      glm::mat4 proj =
+          glm::perspective(fieldOfView, width / height, 0.1f, 100.0f);
+      return Mat4(proj);
+    case ProjectionType::ORTHOGRAPHIC:
+      glm::mat4 ortho = glm::ortho(0.f, 800.f, 0.f, 600.f, 0.1f, 100.f);
+      return Mat4(ortho);
+  }
+}
+
+Mat4 Camera::getViewMatrix() {
+  return transform.getInverseModelMatrix();
 }
 
 Camera& Camera::getMainCamera() {
