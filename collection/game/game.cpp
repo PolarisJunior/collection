@@ -130,27 +130,6 @@ int main(int argc, char** argv) {
   Camera::setMainCamera(mainCamera);
   // mainCamera.projectionType = Camera::ProjectionType::ORTHOGRAPHIC;
 
-  // examples::glHelloWorld();
-  const char* vertexShaderSource =
-      "#version 330 core\n"
-      "layout (location = 0) in vec3 aPos;\n"
-      "uniform mat4 model;"
-      "uniform mat4 view;"
-      "uniform mat4 projection;"
-      "void main()\n"
-      "{\n"
-      // "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-      "gl_Position =  projection * view * model * vec4(aPos, 1.0);"
-      "}\0";
-  const char* fragmentShaderSource =
-      "#version 330 core\n"
-      "out vec4 FragColor;\n"
-      "uniform float u_time;"
-      "void main()\n"
-      "{\n"
-      "   FragColor = vec4(sin(u_time*.01), 0.5f, 0.2f, 1.0f);\n"
-      "}\n\0";
-
   GlClient glClient;
 
   Transform transform;
@@ -190,8 +169,10 @@ int main(int argc, char** argv) {
   //     }
 
   std::optional<ShaderProgram> prog = ShaderProgram::createProgram();
-  int32_t vShaderHandle = prog->addVertShader(vertexShaderSource);
-  prog->addFragShader(fragmentShaderSource);
+  // prog->addVertShader(vertSource);
+  // prog->addFragShader(fragSource);
+  prog->loadVertFromFile("../res/simple.vert");
+  prog->loadFragFromFile("../res/simple.frag");
 
   prog->finalizeProgram();
 

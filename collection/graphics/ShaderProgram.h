@@ -15,6 +15,9 @@ class ShaderProgram {
   int32_t addFragShader(const std::string& src);
   int32_t addShader(const std::string& src, ShaderType type);
 
+  int32_t loadVertFromFile(const std::string& filePath);
+  int32_t loadFragFromFile(const std::string& filePath);
+
   void uniform(const std::string& name, Mat4& m);
   void uniform(const std::string& name, float f);
 

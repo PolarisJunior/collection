@@ -2,6 +2,7 @@
 #include "graphics/ShaderProgram.h"
 #include <gl/glew.h>
 #include <iostream>
+#include "io/File.h"
 
 ShaderProgram::ShaderProgram(int32_t handle) : programHandle(handle) {}
 
@@ -41,6 +42,16 @@ int32_t ShaderProgram::addShader(const std::string& src, ShaderType type) {
 
   glAttachShader(programHandle, shaderHandle);
   // glDeleteShader(shaderHandle);
+}
+
+int32_t ShaderProgram::loadVertFromFile(const std::string& filePath) {
+  std::string src = File(filePath).readAsString();
+  return addVertShader(src);
+}
+
+int32_t ShaderProgram::loadFragFromFile(const std::string& filePath) {
+  std::string src = File(filePath).readAsString();
+  return addFragShader(src);
 }
 
 void ShaderProgram::finalizeProgram() {
