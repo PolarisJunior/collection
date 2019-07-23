@@ -191,11 +191,8 @@ int main(int argc, char** argv) {
   glBindVertexArray(
       vao);  // seeing as we only have a single VAO there's no need to bind it
              // every time, but we'll do so to keep things a bit more organized
-  // Mat4 modelNormal = transform.localRotation().toMatrix()
-  prog->uniform("model", model);
-  prog->uniform("view", vMatrix);
-  prog->uniform("projection", pMatrix);
 
+  prog->uniform("projection", pMatrix);
   prog->uniform("u_texture", 0);
 
   Renderer& mainRenderer = Window::getMainRenderer();
@@ -363,6 +360,12 @@ int main(int argc, char** argv) {
       if (keyboard.keyDown(SDL_SCANCODE_Z)) {
         transform.rotate(.01, 0, 1, 0);
       }
+      if (keyboard.keyDown(SDL_SCANCODE_X)) {
+        transform.rotate(.01, 1, 0, 0);
+      }
+      if (keyboard.keyDown(SDL_SCANCODE_C)) {
+        transform.translate(Vec3::left() * 0.05);
+      }
 
       velocity.normalize() *= speed;
       pos += velocity;
@@ -388,7 +391,9 @@ int main(int argc, char** argv) {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     vMatrix = Camera::getMainCamera().getViewMatrix();
+    vMatrix.invertTranslate();
     model = transform.getModelMatrix();
+    model.invertTranslate();
     prog->uniform("view", vMatrix);
     prog->uniform("model", model);
     prog->uniform("model_normal", transform.localRotation().toMatrix());

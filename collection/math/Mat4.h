@@ -13,6 +13,9 @@ class Mat4 {
   Vec3 getCol3(int32_t c);
 
   void set(int32_t r, int32_t c, float v);
+  // inverts the 4th column of the first 3 rows
+  // this is helpful for adjusting to opengl coordinates
+  void invertTranslate();
 
   Vec3 operator*(const Vec3& rhs);
   Mat4 operator*(const Mat4& rhs);

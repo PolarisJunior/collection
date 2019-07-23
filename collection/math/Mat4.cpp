@@ -30,6 +30,12 @@ void Mat4::set(int32_t r, int32_t c, float v) {
   matrix[c][r] = v;
 }
 
+void Mat4::invertTranslate() {
+  matrix[3][0] = -matrix[3][0];
+  matrix[3][1] = -matrix[3][1];
+  matrix[3][2] = -matrix[3][2];
+}
+
 Mat4 Mat4::translate(const Vec3& offsets) {
   return glm::translate(toGlmVec(offsets));
 }

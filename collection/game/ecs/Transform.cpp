@@ -5,15 +5,7 @@ Mat4 Transform::getModelMatrix() {
   if (matrixUpToDate) {
     return modelMatrix;
   } else {
-    // modelMatrix = Mat4::translate(localPosition_) * localRotation_.toMatrix()
-    // *
-    //               Mat4::scale(localScale_);
-    // modelMatrix = Mat4::translate(-localPosition_) *
-    // localRotation_.toMatrix() *
-    //               Mat4::rotate(Mathf::pi, 1, 0, 0) *
-    //               Mat4::rotate(Mathf::pi, 0, 1, 0) *
-    //               Mat4::scale(localScale_);
-    modelMatrix = Mat4::translate(-localPosition_) * localRotation_.toMatrix() *
+    modelMatrix = Mat4::translate(localPosition_) * localRotation_.toMatrix() *
                   Mat4::scale(localScale_);
     matrixUpToDate = true;
     return modelMatrix;
