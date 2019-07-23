@@ -36,7 +36,10 @@ int32_t ShaderProgram::addShader(const std::string& src, ShaderType type) {
 
   int32_t success;
   glGetShaderiv(shaderHandle, GL_COMPILE_STATUS, &success);
+  char infoLog[1024];
   if (!success) {
+    glGetShaderInfoLog(shaderHandle, 1024, nullptr, infoLog);
+    std::cout << "error: " << infoLog << std::endl;
     exit(EXIT_FAILURE);
   }
 
@@ -54,7 +57,7 @@ int32_t ShaderProgram::loadFragFromFile(const std::string& filePath) {
   return addFragShader(src);
 }
 
-void ShaderProgram::finalizeProgram() {
+void ShaderProgram::linkProgram() {
   glLinkProgram(programHandle);
 
   int32_t success;

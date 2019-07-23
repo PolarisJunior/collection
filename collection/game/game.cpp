@@ -38,12 +38,13 @@
 
 #include "graphics/Color.h"
 #include "graphics/Image.h"
-#include "graphics/Mesh.h"
 #include "graphics/Renderer.h"
 #include "graphics/Sprite.h"
 #include "graphics/Texture.h"
 #include "graphics/TileMap.h"
 #include "graphics/TileSet.h"
+#include "graphics/models/CubeMesh.h"
+#include "graphics/models/Mesh.h"
 
 #include "graphics/ShaderProgram.h"
 #include "graphics/gl/GlClient.h"
@@ -127,8 +128,9 @@ int main(int argc, char** argv) {
   }
 
   Camera mainCamera;
+  mainCamera.fieldOfView = 100;
   Camera::setMainCamera(mainCamera);
-  // mainCamera.projectionType = Camera::ProjectionType::ORTHOGRAPHIC;
+  mainCamera.projectionType = Camera::ProjectionType::PERSPECTIVE;
 
   GlClient glClient;
 
@@ -149,35 +151,39 @@ int main(int argc, char** argv) {
   Mat4 pMatrix = Camera::getMainCamera().getProjectionMatrix();
   Mat4 vMatrix = Camera::getMainCamera().getViewMatrix();
 
-  Vec3 vs[] = {Vec3(0.5f, 0.5f, -0.5f),   Vec3(0.5f, -0.5f, -0.5f),
-               Vec3(-0.5f, -0.5f, -0.5f), Vec3(-0.5f, 0.5f, -0.5f),
-               Vec3(0.5, 0.5, 0.5),       Vec3(0.5, -0.5, 0.5),
-               Vec3(-0.5, -0.5, 0.5),     Vec3(-0.5, 0.5, 0.5)};
-
-  std::vector<int32_t> is = {0, 1, 3,  // first Triangle
-                             1, 2, 3,  // second Triangle
-                             4, 5, 7, 5, 6, 7, 3, 7, 4, 3, 4, 0};
-
-  std::vector<Vec2> texCoords = {Vec2(1, 1), Vec2(1, 0), Vec2(0, 0),
-                                 Vec2(0, 1), Vec2(0, 0), Vec2(1, 0),
-                                 Vec2(1, 1), Vec2(0, 1)};
-
   std::optional<ShaderProgram> prog = ShaderProgram::createProgram();
   prog->loadVertFromFile("../res/simple.vert");
   prog->loadFragFromFile("../res/simple.frag");
 
-  prog->finalizeProgram();
+  prog->linkProgram();
 
-  Mesh quadMesh;
-  quadMesh.setVertices(std::vector<Vec3>(std::begin(vs), std::end(vs)));
-  quadMesh.setTriangles(is);
-  quadMesh.setUvs(texCoords);
+  CubeMesh cubeMesh;
 
   // unsigned int VBO, VAO, EBO;
-  uint32_t vao = glClient.sendMesh(quadMesh);
+  uint32_t vao = glClient.sendMesh(cubeMesh);
 
-  // draw our first triangle
+  unsigned int texture;
+  glGenTextures(1, &texture);
+  glBindTexture(GL_TEXTURE_2D, texture);
+
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
+                  GL_REPEAT);  // set texture wrapping to GL_REPEAT (default
+                               // wrapping method)
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  // set texture filtering parameters
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+  SDL_Surface* surf = IMG_Load("../res/monkey.png");
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, surf->w, surf->h, 0, GL_RGBA,
+               GL_UNSIGNED_BYTE, surf->pixels);
+  glGenerateMipmap(GL_TEXTURE_2D);
+  SDL_FreeSurface(surf);
+
   prog->useProgram();
+
+  glUniform1i(glGetUniformLocation(prog->getProgramHandle(), "u_texture"), 0);
+
   glBindVertexArray(
       vao);  // seeing as we only have a single VAO there's no need to bind it
              // every time, but we'll do so to keep things a bit more organized
@@ -371,12 +377,11 @@ int main(int argc, char** argv) {
     // mainRenderer.present();
 
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     vMatrix = Camera::getMainCamera().getViewMatrix();
     prog->uniform("view", vMatrix);
     prog->uniform("u_time", Time::getTicks());
-    glDrawElements(GL_TRIANGLES, 18, GL_UNSIGNED_INT, 0);
-
+    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
     // glDrawArrays(GL_TRIANGLES, 0, 6);
     Window::getMainWindow().swapBufferWindow();
     render();

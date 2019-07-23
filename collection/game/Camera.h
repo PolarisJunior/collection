@@ -50,6 +50,11 @@ class Camera {
   Transform transform;
   ProjectionType projectionType = ProjectionType::PERSPECTIVE;
 
+  // Field of view in degrees
+  float fieldOfView = 45;
+  float nearClipPlane = 0.1f;
+  float farClipPlane = 1000.0f;
+
  protected:
   Actor* attachedActor = nullptr;
   uint32_t attachedEntity = 0;
@@ -61,9 +66,6 @@ class Camera {
 
   float width;
   float height;
-
-  // Field of view in degrees
-  float fieldOfView = 45;
 
   static Camera* mainCamera;
 };

@@ -7,6 +7,11 @@
 
 class Mesh {
  public:
+  Mesh() = default;
+  Mesh(const std::vector<Vec3>& vs,
+       const std::vector<Vec2>& uvs,
+       const std::vector<int32_t>& ts);
+
   void setVertices(const std::vector<Vec3>& vs) { vertices_ = vs; }
   void setTriangles(const std::vector<int32_t>& ts) { triangles_ = ts; }
   void setUvs(const std::vector<Vec2>& uvs) { uvs_ = uvs; }

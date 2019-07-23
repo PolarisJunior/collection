@@ -40,11 +40,12 @@ void Camera::unAttach() {
 Mat4 Camera::getProjectionMatrix() {
   switch (projectionType) {
     case ProjectionType::PERSPECTIVE:
-      glm::mat4 proj =
-          glm::perspective(fieldOfView, width / height, 0.1f, 100.0f);
+      glm::mat4 proj = glm::perspective(fieldOfView, width / height,
+                                        nearClipPlane, farClipPlane);
       return Mat4(proj);
     case ProjectionType::ORTHOGRAPHIC:
-      glm::mat4 ortho = glm::ortho(0.f, 800.f, 0.f, 600.f, 0.1f, 100.f);
+      glm::mat4 ortho =
+          glm::ortho(0.f, 800.f, 0.f, 600.f, nearClipPlane, farClipPlane);
       return Mat4(ortho);
   }
 }

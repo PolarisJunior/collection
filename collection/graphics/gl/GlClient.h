@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include "graphics/Mesh.h"
+#include "graphics/models/Mesh.h"
 
 class GlClient {
  public:

@@ -30,5 +30,6 @@ std::string GlLoader::load() {
     return std::string(SDL_GetError());
   }
 
+  glEnable(GL_DEPTH_TEST);
   return "";
 }

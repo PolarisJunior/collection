@@ -21,7 +21,7 @@ class ShaderProgram {
   void uniform(const std::string& name, Mat4& m);
   void uniform(const std::string& name, float f);
 
-  void finalizeProgram();
+  void linkProgram();
 
   void useProgram();
 
