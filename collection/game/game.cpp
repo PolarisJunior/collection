@@ -135,23 +135,19 @@ int main(int argc, char** argv) {
 
   GlClient glClient;
 
-  std::cout << CubeMesh::cubeNormals.size() << " "
-            << CubeMesh::cubeVertices.size() << std::endl;
-
   Transform transform;
   transform.translate(Vec3(-10, -5, -.3));
   transform.rotate(Mathf::pi_4, 0, 1, 0);
   transform.scale(2, 2, 2);
-
-  Mat4 model = transform.getModelMatrix();
+  std::vector<Transform> transforms;
+  int i = 0;
+  for (float v = 0; v < Mathf::two_pi; v += 0.1f) {
+    transforms.push_back(Transform());
+    transforms[i].translate(Mathf::sin(v) * 10, 0, Mathf::cos(v) * 10);
+    i++;
+  }
 
   Camera::getMainCamera().transform.translate(Vec3(0, 0, 0));
-  std::cout << "before" << mainCamera.transform.front() << "\n";
-  // Camera::getMainCamera().transform.rotate(Mathf::pi, Vec3(0, 0, 0));
-  std::cout << "after" << mainCamera.transform.front() << "\n";
-
-  Mat4 pMatrix = Camera::getMainCamera().getProjectionMatrix();
-  Mat4 vMatrix = Camera::getMainCamera().getViewMatrix();
 
   std::optional<ShaderProgram> prog = ShaderProgram::createProgram();
   prog->loadVertFromFile("../res/simple.vert");
@@ -163,7 +159,7 @@ int main(int argc, char** argv) {
   SphereMesh sphereMesh;
 
   // unsigned int VBO, VAO, EBO;
-  uint32_t vao = glClient.sendMesh(cubeMesh);
+  uint32_t vao = glClient.sendMesh(sphereMesh);
 
   unsigned int texture;
   glGenTextures(1, &texture);
@@ -192,6 +188,7 @@ int main(int argc, char** argv) {
       vao);  // seeing as we only have a single VAO there's no need to bind it
              // every time, but we'll do so to keep things a bit more organized
 
+  Mat4 pMatrix = Camera::getMainCamera().getProjectionMatrix();
   prog->uniform("projection", pMatrix);
   prog->uniform("u_texture", 0);
 
@@ -390,16 +387,20 @@ int main(int argc, char** argv) {
 
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    vMatrix = Camera::getMainCamera().getViewMatrix();
-    vMatrix.invertTranslate();
-    model = transform.getModelMatrix();
-    model.invertTranslate();
-    prog->uniform("view", vMatrix);
-    prog->uniform("model", model);
-    prog->uniform("model_normal", transform.localRotation().toMatrix());
+
+    Mat4 viewMatrix = Camera::getMainCamera().getLeftViewMatrix();
+
+    prog->uniform("view", viewMatrix);
     prog->uniform("u_time", (float)Time::getTicks());
-    glDrawElements(GL_TRIANGLES, SphereMesh::sphereTriangles.size(),
-                   GL_UNSIGNED_INT, 0);
+
+    for (auto it = transforms.begin(); it < transforms.end(); it++) {
+      Mat4 model = it->getLeftModelMatrix();
+      prog->uniform("model", model);
+      prog->uniform("model_normal", it->localRotation().toMatrix());
+      glDrawElements(GL_TRIANGLES, SphereMesh::sphereTriangles.size(),
+                     GL_UNSIGNED_INT, 0);
+    }
+
     // glDrawArrays(GL_TRIANGLES, 0, 6);
     Window::getMainWindow().swapBufferWindow();
     render();
@@ -407,11 +408,6 @@ int main(int argc, char** argv) {
     // For calculating FPS
     renderCount++;
     if (renderCount % 100 == 0) {
-      std::cout << mainCamera.transform.localPosition() << std::endl;
-      std::cout << "forward" << mainCamera.transform.front() << "up "
-                << mainCamera.transform.up() << " right"
-                << mainCamera.transform.right() << std::endl;
-
       uint32_t msSinceLastFpsCalc =
           std::max<int>(Time::getTicks() - lastRender, 1);
       // std::cout << 100 * 1000 / msSinceLastFpsCalc << "fps" << std::endl;

@@ -12,6 +12,12 @@ Mat4 Transform::getModelMatrix() {
   }
 }
 
+Mat4 Transform::getLeftModelMatrix() {
+  Mat4 m = getModelMatrix();
+  m.invertTranslate();
+  return m;
+}
+
 Mat4 Transform::getInverseModelMatrix() {
   return getModelMatrix().inverse();
   // Vec3 t;

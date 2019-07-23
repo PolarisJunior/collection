@@ -54,6 +54,8 @@ class Vector3 {
   static Vector3 down();
   static Vector3 front();
   static Vector3 back();
+  static Vector3 forward();
+  static Vector3 backward();
 };
 
 template <class Numeric>
@@ -225,6 +227,16 @@ inline Vector3<Numeric> Vector3<Numeric>::back() {
 
 template <typename Numeric>
 inline Vector3<Numeric> Vector3<Numeric>::front() {
+  return Vector3(0, 0, 1);
+}
+
+template <typename Numeric>
+inline Vector3<Numeric> Vector3<Numeric>::backward() {
+  return Vector3(0, 0, -1);
+}
+
+template <typename Numeric>
+inline Vector3<Numeric> Vector3<Numeric>::forward() {
   return Vector3(0, 0, 1);
 }
 

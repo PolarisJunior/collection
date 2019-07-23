@@ -51,14 +51,13 @@ Mat4 Camera::getProjectionMatrix() {
 }
 
 Mat4 Camera::getViewMatrix() {
-  // Mat4 modelMatrix = Mat4::translate(-transform.localPosition()) *
-  //                    transform.localRotation().toMatrix() *
-  //                    Mat4::scale(transform.localScale());
-  // return Mat4(glm::inverse(modelMatrix.matrix));
-  Mat4 model = transform.getModelMatrix();
-  // model.invertTranslate();
-  // return transform.getInverseModelMatrix();
-  return model.inverse();
+  return transform.getModelMatrix().inverse();
+}
+
+Mat4 Camera::getLeftViewMatrix() {
+  Mat4 m = getViewMatrix();
+  m.invertTranslate();
+  return m;
 }
 
 Camera& Camera::getMainCamera() {
