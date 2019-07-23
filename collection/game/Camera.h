@@ -52,8 +52,8 @@ class Camera {
   Transform transform;
   ProjectionType projectionType = ProjectionType::PERSPECTIVE;
 
-  // Field of view height in degrees
-  float fieldOfView = 45;
+  // Field of view in degrees
+  float fieldOfView = 60;
   float nearClipPlane = 0.1f;
   float farClipPlane = 1000.0f;
 

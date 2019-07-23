@@ -45,6 +45,8 @@
 #include "graphics/TileSet.h"
 #include "graphics/models/CubeMesh.h"
 #include "graphics/models/Mesh.h"
+#include "graphics/models/PlaneMesh.h"
+#include "graphics/models/QuadMesh.h"
 #include "graphics/models/SphereMesh.h"
 
 #include "graphics/ShaderProgram.h"
@@ -128,7 +130,7 @@ int main(int argc, char** argv) {
 
   Camera mainCamera;
   // mainCamera.fieldOfView = Mathf::pi_4;
-  mainCamera.fieldOfView = 45;
+  mainCamera.fieldOfView = 90;
   Camera::setMainCamera(mainCamera);
   mainCamera.projectionType = Camera::ProjectionType::PERSPECTIVE;
 
@@ -146,7 +148,8 @@ int main(int argc, char** argv) {
   for (int j = 0; j < 16; j++) {
     for (int k = 0; k < 16; k++) {
       for (int a = 0; a < 20; a++) {
-        transforms.push_back(Transform(j - 50, a - 30, k));
+        transforms.push_back(
+            Transform(j * 1.0001 - 50, a * 1.0001 - 30, k * 1.0001));
         //  transforms.back().translate();
       }
     }
@@ -160,9 +163,13 @@ int main(int argc, char** argv) {
 
   CubeMesh cubeMesh;
   SphereMesh sphereMesh;
+  QuadMesh quadMesh;
+  PlaneMesh planeMesh;
+
+  Mesh& usedMesh = planeMesh;
 
   // unsigned int VBO, VAO, EBO;
-  uint32_t vao = glClient.sendMesh(cubeMesh);
+  uint32_t vao = glClient.sendMesh(usedMesh);
 
   unsigned int texture;
   glGenTextures(1, &texture);
@@ -408,8 +415,8 @@ int main(int argc, char** argv) {
       prog->uniform("MVP", PV * model);
       prog->uniform("model_normal", it->localRotation().toMatrix());
 
-      glDrawElements(GL_TRIANGLES, CubeMesh::cubeTriangles.size(),
-                     GL_UNSIGNED_INT, 0);
+      glDrawElements(GL_TRIANGLES, usedMesh.triangles().size(), GL_UNSIGNED_INT,
+                     0);
     }
 
     // prog->uniform("MVP", PV * transform.getModelMatrix());
