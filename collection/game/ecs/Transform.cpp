@@ -1,6 +1,8 @@
 
 #include "game/ecs/Transform.h"
 
+Transform::Transform(float x, float y, float z) : localPosition_(x, y, z) {}
+
 Mat4 Transform::getModelMatrix() {
   if (matrixUpToDate) {
     return modelMatrix;

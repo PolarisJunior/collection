@@ -82,8 +82,6 @@ static Actor actor;
 
 EventScheduler eventScheduler;
 
-void render();
-
 int main(int argc, char** argv) {
   {
     SdlLoader sdlLoader;
@@ -129,25 +127,30 @@ int main(int argc, char** argv) {
   }
 
   Camera mainCamera;
-  mainCamera.fieldOfView = 100;
+  // mainCamera.fieldOfView = Mathf::pi_4;
+  mainCamera.fieldOfView = 45;
   Camera::setMainCamera(mainCamera);
   mainCamera.projectionType = Camera::ProjectionType::PERSPECTIVE;
 
   GlClient glClient;
 
   Transform transform;
-  transform.translate(Vec3(-10, -5, -.3));
-  transform.rotate(Mathf::pi_4, 0, 1, 0);
-  transform.scale(2, 2, 2);
   std::vector<Transform> transforms;
   int i = 0;
-  for (float v = 0; v < Mathf::two_pi; v += 0.1f) {
-    transforms.push_back(Transform());
-    transforms[i].translate(Mathf::sin(v) * 10, 0, Mathf::cos(v) * 10);
-    i++;
-  }
+  // for (float v = 0; v < Mathf::two_pi; v += 0.1f) {
+  //   transforms.push_back(Transform());
+  //   transforms[i].translate(Mathf::sin(v) * 10, 0, Mathf::cos(v) * 10);
+  //   i++;
+  // }
 
-  Camera::getMainCamera().transform.translate(Vec3(0, 0, 0));
+  for (int j = 0; j < 16; j++) {
+    for (int k = 0; k < 16; k++) {
+      for (int a = 0; a < 20; a++) {
+        transforms.push_back(Transform(j - 50, a - 30, k));
+        //  transforms.back().translate();
+      }
+    }
+  }
 
   std::optional<ShaderProgram> prog = ShaderProgram::createProgram();
   prog->loadVertFromFile("../res/simple.vert");
@@ -159,7 +162,7 @@ int main(int argc, char** argv) {
   SphereMesh sphereMesh;
 
   // unsigned int VBO, VAO, EBO;
-  uint32_t vao = glClient.sendMesh(sphereMesh);
+  uint32_t vao = glClient.sendMesh(cubeMesh);
 
   unsigned int texture;
   glGenTextures(1, &texture);
@@ -313,6 +316,7 @@ int main(int argc, char** argv) {
     uint32_t frameTime = 0;
     uint32_t numLoops = 0;
 
+    Mat4 PV;
     while ((currentMs - lastUpdate) > UPDATE_PERIOD && numLoops < MAX_LOOPS) {
       eventScheduler.runUpTo(lastUpdate);
 
@@ -366,6 +370,11 @@ int main(int argc, char** argv) {
 
       velocity.normalize() *= speed;
       pos += velocity;
+
+      // Mat4 viewMatrix = Camera::getMainCamera().getLeftViewMatrix();
+      Mat4 viewMatrix = Camera::getMainCamera().getViewMatrix();
+      PV = pMatrix * viewMatrix;
+      prog->uniform("pv", PV);
       // game code end
 
       lastUpdate += UPDATE_PERIOD;
@@ -388,29 +397,36 @@ int main(int argc, char** argv) {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    Mat4 viewMatrix = Camera::getMainCamera().getLeftViewMatrix();
-
-    prog->uniform("view", viewMatrix);
+    // prog->uniform("view", viewMatrix);
     prog->uniform("u_time", (float)Time::getTicks());
 
     for (auto it = transforms.begin(); it < transforms.end(); it++) {
-      Mat4 model = it->getLeftModelMatrix();
-      prog->uniform("model", model);
+      // Mat4 model = it->getLeftModelMatrix();
+      Mat4 model = it->getModelMatrix();
+
+      // prog->uniform("model", model);
+      prog->uniform("MVP", PV * model);
       prog->uniform("model_normal", it->localRotation().toMatrix());
-      glDrawElements(GL_TRIANGLES, SphereMesh::sphereTriangles.size(),
+
+      glDrawElements(GL_TRIANGLES, CubeMesh::cubeTriangles.size(),
                      GL_UNSIGNED_INT, 0);
     }
 
+    // prog->uniform("MVP", PV * transform.getModelMatrix());
+    // prog->uniform("model_normal", transform.localRotation().toMatrix());
+    // glDrawElements(GL_TRIANGLES, CubeMesh::cubeTriangles.size(),
+    //                GL_UNSIGNED_INT, 0);
+
     // glDrawArrays(GL_TRIANGLES, 0, 6);
     Window::getMainWindow().swapBufferWindow();
-    render();
 
     // For calculating FPS
     renderCount++;
     if (renderCount % 100 == 0) {
       uint32_t msSinceLastFpsCalc =
           std::max<int>(Time::getTicks() - lastRender, 1);
-      // std::cout << 100 * 1000 / msSinceLastFpsCalc << "fps" << std::endl;
+
+      std::cout << 100 * 1000 / msSinceLastFpsCalc << "fps" << std::endl;
       uint32_t curFps = 100 * 1000 / msSinceLastFpsCalc;
       fpsText = std::to_string(curFps);
       lastRender += msSinceLastFpsCalc;
@@ -422,5 +438,3 @@ int main(int argc, char** argv) {
 
   return EXIT_SUCCESS;
 }
-
-void render() {}

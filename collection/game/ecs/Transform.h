@@ -7,6 +7,8 @@
 class Transform {
  public:
   Transform() = default;
+  // initializes with a position set
+  Transform(float x, float y, float z);
 
   Vec3 localPosition() const { return this->localPosition_; }
   Quaternion localRotation() const { return this->localRotation_; }

@@ -31,5 +31,7 @@ std::string GlLoader::load() {
   }
 
   glEnable(GL_DEPTH_TEST);
+  glEnable(GL_CULL_FACE);
+  glFrontFace(GL_CW);
   return "";
 }

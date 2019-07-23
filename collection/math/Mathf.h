@@ -13,6 +13,8 @@ struct Mathf {
   // static float clampAngle(float ang);
   // static float normalizeAngle(float ang);
 
+  static float lerp(float a, float b, float t) { return a + t * (b - a); }
+
   static float clampRad(float rad);
   static float normalizeRad(float rad);
 
