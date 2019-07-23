@@ -45,6 +45,7 @@
 #include "graphics/TileSet.h"
 #include "graphics/models/CubeMesh.h"
 #include "graphics/models/Mesh.h"
+#include "graphics/models/SphereMesh.h"
 
 #include "graphics/ShaderProgram.h"
 #include "graphics/gl/GlClient.h"
@@ -158,9 +159,10 @@ int main(int argc, char** argv) {
   prog->linkProgram();
 
   CubeMesh cubeMesh;
+  SphereMesh sphereMesh;
 
   // unsigned int VBO, VAO, EBO;
-  uint32_t vao = glClient.sendMesh(cubeMesh);
+  uint32_t vao = glClient.sendMesh(sphereMesh);
 
   unsigned int texture;
   glGenTextures(1, &texture);
@@ -381,7 +383,8 @@ int main(int argc, char** argv) {
     vMatrix = Camera::getMainCamera().getViewMatrix();
     prog->uniform("view", vMatrix);
     prog->uniform("u_time", Time::getTicks());
-    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+    // glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, SphereMesh::sphereTriangles.size(), GL_UNSIGNED_INT, 0);
     // glDrawArrays(GL_TRIANGLES, 0, 6);
     Window::getMainWindow().swapBufferWindow();
     render();
