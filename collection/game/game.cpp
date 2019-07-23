@@ -135,18 +135,19 @@ int main(int argc, char** argv) {
 
   GlClient glClient;
 
+  std::cout << CubeMesh::cubeNormals.size() << " "
+            << CubeMesh::cubeVertices.size() << std::endl;
+
   Transform transform;
-  transform.translate(Vec3(-.3, -.3, -.3));
-  transform.rotate(Quaternion(0, 0, Mathf::pi_4 / 2));
-  transform.rotate(Quaternion(0, Mathf::pi_4 / 2, 0));
-  transform.rotate(Quaternion(Mathf::pi_4 / 2, 0, 0));
+  transform.translate(Vec3(-10, -5, -.3));
+  transform.rotate(Mathf::pi_4, 0, 1, 0);
   transform.scale(2, 2, 2);
 
   Mat4 model = transform.getModelMatrix();
 
-  Camera::getMainCamera().transform.translate(Vec3(0, 0, -20));
+  Camera::getMainCamera().transform.translate(Vec3(0, 0, 0));
   std::cout << "before" << mainCamera.transform.front() << "\n";
-  Camera::getMainCamera().transform.rotate(Mathf::pi, Vec3(0, 1, 0));
+  // Camera::getMainCamera().transform.rotate(Mathf::pi, Vec3(0, 0, 0));
   std::cout << "after" << mainCamera.transform.front() << "\n";
 
   Mat4 pMatrix = Camera::getMainCamera().getProjectionMatrix();
@@ -162,7 +163,7 @@ int main(int argc, char** argv) {
   SphereMesh sphereMesh;
 
   // unsigned int VBO, VAO, EBO;
-  uint32_t vao = glClient.sendMesh(sphereMesh);
+  uint32_t vao = glClient.sendMesh(cubeMesh);
 
   unsigned int texture;
   glGenTextures(1, &texture);
@@ -184,15 +185,18 @@ int main(int argc, char** argv) {
 
   prog->useProgram();
 
-  glUniform1i(glGetUniformLocation(prog->getProgramHandle(), "u_texture"), 0);
+  // glUniform1i(glGetUniformLocation(prog->getProgramHandle(), "u_texture"),
+  // 0);
 
   glBindVertexArray(
       vao);  // seeing as we only have a single VAO there's no need to bind it
              // every time, but we'll do so to keep things a bit more organized
-
+  // Mat4 modelNormal = transform.localRotation().toMatrix()
   prog->uniform("model", model);
   prog->uniform("view", vMatrix);
   prog->uniform("projection", pMatrix);
+
+  prog->uniform("u_texture", 0);
 
   Renderer& mainRenderer = Window::getMainRenderer();
 
@@ -326,35 +330,38 @@ int main(int argc, char** argv) {
       if (keyboard.keyDown(SDL_SCANCODE_UP)) {
         velocity += Dir2d::dirVectors[Dir2d::UP];
         Camera::getMainCamera().transform.translate(
-            -mainCamera.transform.front());
+            mainCamera.transform.front());
       }
       if (keyboard.keyDown(SDL_SCANCODE_RIGHT)) {
         velocity += Dir2d::dirVectors[Dir2d::RIGHT];
         Camera::getMainCamera().transform.translate(
-            -mainCamera.transform.left());
+            mainCamera.transform.right());
       }
       if (keyboard.keyDown(SDL_SCANCODE_LEFT)) {
         velocity += Dir2d::dirVectors[Dir2d::LEFT];
         Camera::getMainCamera().transform.translate(
-            -mainCamera.transform.right());
+            mainCamera.transform.left());
       }
       if (keyboard.keyDown(SDL_SCANCODE_DOWN)) {
         velocity += Dir2d::dirVectors[Dir2d::DOWN];
         Camera::getMainCamera().transform.translate(
-            -mainCamera.transform.back());
+            mainCamera.transform.back());
       }
       if (keyboard.keyDown(SDL_SCANCODE_W)) {
-        Camera::getMainCamera().transform.translate(-mainCamera.transform.up());
+        Camera::getMainCamera().transform.translate(mainCamera.transform.up());
       }
       if (keyboard.keyDown(SDL_SCANCODE_S)) {
         Camera::getMainCamera().transform.translate(
-            -mainCamera.transform.down());
+            mainCamera.transform.down());
       }
       if (keyboard.keyDown(SDL_SCANCODE_A)) {
-        Camera::getMainCamera().transform.rotate(.05, Vec3::up());
+        Camera::getMainCamera().transform.rotate(-.05, Vec3::up());
       }
       if (keyboard.keyDown(SDL_SCANCODE_D)) {
-        Camera::getMainCamera().transform.rotate(-.05, Vec3::up());
+        Camera::getMainCamera().transform.rotate(.05, Vec3::up());
+      }
+      if (keyboard.keyDown(SDL_SCANCODE_Z)) {
+        transform.rotate(.01, 0, 1, 0);
       }
 
       velocity.normalize() *= speed;
@@ -381,10 +388,13 @@ int main(int argc, char** argv) {
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     vMatrix = Camera::getMainCamera().getViewMatrix();
+    model = transform.getModelMatrix();
     prog->uniform("view", vMatrix);
-    prog->uniform("u_time", Time::getTicks());
-    // glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
-    glDrawElements(GL_TRIANGLES, SphereMesh::sphereTriangles.size(), GL_UNSIGNED_INT, 0);
+    prog->uniform("model", model);
+    prog->uniform("model_normal", transform.localRotation().toMatrix());
+    prog->uniform("u_time", (float)Time::getTicks());
+    glDrawElements(GL_TRIANGLES, SphereMesh::sphereTriangles.size(),
+                   GL_UNSIGNED_INT, 0);
     // glDrawArrays(GL_TRIANGLES, 0, 6);
     Window::getMainWindow().swapBufferWindow();
     render();
@@ -392,6 +402,11 @@ int main(int argc, char** argv) {
     // For calculating FPS
     renderCount++;
     if (renderCount % 100 == 0) {
+      std::cout << mainCamera.transform.localPosition() << std::endl;
+      std::cout << "forward" << mainCamera.transform.front() << "up "
+                << mainCamera.transform.up() << " right"
+                << mainCamera.transform.right() << std::endl;
+
       uint32_t msSinceLastFpsCalc =
           std::max<int>(Time::getTicks() - lastRender, 1);
       // std::cout << 100 * 1000 / msSinceLastFpsCalc << "fps" << std::endl;

@@ -58,7 +58,7 @@ Mat4 Mat4::inverse() const {
   return Mat4(glm::inverse(matrix));
 }
 
-float* Mat4::dataPointer() {
+const float* Mat4::dataPointer() const {
   return &matrix[0][0];
 }
 

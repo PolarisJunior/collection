@@ -39,7 +39,7 @@ int32_t ShaderProgram::addShader(const std::string& src, ShaderType type) {
   char infoLog[1024];
   if (!success) {
     glGetShaderInfoLog(shaderHandle, 1024, nullptr, infoLog);
-    std::cout << "error: " << infoLog << std::endl;
+    std::cout << "Error: " << infoLog << std::endl;
     exit(EXIT_FAILURE);
   }
 
@@ -79,11 +79,15 @@ std::optional<ShaderProgram> ShaderProgram::createProgram() {
   return std::nullopt;
 }
 
-void ShaderProgram::uniform(const std::string& name, Mat4& m) {
+void ShaderProgram::uniform(const std::string& name, const Mat4& m) {
   glUniformMatrix4fv(glGetUniformLocation(getProgramHandle(), name.c_str()), 1,
                      GL_FALSE, m.dataPointer());
 }
 
 void ShaderProgram::uniform(const std::string& name, float f) {
   glUniform1f(glGetUniformLocation(getProgramHandle(), name.c_str()), f);
+}
+
+void ShaderProgram::uniform(const std::string& name, int32_t v) {
+  glUniform1i(glGetUniformLocation(getProgramHandle(), name.c_str()), v);
 }

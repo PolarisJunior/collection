@@ -52,35 +52,44 @@ int32_t GlClient::createShaderProgram(const char* vertSource,
 }
 
 uint32_t GlClient::sendMesh(const Mesh& mesh) {
-  unsigned int VBO, VAO, EBO, UV;
+  unsigned int VBO, VAO, EBO, UV, NORMS;
   glGenVertexArrays(1, &VAO);
   glGenBuffers(1, &VBO);
   glGenBuffers(1, &EBO);
   glGenBuffers(1, &UV);
+  glGenBuffers(1, &NORMS);
 
   glBindVertexArray(VAO);
 
+  // UVS
   glBindBuffer(GL_ARRAY_BUFFER, UV);
   glBufferData(GL_ARRAY_BUFFER, sizeof(Vec2) * mesh.uvs().size(),
                mesh.uvs().data(), GL_STATIC_DRAW);
   glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
   glEnableVertexAttribArray(1);
 
+  // NORMALS
+  glBindBuffer(GL_ARRAY_BUFFER, NORMS);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(Vec3) * mesh.normals().size(),
+               mesh.normals().data(), GL_STATIC_DRAW);
+  glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+  glEnableVertexAttribArray(2);
+
+  // POSITIONS
+
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
   glBufferData(GL_ARRAY_BUFFER, sizeof(Vec3) * mesh.vertices().size(),
                mesh.vertices().data(), GL_STATIC_DRAW);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+  glEnableVertexAttribArray(0);
 
+  // INDICES/TRIANGLES
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER,
                sizeof(int32_t) * mesh.triangles().size(),
                mesh.triangles().data(), GL_STATIC_DRAW);
 
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-  glEnableVertexAttribArray(0);
-
   glBindBuffer(GL_ARRAY_BUFFER, 0);
-
   glBindVertexArray(0);
-
   return VAO;
 }

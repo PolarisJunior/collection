@@ -19,7 +19,7 @@ class Mat4 {
 
   Mat4 inverse() const;
 
-  float* dataPointer();
+  const float* dataPointer() const;
 
   static Mat4 translate(const Vec3& offsets);
   static Mat4 translate(float x, float y, float z) {

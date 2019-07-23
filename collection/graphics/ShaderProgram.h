@@ -18,8 +18,11 @@ class ShaderProgram {
   int32_t loadVertFromFile(const std::string& filePath);
   int32_t loadFragFromFile(const std::string& filePath);
 
-  void uniform(const std::string& name, Mat4& m);
+  void uniform(const std::string& name, const Mat4& m);
+  // warning: be careful of ambiguity between floats and integers
   void uniform(const std::string& name, float f);
+  // Note use this to load uniform variables as sampler types
+  void uniform(const std::string& name, int32_t v);
 
   void linkProgram();
 
