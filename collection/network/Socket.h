@@ -4,6 +4,20 @@
 #include <memory>
 #include <string>
 
+// ClientSocket clientSocket;
+// clientSocket.setRecvTimeout(std::chrono::seconds(5));
+// std::string str = clientSocket.receive();
+
+// std::cout << "received: " << str << std::endl;
+
+// std::string ourMsg = "hello network";
+// clientSocket.sendMsg(ourMsg);
+
+// ServerSocket socket;
+// std::unique_ptr<Socket> sock = socket.acceptConnection();
+// std::string myMsg = "frappucino";
+// sock->sendMsg(myMsg);
+
 typedef uint64_t SocketId;
 
 class Socket {

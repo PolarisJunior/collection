@@ -95,28 +95,6 @@ int main(int argc, char** argv) {
       exit(EXIT_FAILURE);
     }
   }
-  // std::optional<RelationalDatabase> db =
-  //   RelationalDatabase::loadDatabase("test2.db");
-  // if (db) {
-  //   printf("create\n");
-  //   db->createTable();
-  // } else {
-  //   printf("not create\n");
-  // }
-
-  // ClientSocket clientSocket;
-  // clientSocket.setRecvTimeout(std::chrono::seconds(5));
-  // std::string str = clientSocket.receive();
-
-  // std::cout << "received: " << str << std::endl;
-
-  // std::string ourMsg = "hello network";
-  // clientSocket.sendMsg(ourMsg);
-
-  // ServerSocket socket;
-  // std::unique_ptr<Socket> sock = socket.acceptConnection();
-  // std::string myMsg = "frappucino";
-  // sock->sendMsg(myMsg);
 
   WindowBuilder windowBuilder;
   windowBuilder.setTitle("Game").setDims(800, 600).setVisible();
@@ -147,14 +125,21 @@ int main(int argc, char** argv) {
   //   i++;
   // }
 
-  for (int j = 0; j < 16; j++) {
-    for (int k = 0; k < 16; k++) {
-      for (int a = 0; a < 20; a++) {
-        transforms.push_back(
-            Transform(j * 1.0001 - 50, a * 1.0001 - 30, k * 1.0001));
-        //  transforms.back().translate();
-      }
-    }
+  // for (int j = 0; j < 16; j++) {
+  //   for (int k = 0; k < 16; k++) {
+  //     for (int a = 0; a < 20; a++) {
+  //       transforms.push_back(
+  //           Transform(j * 1.0001 - 50, a * 1.0001 - 30, k * 1.0001));
+  //       //  transforms.back().translate();
+  //     }
+  //   }
+  // }
+
+  Chunk c;
+  for (auto it = c.begin(); it < c.end(); ++it) {
+    Vector3 v = *it;
+    transforms.push_back(Transform(v.x, v.y, v.z));
+    // std::cout << *it << std::endl;
   }
 
   std::optional<ShaderProgram> prog = ShaderProgram::createProgram();

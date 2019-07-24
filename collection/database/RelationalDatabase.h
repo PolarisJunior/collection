@@ -4,6 +4,15 @@
 #include <optional>
 #include <string>
 
+// std::optional<RelationalDatabase> db =
+//   RelationalDatabase::loadDatabase("test2.db");
+// if (db) {
+//   printf("create\n");
+//   db->createTable();
+// } else {
+//   printf("not create\n");
+// }
+
 struct sqlite3;
 
 class RelationalDatabase {
