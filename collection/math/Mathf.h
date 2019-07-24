@@ -15,6 +15,11 @@ struct Mathf {
 
   static float lerp(float a, float b, float t) { return a + t * (b - a); }
 
+  // in range of values, inclusive
+  static bool inRange(float x, float a, float b);
+
+  static float clamp(float x, float a, float b);
+
   static float clampRad(float rad);
   static float normalizeRad(float rad);
 

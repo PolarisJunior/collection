@@ -32,6 +32,14 @@ float Mathf::mod(float x, float y) {
   return x - intPortion;
 }
 
+bool Mathf::inRange(float x, float a, float b) {
+  return clamp(x, a, b) == x;
+}
+
+float Mathf::clamp(float x, float a, float b) {
+  return std::clamp(x, a, b);
+}
+
 // clamp between 0 and 2pi
 float Mathf::clampRad(float rad) {
   float res = Mathf::mod(rad, Mathf::pi * 2);

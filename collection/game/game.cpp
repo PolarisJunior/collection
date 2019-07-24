@@ -36,6 +36,8 @@
 
 #include "game/ecs/Transform.h"
 
+#include "game/voxel/Chunk.h"
+
 #include "graphics/Color.h"
 #include "graphics/Image.h"
 #include "graphics/Renderer.h"

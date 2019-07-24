@@ -4,6 +4,7 @@
 #include <math.h>
 #include <cstdint>
 #include <ostream>
+#include "crypto/Hash.h"
 
 template <class Numeric>
 class Vector3 {
@@ -22,13 +23,19 @@ class Vector3 {
 
   Vector3 operator-() const;
 
+  std::size_t operator()() const {
+    std::size_t h = Hash::hashCombine(x, y);
+    Hash::hashCombine(h, z);
+    return h;
+  }
+
   Vector3& operator+=(const Vector3& other);
   Vector3& operator-=(const Vector3& other);
   Vector3& operator*=(const Vector3& other);
   Vector3& operator*=(float scale);
   Vector3& operator/=(float divisor);
 
-  bool operator==(const Vector3& other);
+  bool operator==(const Vector3& other) const;
 
   friend std::ostream& operator<<(std::ostream& out, const Vector3& vec) {
     return out << "(" << vec.x << ", " << vec.y << ", " << vec.z << ")";
@@ -133,7 +140,7 @@ inline Vector3<Numeric>& Vector3<Numeric>::operator/=(float divisor) {
 }
 
 template <class Numeric>
-inline bool Vector3<Numeric>::operator==(const Vector3<Numeric>& other) {
+inline bool Vector3<Numeric>::operator==(const Vector3<Numeric>& other) const {
   return this->x == other.x && this->y == other.y && this->z == other.z;
 }
 
@@ -241,3 +248,19 @@ inline Vector3<Numeric> Vector3<Numeric>::forward() {
 }
 
 using Vec3 = Vector3<float>;
+
+// C++ hashing is uh something else
+namespace std {
+template <typename T>
+struct hash<Vector3<T>> {
+  // using argument_type = Vector3<T>;
+  // using result_type = size_t;
+  inline static hash<T> hasher{};
+  size_t operator()(Vector3<T> const& v) const noexcept {
+    size_t h = hasher(v.x);
+    Hash::hashCombine<T>(h, v.y);
+    Hash::hashCombine<T>(h, v.z);
+    return h;
+  }
+};
+}  // namespace std
