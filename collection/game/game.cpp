@@ -44,6 +44,7 @@
 #include "graphics/Renderer.h"
 #include "graphics/Sprite.h"
 #include "graphics/Texture.h"
+#include "graphics/TextureAtlas.h"
 #include "graphics/TileMap.h"
 #include "graphics/TileSet.h"
 #include "graphics/models/CubeMesh.h"
@@ -148,7 +149,7 @@ int main(int argc, char** argv) {
   // unsigned int VBO, VAO, EBO;
   uint32_t vao = glClient.sendMesh(usedMesh);
   uint32_t vao2 = glClient.sendMesh(quadMesh);
-
+  // std::cout << "foo" << std::endl;
   unsigned int texture;
   glGenTextures(1, &texture);
   glBindTexture(GL_TEXTURE_2D, texture);
@@ -158,14 +159,22 @@ int main(int argc, char** argv) {
                                // wrapping method)
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
   // set texture filtering parameters
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-  SDL_Surface* surf = IMG_Load("../res/monkey.png");
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, surf->w, surf->h, 0, GL_RGBA,
-               GL_UNSIGNED_BYTE, surf->pixels);
+  // SDL_Surface* surf = IMG_Load("../res/monkey.png");
+  // SDL_Surface* surf = IMG_Load("../res/minecraft.jpg");
+  int32_t pixelType = GL_RGB;
+  TextureAtlas atlas("../res/minecraft.jpg");
+  if (atlas.hasAlpha()) {
+    pixelType = GL_RGBA;
+  }
+  glTexImage2D(GL_TEXTURE_2D, 0, pixelType, atlas.width(), atlas.height(), 0,
+               pixelType, GL_UNSIGNED_BYTE, atlas.dataPointer());
+
   glGenerateMipmap(GL_TEXTURE_2D);
-  SDL_FreeSurface(surf);
 
   prog->useProgram();
 
@@ -198,9 +207,6 @@ int main(int argc, char** argv) {
   mainCamera.setWidth(static_cast<float>(Window::getMainWindow().getWidth()));
   mainCamera.setHeight(static_cast<float>(Window::getMainWindow().getHeight()));
 
-  actor.x = 0;
-  actor.y = 0;
-  mainCamera.moveCamera(0, 0);
   mainCamera.attachToActor(&actor);
   mainCamera.setAttachOffset(Vector2(100.0f, 100.0f));
 

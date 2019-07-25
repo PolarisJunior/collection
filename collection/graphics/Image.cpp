@@ -1,8 +1,10 @@
 
 #include "Image.h"
+#include <iostream>
 #include "io/File.h"
 
 Image::Image(const std::string& filePath) {
+  std::cout << "is this ever run" << std::endl;
   File file(filePath);
   buf = file.readBytes();
   bufSize = file.getSize();

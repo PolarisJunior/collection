@@ -57,19 +57,19 @@ Mesh ChunkMeshBuilder::buildMesh(const Chunk& chunk) {
 
   for (auto it = chunk.blocksInChunk.begin(); it != chunk.blocksInChunk.end();
        ++it) {
-    const Vector3<int32_t> pos = it->first;
-    const Block::Type type = it->second;
-
-    auto points = getAdjacentPoints(pos);
+    const Vector3<int32_t> blockPos = it->first;
+    const Block::Type blockType = it->second;
 
     int32_t i = 0;
     for (const vec& direction : allDirections) {
-      const vec adjacentPos = pos + direction;
+      const vec adjacentPos = blockPos + direction;
       if (chunk.getBlockType(adjacentPos) == Block::Type::AIR) {
         // Center and then reposition
-        mesh.joinMesh(faces[i], pos.x + (float)direction.x / 2,
-                      pos.y + 0.5 + (float)direction.y / 2,
-                      pos.z + (float)direction.z / 2);
+        // all sides are some particular distance from the center point of a
+        // block
+        mesh.joinMesh(faces[i], blockPos.x + (float)direction.x / 2,
+                      blockPos.y + 0.5 + (float)direction.y / 2,
+                      blockPos.z + (float)direction.z / 2);
       }
       i++;
     }

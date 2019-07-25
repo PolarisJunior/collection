@@ -10,6 +10,8 @@ struct Mathf {
 
   static constexpr float square(float x) { return x * x; }
 
+  static float sqrt(float x);
+
   // static float clampAngle(float ang);
   // static float normalizeAngle(float ang);
 

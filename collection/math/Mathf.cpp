@@ -5,6 +5,10 @@
 #include <algorithm>
 #include <cmath>
 
+float Mathf::sqrt(float x) {
+  return std::sqrt(x);
+}
+
 float Mathf::abs(float v) {
   return fabs(v);
 }

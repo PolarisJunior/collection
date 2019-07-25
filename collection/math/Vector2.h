@@ -11,11 +11,12 @@ class Vector2 {
 
   Vector2() = default;
   Vector2<T>(T x, T y);
+  Vector2<T>(T k) : x(k), y(k) {}
 
-  Vector2 operator+(const Vector2& other);
-  Vector2 operator-(const Vector2& other);
-  Vector2 operator*(float scale);
-  Vector2 operator/(float divisor);
+  Vector2 operator+(const Vector2& other) const;
+  Vector2 operator-(const Vector2& other) const;
+  Vector2 operator*(float scale) const;
+  Vector2 operator/(float divisor) const;
 
   Vector2& operator+=(const Vector2& other);
   Vector2& operator-=(const Vector2& other);
@@ -49,22 +50,22 @@ template <typename T>
 inline Vector2<T>::Vector2(T x, T y) : x(x), y(y) {}
 
 template <typename T>
-inline Vector2<T> Vector2<T>::operator+(const Vector2& other) {
+inline Vector2<T> Vector2<T>::operator+(const Vector2& other) const {
   return Vector2(this->x + other.x, this->y + other.y);
 }
 
 template <typename T>
-inline Vector2<T> Vector2<T>::operator-(const Vector2& other) {
+inline Vector2<T> Vector2<T>::operator-(const Vector2& other) const {
   return Vector2(this->x - other.x, this->y - other.y);
 }
 
 template <typename T>
-inline Vector2<T> Vector2<T>::operator*(float scale) {
+inline Vector2<T> Vector2<T>::operator*(float scale) const {
   return Vector2(this->x * scale, this->y * scale);
 }
 
 template <typename T>
-inline Vector2<T> Vector2<T>::operator/(float divisor) {
+inline Vector2<T> Vector2<T>::operator/(float divisor) const {
   return Vector2(this->x / divisor, this->y / divisor);
 }
 
