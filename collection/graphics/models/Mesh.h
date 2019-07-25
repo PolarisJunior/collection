@@ -2,9 +2,12 @@
 #pragma once
 
 #include <vector>
+#include "game/ecs/Transform.h"
+#include "math/Mat4.h"
 #include "math/Vector2.h"
 #include "math/Vector3.h"
 
+/* A modifiable mesh */
 class Mesh {
  public:
   Mesh() = default;
@@ -19,6 +22,20 @@ class Mesh {
 
   void setUvs(const std::vector<Vec2>& uvs) { uvs_ = uvs; }
   void setNormals(const std::vector<Vec3>& norms) { normals_ = norms; }
+
+  // Join two meshes together by adding their data together
+  void joinMesh(const Mesh& otherMesh,
+                float offsetX = 0,
+                float offsetY = 0,
+                float offsetZ = 0,
+                const Quaternion& rotation = Quaternion::identity);
+  void joinMesh(const Mesh& otherMesh, const Transform& t);
+
+  void translateVertices(const Vec3& v);
+  void translateVertices(float x, float y, float z);
+
+  void rotateVertices(const Quaternion& rotation);
+  void rotateVertices(const Mat4& rotationMatrix);
 
   const std::vector<Vec3>& vertices() const { return vertices_; };
   const std::vector<int32_t>& triangles() const { return triangles_; };

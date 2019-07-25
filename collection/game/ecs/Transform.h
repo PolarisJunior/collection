@@ -41,8 +41,6 @@ class Transform {
   }
 
   Mat4 getModelMatrix();
-  // Gets the model matrix adjusted for opengl lefthand rule
-  Mat4 getLeftModelMatrix();
   Mat4 getInverseModelMatrix();
 
   Vec3 right() const { return localRotation_ * Vec3::right(); }

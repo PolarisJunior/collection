@@ -49,14 +49,14 @@ Mat4 Mat4::rotate(float rad, const Vec3& axis) {
   return Mat4(m);
 }
 
-Vec3 Mat4::operator*(const Vec3& rhs) {
+Vec3 Mat4::operator*(const Vec3& rhs) const {
   glm::vec4 res(rhs.x, rhs.y, rhs.z, 1.0f);
   res = matrix * res;
 
   return fromGlmVec(res);
 }
 
-Mat4 Mat4::operator*(const Mat4& rhs) {
+Mat4 Mat4::operator*(const Mat4& rhs) const {
   return Mat4(this->matrix * rhs.matrix);
 }
 

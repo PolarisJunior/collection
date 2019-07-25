@@ -40,8 +40,6 @@ class Camera {
   void setAttachOffset(Vector2<float> offset);
 
   Mat4 getViewMatrix();
-  // adjusted for opengl coordinates
-  Mat4 getLeftViewMatrix();
   Mat4 getProjectionMatrix();
 
   static void setMainCamera(Camera& cam);

@@ -46,19 +46,13 @@ Mat4 Camera::getProjectionMatrix() {
       return Mat4(proj);
     case ProjectionType::ORTHOGRAPHIC:
       glm::mat4 ortho =
-          glm::ortho(0.f, 800.f, 0.f, 600.f, nearClipPlane, farClipPlane);
+          glm::orthoLH(0.f, 800.f, 0.f, 600.f, nearClipPlane, farClipPlane);
       return Mat4(ortho);
   }
 }
 
 Mat4 Camera::getViewMatrix() {
   return transform.getModelMatrix().inverse();
-}
-
-Mat4 Camera::getLeftViewMatrix() {
-  Mat4 m = getViewMatrix();
-  m.invertTranslate();
-  return m;
 }
 
 Camera& Camera::getMainCamera() {

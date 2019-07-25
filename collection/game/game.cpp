@@ -37,6 +37,7 @@
 #include "game/ecs/Transform.h"
 
 #include "game/voxel/Chunk.h"
+#include "game/voxel/ChunkMeshBuilder.h"
 
 #include "graphics/Color.h"
 #include "graphics/Image.h"
@@ -74,6 +75,8 @@
 #include "io/FileInputStream.h"
 
 #include "references/gl_examples.h"
+
+#include "util/Macros.h"
 
 static bool running;
 static SdlEventPoller eventPoller;
@@ -116,31 +119,14 @@ int main(int argc, char** argv) {
 
   GlClient glClient;
 
-  Transform transform;
-  std::vector<Transform> transforms;
-  int i = 0;
-  // for (float v = 0; v < Mathf::two_pi; v += 0.1f) {
-  //   transforms.push_back(Transform());
-  //   transforms[i].translate(Mathf::sin(v) * 10, 0, Mathf::cos(v) * 10);
-  //   i++;
-  // }
-
-  // for (int j = 0; j < 16; j++) {
-  //   for (int k = 0; k < 16; k++) {
-  //     for (int a = 0; a < 20; a++) {
-  //       transforms.push_back(
-  //           Transform(j * 1.0001 - 50, a * 1.0001 - 30, k * 1.0001));
-  //       //  transforms.back().translate();
-  //     }
-  //   }
-  // }
-
-  Chunk c;
-  for (auto it = c.begin(); it < c.end(); ++it) {
+  Chunk c(0, 0, 0);
+  foreach (it, c) {
     Vector3 v = *it;
-    transforms.push_back(Transform(v.x, v.y, v.z));
-    // std::cout << *it << std::endl;
+    c.setBlockType(v.x, v.y, v.z, Block::Type::DIRT);
   }
+
+  Mesh chunkMesh;
+  chunkMesh = ChunkMeshBuilder::buildMesh(c);
 
   std::optional<ShaderProgram> prog = ShaderProgram::createProgram();
   prog->loadVertFromFile("../res/simple.vert");
@@ -153,10 +139,15 @@ int main(int argc, char** argv) {
   QuadMesh quadMesh;
   PlaneMesh planeMesh;
 
-  Mesh& usedMesh = planeMesh;
+  Transform groundPlaneTransform;
+  groundPlaneTransform.scale(100, 1, 100);
+  groundPlaneTransform.translate(0, -6, 0);
+
+  Mesh& usedMesh = chunkMesh;
 
   // unsigned int VBO, VAO, EBO;
   uint32_t vao = glClient.sendMesh(usedMesh);
+  uint32_t vao2 = glClient.sendMesh(quadMesh);
 
   unsigned int texture;
   glGenTextures(1, &texture);
@@ -180,10 +171,6 @@ int main(int argc, char** argv) {
 
   // glUniform1i(glGetUniformLocation(prog->getProgramHandle(), "u_texture"),
   // 0);
-
-  glBindVertexArray(
-      vao);  // seeing as we only have a single VAO there's no need to bind it
-             // every time, but we'll do so to keep things a bit more organized
 
   Mat4 pMatrix = Camera::getMainCamera().getProjectionMatrix();
   prog->uniform("projection", pMatrix);
@@ -296,6 +283,8 @@ int main(int argc, char** argv) {
            event.button.x, event.button.y, worldPos.x, worldPos.y);
   });
 
+  Transform transform;
+
   eventScheduler.scheduleEvent(
       []() { std::cout << "scheduled event ran" << std::endl; }, 3.0);
 
@@ -322,29 +311,28 @@ int main(int argc, char** argv) {
       if (keyboard.keyDown(SDL_SCANCODE_UP)) {
         velocity += Dir2d::dirVectors[Dir2d::UP];
         Camera::getMainCamera().transform.translate(
-            mainCamera.transform.front());
+            mainCamera.transform.front() / 5);
       }
       if (keyboard.keyDown(SDL_SCANCODE_RIGHT)) {
         velocity += Dir2d::dirVectors[Dir2d::RIGHT];
         Camera::getMainCamera().transform.translate(
-            mainCamera.transform.right());
+            mainCamera.transform.right() / 5);
       }
       if (keyboard.keyDown(SDL_SCANCODE_LEFT)) {
         velocity += Dir2d::dirVectors[Dir2d::LEFT];
         Camera::getMainCamera().transform.translate(
-            mainCamera.transform.left());
+            mainCamera.transform.left() / 5);
       }
       if (keyboard.keyDown(SDL_SCANCODE_DOWN)) {
         velocity += Dir2d::dirVectors[Dir2d::DOWN];
         Camera::getMainCamera().transform.translate(
-            mainCamera.transform.back());
+            mainCamera.transform.back() / 5);
       }
       if (keyboard.keyDown(SDL_SCANCODE_W)) {
-        Camera::getMainCamera().transform.translate(mainCamera.transform.up());
+        Camera::getMainCamera().transform.rotate(-0.05, Vec3::right());
       }
       if (keyboard.keyDown(SDL_SCANCODE_S)) {
-        Camera::getMainCamera().transform.translate(
-            mainCamera.transform.down());
+        Camera::getMainCamera().transform.rotate(0.05, Vec3::right());
       }
       if (keyboard.keyDown(SDL_SCANCODE_A)) {
         Camera::getMainCamera().transform.rotate(-.05, Vec3::up());
@@ -394,17 +382,22 @@ int main(int argc, char** argv) {
     // prog->uniform("view", viewMatrix);
     prog->uniform("u_time", (float)Time::getTicks());
 
-    for (auto it = transforms.begin(); it < transforms.end(); it++) {
-      // Mat4 model = it->getLeftModelMatrix();
-      Mat4 model = it->getModelMatrix();
+    glBindVertexArray(vao);
 
-      // prog->uniform("model", model);
-      prog->uniform("MVP", PV * model);
-      prog->uniform("model_normal", it->localRotation().toMatrix());
+    Mat4 model = transform.getModelMatrix();
+    // prog->uniform("model", model);
+    prog->uniform("MVP", PV * model);
+    prog->uniform("model_normal", transform.localRotation().toMatrix());
 
-      glDrawElements(GL_TRIANGLES, usedMesh.triangles().size(), GL_UNSIGNED_INT,
-                     0);
-    }
+    glDrawElements(GL_TRIANGLES, usedMesh.triangles().size(), GL_UNSIGNED_INT,
+                   0);
+
+    glBindVertexArray(vao2);
+    prog->uniform("MVP", PV * groundPlaneTransform.getModelMatrix());
+    prog->uniform("model_normal",
+                  groundPlaneTransform.localRotation().toMatrix());
+    glDrawElements(GL_TRIANGLES, quadMesh.triangles().size(), GL_UNSIGNED_INT,
+                   0);
 
     // prog->uniform("MVP", PV * transform.getModelMatrix());
     // prog->uniform("model_normal", transform.localRotation().toMatrix());

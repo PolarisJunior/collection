@@ -17,8 +17,8 @@ class Mat4 {
   // this is helpful for adjusting to opengl coordinates
   void invertTranslate();
 
-  Vec3 operator*(const Vec3& rhs);
-  Mat4 operator*(const Mat4& rhs);
+  Vec3 operator*(const Vec3& rhs) const;
+  Mat4 operator*(const Mat4& rhs) const;
 
   Mat4 inverse() const;
 
