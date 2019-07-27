@@ -3,8 +3,10 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include <algorithm>
+#include "math/Vector2.h"
 
-TextureAtlas::TextureAtlas(const std::string& imgPath, int32_t cw, int32_t ch) {
+TextureAtlas::TextureAtlas(const std::string& imgPath, int32_t cw, int32_t ch)
+    : cellWidth(cw), cellHeight(ch) {
   SDL_Surface* surf = IMG_Load(imgPath.c_str());
   int32_t numBytes = surf->pitch * surf->h;
 
@@ -23,6 +25,12 @@ TextureAtlas::TextureAtlas(const std::string& imgPath, int32_t cw, int32_t ch) {
   }
 
   SDL_FreeSurface(surf);
+}
+
+std::array<Vec2, 6> TextureAtlas::getFaceTexCoords(int32_t row,
+                                                   int32_t col) const {
+  std::array<Vec2, 6> texCoords;
+  return texCoords;
 }
 
 uint8_t* TextureAtlas::dataPointer() {

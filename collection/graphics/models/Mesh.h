@@ -19,11 +19,12 @@ class Mesh {
 
   void setVertices(const std::vector<Vec3>& vs) { vertices_ = vs; }
   void setTriangles(const std::vector<int32_t>& ts) { triangles_ = ts; }
-
   void setUvs(const std::vector<Vec2>& uvs) { uvs_ = uvs; }
   void setNormals(const std::vector<Vec3>& norms) { normals_ = norms; }
 
-  // Join two meshes together by adding their data together
+  void uvs(std::vector<Vec2>&& uvs) { uvs_ = std::move(uvs); }
+
+  // Join two meshes together with an offset and rotation
   void joinMesh(const Mesh& otherMesh,
                 float offsetX = 0,
                 float offsetY = 0,

@@ -113,7 +113,6 @@ int main(int argc, char** argv) {
   }
 
   Camera mainCamera;
-  // mainCamera.fieldOfView = Mathf::pi_4;
   mainCamera.fieldOfView = 90;
   Camera::setMainCamera(mainCamera);
   mainCamera.projectionType = Camera::ProjectionType::PERSPECTIVE;
@@ -126,48 +125,23 @@ int main(int argc, char** argv) {
     c.setBlockType(v.x, v.y, v.z, Block::Type::DIRT);
   }
 
-  Mesh chunkMesh;
-  chunkMesh = ChunkMeshBuilder::buildMesh(c);
-
   std::optional<ShaderProgram> prog = ShaderProgram::createProgram();
   prog->loadVertFromFile("../res/simple.vert");
   prog->loadFragFromFile("../res/simple.frag");
 
   prog->linkProgram();
 
-  CubeMesh cubeMesh;
-  SphereMesh sphereMesh;
-  QuadMesh quadMesh;
-  PlaneMesh planeMesh;
-
   Transform groundPlaneTransform;
   groundPlaneTransform.scale(100, 1, 100);
   groundPlaneTransform.translate(0, -6, 0);
 
-  Mesh& usedMesh = chunkMesh;
-
-  // unsigned int VBO, VAO, EBO;
-  uint32_t vao = glClient.sendMesh(usedMesh);
-  uint32_t vao2 = glClient.sendMesh(quadMesh);
-  // std::cout << "foo" << std::endl;
   unsigned int texture;
   glGenTextures(1, &texture);
   glBindTexture(GL_TEXTURE_2D, texture);
 
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S,
-                  GL_REPEAT);  // set texture wrapping to GL_REPEAT (default
-                               // wrapping method)
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  // set texture filtering parameters
-  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-  // SDL_Surface* surf = IMG_Load("../res/monkey.png");
-  // SDL_Surface* surf = IMG_Load("../res/minecraft.jpg");
   int32_t pixelType = GL_RGB;
-  TextureAtlas atlas("../res/minecraft.jpg");
+  TextureAtlas atlas("../res/minecraft.jpg", 64, 64);
+  // TextureAtlas atlas("../res/spritesheet_tiles2.png", 32, 32);
   if (atlas.hasAlpha()) {
     pixelType = GL_RGBA;
   }
@@ -175,11 +149,27 @@ int main(int argc, char** argv) {
                pixelType, GL_UNSIGNED_BYTE, atlas.dataPointer());
 
   glGenerateMipmap(GL_TEXTURE_2D);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 1);
 
   prog->useProgram();
 
-  // glUniform1i(glGetUniformLocation(prog->getProgramHandle(), "u_texture"),
-  // 0);
+  CubeMesh cubeMesh;
+  SphereMesh sphereMesh;
+  QuadMesh quadMesh;
+  PlaneMesh planeMesh;
+
+  Mesh chunkMesh;
+  ChunkMeshBuilder meshBuilder;
+  chunkMesh = meshBuilder.buildMesh(c, atlas);
+  Mesh& usedMesh = chunkMesh;
+
+  // unsigned int VBO, VAO, EBO;
+  uint32_t vao = glClient.sendMesh(usedMesh);
+  uint32_t vao2 = glClient.sendMesh(quadMesh);
 
   Mat4 pMatrix = Camera::getMainCamera().getProjectionMatrix();
   prog->uniform("projection", pMatrix);

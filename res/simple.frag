@@ -15,4 +15,4 @@ void main()
     FragColor = vec4(c.xyz, 1.0f);
     //FragColor = vec4((normal), 1.0f);
 
-}      
+}

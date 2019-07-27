@@ -1,36 +1,19 @@
 
 #include "ChunkMeshBuilder.h"
+#include <algorithm>
 #include <iostream>
-#include "graphics/models/CubeMesh.h"
+#include "game/voxel/Block.h"
+#include "graphics/TextureAtlas.h"
 #include "graphics/models/PlaneMesh.h"
-#include "graphics/models/QuadMesh.h"
 #include "math/Mat4.h"
-
-/*
-dynamic programming solution?
-build array 16 * 16 * 16 true if occupied
-
- */
-
-std::vector<Vector3<int32_t>> getAdjacentPoints(const Vector3<int32_t>& v) {
-  std::vector<Vector3<int32_t>> points;
-  using vec = Vector3<int32_t>;
-
-  points.push_back(v + vec::up());
-  points.push_back(v + vec::down());
-  points.push_back(v + vec::right());
-  points.push_back(v + vec::left());
-  points.push_back(v + vec::forward());
-  points.push_back(v + vec::backward());
-  return points;
-}
 
 using vec = Vector3<int32_t>;
 std::vector<Vector3<int32_t>> allDirections = {vec::up(),      vec::down(),
                                                vec::right(),   vec::left(),
                                                vec::forward(), vec::backward()};
 
-Mesh ChunkMeshBuilder::buildMesh(const Chunk& chunk) {
+Mesh ChunkMeshBuilder::buildMesh(const Chunk& chunk,
+                                 const TextureAtlas& atlas) {
   Mesh mesh;
   Mesh faceMesh = PlaneMesh();
 
@@ -63,10 +46,37 @@ Mesh ChunkMeshBuilder::buildMesh(const Chunk& chunk) {
     int32_t i = 0;
     for (const vec& direction : allDirections) {
       const vec adjacentPos = blockPos + direction;
-      if (chunk.getBlockType(adjacentPos) == Block::Type::AIR) {
-        // Center and then reposition
-        // all sides are some particular distance from the center point of a
-        // block
+      Block::Type adjacentBlockType = chunk.getBlockType(adjacentPos);
+      if (adjacentBlockType == Block::Type::AIR) {
+        Block::Face face = Block::indicesToFaces.at(i);
+        // int32_t blockIdx = atlas.textureIndex(3, 1);
+        int32_t blockIdx = Block::getAtlasIndex(adjacentBlockType, face);
+        std::vector<Vec2> newUvs;
+
+        float pixelWidth = 1.0 / atlas.width();
+        float pixelHeight = 1.0 / atlas.height();
+
+        const Vec2 uvOffset =
+            Vec2((float)(blockIdx % atlas.numCols()) / atlas.numCols() +
+                     pixelWidth / 2,
+                 (float)(blockIdx / atlas.numRows()) / atlas.numRows() +
+                     pixelHeight / 2);
+
+        const Vec2 numTextures = Vec2(atlas.numCols(), atlas.numRows());
+
+        std::transform(
+            faceMesh.uvs().begin(), faceMesh.uvs().end(),
+            std::back_inserter(newUvs),
+            [&numTextures, &uvOffset, pixelWidth, pixelHeight](const Vec2& st) {
+              return st / numTextures + uvOffset +
+                     Vec2(pixelWidth / 2 * (1 - st.x) - pixelWidth * st.x,
+                          pixelHeight / 2 * (1 - st.y) - pixelHeight * st.y);
+            });
+
+        faces[i].uvs(std::move(newUvs));
+
+        // faces[i].uvs()) Center and then reposition all sides are some
+        // particular distance from the center point of a block
         mesh.joinMesh(faces[i], blockPos.x + (float)direction.x / 2,
                       blockPos.y + 0.5 + (float)direction.y / 2,
                       blockPos.z + (float)direction.z / 2);

@@ -1,8 +1,11 @@
 #pragma once
 #include "Chunk.h"
 #include "graphics/models/Mesh.h"
+class TextureAtlas;
 
 class ChunkMeshBuilder {
  public:
-  static Mesh buildMesh(const Chunk& c);
+  Mesh buildMesh(const Chunk& c, const TextureAtlas& atlas);
+
+ private:
 };

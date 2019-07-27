@@ -23,10 +23,12 @@ void Mesh::joinMesh(const Mesh& otherMesh,
                  std::back_inserter(triangles_),
                  [dist](int32_t idx) { return idx + dist; });
 
-  // uvs_.insert(uvs_.end(), otherMesh.uvs().begin(), otherMesh.uvs().end());
-  std::transform(
-      otherMesh.uvs().begin(), otherMesh.uvs().end(), std::back_inserter(uvs_),
-      [](const Vec2& st) { return st / 16.f + Vec2(1.0f / 16.f * 3, 0); });
+  uvs_.insert(uvs_.end(), otherMesh.uvs().begin(), otherMesh.uvs().end());
+  // std::transform(
+  //     otherMesh.uvs().begin(), otherMesh.uvs().end(),
+  //     std::back_inserter(uvs_),
+  //     [](const Vec2& st) { return st / 16.f + Vec2(1.0f / 16.f * 3, 0); });
+
   normals_.insert(normals_.end(), otherMesh.normals().begin(),
                   otherMesh.normals().end());
 }

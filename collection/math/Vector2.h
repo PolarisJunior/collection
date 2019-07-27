@@ -17,6 +17,7 @@ class Vector2 {
   Vector2 operator-(const Vector2& other) const;
   Vector2 operator*(float scale) const;
   Vector2 operator/(float divisor) const;
+  Vector2 operator/(const Vector2& lhs) const;
 
   Vector2& operator+=(const Vector2& other);
   Vector2& operator-=(const Vector2& other);
@@ -67,6 +68,11 @@ inline Vector2<T> Vector2<T>::operator*(float scale) const {
 template <typename T>
 inline Vector2<T> Vector2<T>::operator/(float divisor) const {
   return Vector2(this->x / divisor, this->y / divisor);
+}
+
+template <typename T>
+inline Vector2<T> Vector2<T>::operator/(const Vector2<T>& lhs) const {
+  return Vector2(this->x / lhs.x, this->y / lhs.y);
 }
 
 template <typename T>
