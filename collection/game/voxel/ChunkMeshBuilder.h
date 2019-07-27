@@ -1,7 +1,9 @@
 #pragma once
 #include "Chunk.h"
 #include "graphics/models/Mesh.h"
+
 class TextureAtlas;
+class BlockDatabase;
 
 class ChunkMeshBuilder {
  public:

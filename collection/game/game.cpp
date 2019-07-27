@@ -36,6 +36,7 @@
 
 #include "game/ecs/Transform.h"
 
+#include "game/voxel/BlockDatabase.h"
 #include "game/voxel/Chunk.h"
 #include "game/voxel/ChunkMeshBuilder.h"
 
@@ -219,7 +220,7 @@ int main(int argc, char** argv) {
 
   TTF_Font* font = TTF_OpenFont("../res/ROCK.ttf", 28);
   SDL_Color color = {34, 34, 34, 255};
-  SDL_Surface* surface = TTF_RenderText_Solid(font, "foo bar", color);
+  SDL_Surface* surface = TTF_RenderText_Solid(font, "FOO BAR", color);
   SDL_Texture* tex =
       SDL_CreateTextureFromSurface(mainRenderer.getSdlRenderer(), surface);
   SDL_RenderCopy(mainRenderer.getSdlRenderer(), tex, nullptr, nullptr);
@@ -233,23 +234,14 @@ int main(int argc, char** argv) {
     if (event.key.repeat) {
       return;
     }
-
     switch (event.key.keysym.sym) {
       case SDLK_UP:
-        // pos.y += -10;
-        // velocity.y += -10;
         break;
       case SDLK_RIGHT:
-        // pos.x += 10;
-        // velocity.x += 10;
         break;
       case SDLK_DOWN:
-        // pos.y += 10;
-        // velocity.y += 10;
         break;
       case SDLK_LEFT:
-        // pos.x -= 10;
-        // velocity.x += -10;
         break;
     }
   });
@@ -257,16 +249,12 @@ int main(int argc, char** argv) {
   eventPoller.addListener(SDL_KEYUP, [&](const SDL_Event& event) {
     switch (event.key.keysym.sym) {
       case SDLK_UP:
-        // velocity.y += 10;
         break;
       case SDLK_RIGHT:
-        // velocity.x += -10;
         break;
       case SDLK_DOWN:
-        // velocity.y += -10;
         break;
       case SDLK_LEFT:
-        // velocity.x += 10;
         break;
     }
   });
@@ -297,6 +285,7 @@ int main(int argc, char** argv) {
 
     Mat4 PV;
     while ((currentMs - lastUpdate) > UPDATE_PERIOD && numLoops < MAX_LOOPS) {
+      Time::Internal::startLoop(lastUpdate);
       eventScheduler.runUpTo(lastUpdate);
 
       // game code
@@ -304,37 +293,41 @@ int main(int argc, char** argv) {
       int32_t speed = 10;
       Keyboard& keyboard = GameInstance::instance().keyboard();
 
+      float speedScale = 5.0;
       if (keyboard.keyDown(SDL_SCANCODE_UP)) {
         velocity += Dir2d::dirVectors[Dir2d::UP];
         Camera::getMainCamera().transform.translate(
-            mainCamera.transform.front() / 5);
+            mainCamera.transform.front() * Time::deltaTime() * speedScale);
       }
       if (keyboard.keyDown(SDL_SCANCODE_RIGHT)) {
         velocity += Dir2d::dirVectors[Dir2d::RIGHT];
         Camera::getMainCamera().transform.translate(
-            mainCamera.transform.right() / 5);
+            mainCamera.transform.right() * Time::deltaTime() * speedScale);
       }
       if (keyboard.keyDown(SDL_SCANCODE_LEFT)) {
         velocity += Dir2d::dirVectors[Dir2d::LEFT];
         Camera::getMainCamera().transform.translate(
-            mainCamera.transform.left() / 5);
+            mainCamera.transform.left() * Time::deltaTime() * speedScale);
       }
       if (keyboard.keyDown(SDL_SCANCODE_DOWN)) {
         velocity += Dir2d::dirVectors[Dir2d::DOWN];
         Camera::getMainCamera().transform.translate(
-            mainCamera.transform.back() / 5);
+            mainCamera.transform.back() * Time::deltaTime() * speedScale);
       }
       if (keyboard.keyDown(SDL_SCANCODE_W)) {
-        Camera::getMainCamera().transform.rotate(-0.05, Vec3::right());
+        Camera::getMainCamera().transform.rotate(-Time::deltaTime(),
+                                                 Vec3::right());
       }
       if (keyboard.keyDown(SDL_SCANCODE_S)) {
-        Camera::getMainCamera().transform.rotate(0.05, Vec3::right());
+        Camera::getMainCamera().transform.rotate(Time::deltaTime(),
+                                                 Vec3::right());
       }
       if (keyboard.keyDown(SDL_SCANCODE_A)) {
-        Camera::getMainCamera().transform.rotate(-.05, Vec3::up());
+        Camera::getMainCamera().transform.rotate(-Time::deltaTime(),
+                                                 Vec3::up());
       }
       if (keyboard.keyDown(SDL_SCANCODE_D)) {
-        Camera::getMainCamera().transform.rotate(.05, Vec3::up());
+        Camera::getMainCamera().transform.rotate(Time::deltaTime(), Vec3::up());
       }
       if (keyboard.keyDown(SDL_SCANCODE_Z)) {
         transform.rotate(.01, 0, 1, 0);
@@ -349,7 +342,6 @@ int main(int argc, char** argv) {
       velocity.normalize() *= speed;
       pos += velocity;
 
-      // Mat4 viewMatrix = Camera::getMainCamera().getLeftViewMatrix();
       Mat4 viewMatrix = Camera::getMainCamera().getViewMatrix();
       PV = pMatrix * viewMatrix;
       prog->uniform("pv", PV);

@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <iostream>
 #include "game/voxel/Block.h"
+#include "game/voxel/BlockDatabase.h"
 #include "graphics/TextureAtlas.h"
 #include "graphics/models/PlaneMesh.h"
 #include "math/Mat4.h"
@@ -50,7 +51,8 @@ Mesh ChunkMeshBuilder::buildMesh(const Chunk& chunk,
       if (adjacentBlockType == Block::Type::AIR) {
         Block::Face face = Block::indicesToFaces.at(i);
         // int32_t blockIdx = atlas.textureIndex(3, 1);
-        int32_t blockIdx = Block::getAtlasIndex(adjacentBlockType, face);
+        // int32_t blockIdx = Block::getAtlasIndex(adjacentBlockType, face);
+        int32_t blockIdx = BlockDatabase::getAtlasId(blockType, face);
         std::vector<Vec2> newUvs;
 
         float pixelWidth = 1.0 / atlas.width();
