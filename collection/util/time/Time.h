@@ -16,8 +16,6 @@ class Time {
 
   static uint32_t getTicks();
 
-  inline static double latestStartLoopTime_ = 0;
-
   struct Internal {
     // call once at the start of every update loop
     inline static void startLoop(double t) {
@@ -28,5 +26,6 @@ class Time {
   };
 
  private:
-  inline static float deltaTime_;
+  inline static float deltaTime_ = 0;
+  inline static double latestStartLoopTime_ = 0;
 };

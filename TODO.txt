@@ -15,3 +15,7 @@ finish SpriteSystem
 
 we should have one resourceloader that handles errors
 
+create a engine state flow graph
+initialize resources -> initialize dependants of those resources -> deallocate
+dependants -> deallocate resources
+ensure flow such that resources don't get deallocated first

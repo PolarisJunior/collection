@@ -4,6 +4,10 @@
 #include "graphics/Renderer.h"
 #include "ui/WindowBuilder.h"
 
+#ifdef DEBUG
+#include <iostream>
+#endif
+
 Window Window::mainWindow;
 
 Window::Window(std::string& title,
@@ -35,6 +39,9 @@ Window::Window(std::string& title,
 
     windowRenderer = std::make_unique<Renderer>(r);
   }
+#ifdef DEBUG
+  std::cout << "SDL Window created" << std::endl;
+#endif
 }
 
 Window::~Window() {

@@ -24,10 +24,13 @@ class ShaderProgram {
   // Note use this to load uniform variables as sampler types
   void uniform(const std::string& name, int32_t v);
 
+  // Links the program after adding vertex and fragment shaders
   void linkProgram();
 
+  // Set GL to use this shader program for subsequent rendering
   void useProgram();
 
+  // Returns the programHandle used by openGL
   int32_t getProgramHandle() { return programHandle; }
 
   static std::optional<ShaderProgram> createProgram();

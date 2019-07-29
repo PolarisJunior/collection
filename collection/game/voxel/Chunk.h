@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <unordered_map>
 #include "Block.h"
+#include "game/ecs/Transform.h"
 #include "math/Mathf.h"
 #include "math/Vector3.h"
 
@@ -11,13 +12,16 @@ class Chunk {
   using Type = Block::Type;
 
  public:
-  int32_t width = 16;
-  int32_t length = 16;
-  int32_t height = 16;
+  uint32_t width = 16;
+  uint32_t length = 16;
+  uint32_t height = 16;
 
+  // Chunk space position of the chunk
   int32_t x = 0;
   int32_t y = 0;
   int32_t z = 0;
+
+  Type defaultBlockType = Type::AIR;
 
   Chunk(int32_t x, int32_t y, int32_t z) : x(x), y(y), z(z) {}
 
@@ -26,6 +30,10 @@ class Chunk {
         Mathf::inRange(z, 0, length)) {
       blocksInChunk[Vector3<int32_t>(x, y, z)] = type;
     }
+  }
+
+  void setBlockType(const Vector3<int32_t>& pos, Block::Type type) {
+    setBlockType(pos.x, pos.y, pos.z, type);
   }
 
   Type getBlockType(const Vector3<int32_t>& p) const {
@@ -37,8 +45,15 @@ class Chunk {
     if (it != blocksInChunk.end()) {
       return it->second;
     }
-    return Block::Type::AIR;
+    return defaultBlockType;
   }
+
+  Vec3 worldPosition() const {
+    return Vec3((float)width * x, (float)height * y, (float)length * z);
+  }
+
+  // transform representing the base transform without any additional transforms
+  Transform baseTransform() const { return Transform(worldPosition()); }
 
   ChunkIterator begin() const;
 
@@ -56,13 +71,13 @@ class Chunk {
 class ChunkIterator
     : public std::iterator<std::random_access_iterator_tag, Vector3<int32_t>> {
  public:
-  int32_t width;
-  int32_t length;
-  int32_t height;
+  uint32_t width;
+  uint32_t length;
+  uint32_t height;
 
   int32_t idx = 0;
   ChunkIterator(int32_t i) : idx(i) {}
-  ChunkIterator(int32_t w, int32_t l, int32_t h, int32_t i)
+  ChunkIterator(uint32_t w, uint32_t l, uint32_t h, int32_t i)
       : idx(i), width(w), height(h), length(l) {}
 
   bool operator<(const ChunkIterator& other) const {

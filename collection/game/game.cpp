@@ -1,3 +1,4 @@
+#define DEBUG
 
 #include <gl/glew.h>
 
@@ -39,6 +40,7 @@
 #include "game/voxel/BlockDatabase.h"
 #include "game/voxel/Chunk.h"
 #include "game/voxel/ChunkMeshBuilder.h"
+#include "game/voxel/TerrainGenerator.h"
 
 #include "graphics/Color.h"
 #include "graphics/Image.h"
@@ -92,6 +94,9 @@ static Actor actor;
 EventScheduler eventScheduler;
 
 int main(int argc, char** argv) {
+#ifdef DEBUG
+  std::cout << "Starting game..." << std::endl;
+#endif
   {
     SdlLoader sdlLoader;
     auto res = sdlLoader.load();
@@ -114,23 +119,22 @@ int main(int argc, char** argv) {
   }
 
   Camera mainCamera;
-  mainCamera.fieldOfView = 90;
   Camera::setMainCamera(mainCamera);
+  mainCamera.fieldOfView = 90;
   mainCamera.projectionType = Camera::ProjectionType::PERSPECTIVE;
 
   GlClient glClient;
 
-  Chunk c(0, 0, 0);
-  foreach (it, c) {
-    Vector3 v = *it;
-    c.setBlockType(v.x, v.y, v.z, Block::Type::DIRT);
-  }
+  Chunk chunk(1, -1, 1);
+  TerrainGenerator terrainGenerator;
+  terrainGenerator.generateTerrain(chunk, 0, 0, 0);
 
   std::optional<ShaderProgram> prog = ShaderProgram::createProgram();
   prog->loadVertFromFile("../res/simple.vert");
   prog->loadFragFromFile("../res/simple.frag");
 
   prog->linkProgram();
+  prog->useProgram();
 
   Transform groundPlaneTransform;
   groundPlaneTransform.scale(100, 1, 100);
@@ -156,21 +160,20 @@ int main(int argc, char** argv) {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 1);
 
-  prog->useProgram();
-
-  CubeMesh cubeMesh;
-  SphereMesh sphereMesh;
+  // CubeMesh cubeMesh;
+  // SphereMesh sphereMesh;
+  // PlaneMesh planeMesh;
   QuadMesh quadMesh;
-  PlaneMesh planeMesh;
 
   Mesh chunkMesh;
-  ChunkMeshBuilder meshBuilder;
-  chunkMesh = meshBuilder.buildMesh(c, atlas);
+  ChunkMeshBuilder meshBuilder(atlas);
+  chunkMesh = meshBuilder.buildMesh(chunk);
   Mesh& usedMesh = chunkMesh;
 
   // unsigned int VBO, VAO, EBO;
   uint32_t vao = glClient.sendMesh(usedMesh);
   uint32_t vao2 = glClient.sendMesh(quadMesh);
+  glDeleteVertexArrays(1, &vao2);
 
   Mat4 pMatrix = Camera::getMainCamera().getProjectionMatrix();
   prog->uniform("projection", pMatrix);
@@ -267,8 +270,6 @@ int main(int argc, char** argv) {
            event.button.x, event.button.y, worldPos.x, worldPos.y);
   });
 
-  Transform transform;
-
   eventScheduler.scheduleEvent(
       []() { std::cout << "scheduled event ran" << std::endl; }, 3.0);
 
@@ -329,15 +330,6 @@ int main(int argc, char** argv) {
       if (keyboard.keyDown(SDL_SCANCODE_D)) {
         Camera::getMainCamera().transform.rotate(Time::deltaTime(), Vec3::up());
       }
-      if (keyboard.keyDown(SDL_SCANCODE_Z)) {
-        transform.rotate(.01, 0, 1, 0);
-      }
-      if (keyboard.keyDown(SDL_SCANCODE_X)) {
-        transform.rotate(.01, 1, 0, 0);
-      }
-      if (keyboard.keyDown(SDL_SCANCODE_C)) {
-        transform.translate(Vec3::left() * 0.05);
-      }
 
       velocity.normalize() *= speed;
       pos += velocity;
@@ -372,10 +364,11 @@ int main(int argc, char** argv) {
 
     glBindVertexArray(vao);
 
-    Mat4 model = transform.getModelMatrix();
+    Mat4 model = chunk.baseTransform().getModelMatrix();
     // prog->uniform("model", model);
     prog->uniform("MVP", PV * model);
-    prog->uniform("model_normal", transform.localRotation().toMatrix());
+    prog->uniform("model_normal",
+                  chunk.baseTransform().localRotation().toMatrix());
 
     glDrawElements(GL_TRIANGLES, usedMesh.triangles().size(), GL_UNSIGNED_INT,
                    0);

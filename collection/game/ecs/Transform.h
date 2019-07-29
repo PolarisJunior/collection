@@ -9,6 +9,7 @@ class Transform {
   Transform() = default;
   // initializes with a position set
   Transform(float x, float y, float z);
+  Transform(const Vec3& pos) : Transform(pos.x, pos.y, pos.z) {}
 
   Vec3 localPosition() const { return this->localPosition_; }
   Quaternion localRotation() const { return this->localRotation_; }

@@ -13,8 +13,7 @@ std::vector<Vector3<int32_t>> allDirections = {vec::up(),      vec::down(),
                                                vec::right(),   vec::left(),
                                                vec::forward(), vec::backward()};
 
-Mesh ChunkMeshBuilder::buildMesh(const Chunk& chunk,
-                                 const TextureAtlas& atlas) {
+Mesh ChunkMeshBuilder::buildMesh(const Chunk& chunk) const {
   Mesh mesh;
   Mesh faceMesh = PlaneMesh();
 

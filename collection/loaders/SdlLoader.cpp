@@ -5,6 +5,10 @@
 #include <SDL_image.h>
 #include <SDL_ttf.h>
 
+#ifdef DEBUG
+#include <iostream>
+#endif
+
 std::pair<bool, std::string> SdlLoader::load() {
   std::string msg;
   if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0) {
@@ -24,6 +28,9 @@ std::pair<bool, std::string> SdlLoader::load() {
       goto fail;
     }
   }
+#ifdef DEBUG
+  std::cout << "SDL Loaded successfully" << std::endl;
+#endif
   return std::pair(true, msg);
 fail:
   return std::pair(false, msg);

@@ -4,9 +4,12 @@
 
 #include <SDL.h>
 #include <SDL_opengl.h>
-#include <iostream>
 
 #include "ui/Window.h"
+
+#ifdef DEBUG
+#include <iostream>
+#endif
 
 std::string GlLoader::load() {
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
@@ -33,5 +36,9 @@ std::string GlLoader::load() {
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_CULL_FACE);
   glFrontFace(GL_CW);
+
+#ifdef DEBUG
+  std::cout << "OpenGL successfully loaded" << std::endl;
+#endif
   return "";
 }
