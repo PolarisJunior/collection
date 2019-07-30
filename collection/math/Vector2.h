@@ -2,6 +2,7 @@
 
 #include <math.h>
 #include <ostream>
+#include "crypto/Hash.h"
 
 template <typename T>
 class Vector2 {
@@ -10,8 +11,8 @@ class Vector2 {
   T y = 0;
 
   Vector2() = default;
-  Vector2<T>(T x, T y);
-  Vector2<T>(T k) : x(k), y(k) {}
+  Vector2(T x, T y);
+  Vector2(T k) : x(k), y(k) {}
 
   Vector2 operator+(const Vector2& other) const;
   Vector2 operator-(const Vector2& other) const;
@@ -24,7 +25,7 @@ class Vector2 {
   Vector2& operator*=(float scale);
   Vector2& operator/=(float divisor);
 
-  bool operator==(const Vector2& other);
+  bool operator==(const Vector2& other) const;
 
   Vector2 normalized();
   // normalizes the vector in place
@@ -104,7 +105,7 @@ inline Vector2<T>& Vector2<T>::operator/=(float divisor) {
 }
 
 template <typename T>
-inline bool Vector2<T>::operator==(const Vector2& other) {
+inline bool Vector2<T>::operator==(const Vector2& other) const {
   return this->x == other.x && this->y == other.y;
 }
 
@@ -164,3 +165,17 @@ inline Vector2<T> Vector2<T>::down() {
 }
 
 typedef Vector2<float> Vec2;
+
+namespace std {
+template <typename A>
+struct hash<Vector2<A>> {
+  // using argument_type = Vector3<T>;
+  // using result_type = size_t;
+  inline static hash<A> hasher{};
+  size_t operator()(Vector2<A> const& v) const noexcept {
+    size_t h = hasher(v.x);
+    Hash::template hashCombine<A>(h, v.y);
+    return h;
+  }
+};
+}  // namespace std

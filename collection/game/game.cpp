@@ -137,7 +137,7 @@ int main(int argc, char** argv) {
 
   Transform groundPlaneTransform;
   groundPlaneTransform.scale(100, 1, 100);
-  groundPlaneTransform.translate(0, -6, 0);
+  groundPlaneTransform.translate(0, -20, 0);
 
   unsigned int texture;
   glGenTextures(1, &texture);
@@ -159,19 +159,13 @@ int main(int argc, char** argv) {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 1);
 
-  // CubeMesh cubeMesh;
-  // SphereMesh sphereMesh;
-  // PlaneMesh planeMesh;
-  QuadMesh quadMesh;
-
   std::vector<RenderActor> renderActors;
   ChunkMeshBuilder meshBuilder(atlas);
   for (Chunk& chunk : chunks) {
     renderActors.push_back(
         RenderActor(meshBuilder.buildMesh(chunk), chunk.baseTransform()));
   }
-  uint32_t vao2 = glClient.sendMesh(quadMesh);
-  // glDeleteVertexArrays(1, &vao2);
+  renderActors.push_back(RenderActor(QuadMesh(), groundPlaneTransform));
 
   prog->uniform("u_texture", 0);
 
@@ -354,37 +348,12 @@ int main(int argc, char** argv) {
     // mainRenderer.present();
     prog->uniform("u_time", (float)Time::getTicks());
 
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glClient.setClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClient.clearAllBuffers();
 
-    // glBindVertexArray(renderUnits[0].vao);
-
     for (RenderActor& renderActor : renderActors) {
-      glBindVertexArray(renderActor.renderUnit.vao);
-      prog->uniform("model", renderActor.transform.getModelMatrix());
-      prog->uniform("model_normal",
-                    renderActor.transform.localRotation().toMatrix());
-      glDrawElements(GL_TRIANGLES,
-                     renderActor.renderUnit.mesh.triangles().size(),
-                     GL_UNSIGNED_INT, 0);
+      renderActor.render();
     }
-
-    // for (Chunk& chunk : chunks) {
-    //   prog->uniform("model", chunk.baseTransform().getModelMatrix());
-    //   prog->uniform("model_normal",
-    //                 chunk.baseTransform().localRotation().toMatrix());
-    //   glDrawElements(GL_TRIANGLES, usedMesh.triangles().size(),
-    //   GL_UNSIGNED_INT,
-    //                  0);
-    // }
-
-    glBindVertexArray(vao2);
-    prog->uniform("model", groundPlaneTransform.getModelMatrix());
-    prog->uniform("model_normal",
-                  groundPlaneTransform.localRotation().toMatrix());
-
-    glDrawElements(GL_TRIANGLES, quadMesh.triangles().size(), GL_UNSIGNED_INT,
-                   0);
 
     // glDrawArrays(GL_TRIANGLES, 0, 6);
     Window::getMainWindow().swapBufferWindow();

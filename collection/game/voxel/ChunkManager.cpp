@@ -6,10 +6,11 @@ ChunkManager::ChunkManager()
     : terrainGenerator(VoxelServiceLocator::instance().terrainGenerator()) {}
 
 bool ChunkManager::refreshLoadedChunks(float x, float y, float z) {
-  loadedChunks_.push_back(Chunk(0, -1, 0));
-  loadedChunks_.push_back(Chunk(-1, -1, 0));
-  loadedChunks_.push_back(Chunk(0, -1, 1));
-  loadedChunks_.push_back(Chunk(-1, -1, 1));
+  for (int xPos = -3; xPos <= 3; xPos++) {
+    for (int zPos = -3; zPos <= 3; zPos++) {
+      loadedChunks_.push_back(Chunk(xPos, -1, zPos));
+    }
+  }
 
   for (Chunk& chunk : loadedChunks_) {
     terrainGenerator.generateTerrain(chunk);

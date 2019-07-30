@@ -9,7 +9,7 @@ class RenderUnit {
   RenderUnit(Mesh&& m);
 
   void render(Transform& transform);
-
+  // glDeleteVertexArrays(1, &vao2);
   Mesh mesh;
   uint32_t vao = 0;
 };

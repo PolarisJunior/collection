@@ -12,6 +12,8 @@ class GlClient {
 
   uint32_t sendMesh(const Mesh& mesh);
 
+  void setClearColor(float r, float g, float b, float a);
+
   void clearAllBuffers();
 
   static GlClient& instance();

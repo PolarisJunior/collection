@@ -23,12 +23,6 @@ class Vector3 {
 
   Vector3 operator-() const;
 
-  std::size_t operator()() const {
-    std::size_t h = Hash::hashCombine(x, y);
-    Hash::hashCombine(h, z);
-    return h;
-  }
-
   Vector3& operator+=(const Vector3& other);
   Vector3& operator-=(const Vector3& other);
   Vector3& operator*=(const Vector3& other);
@@ -248,6 +242,7 @@ inline Vector3<Numeric> Vector3<Numeric>::forward() {
 }
 
 using Vec3 = Vector3<float>;
+using Vec3i = Vector3<int32_t>;
 
 // C++ hashing is uh something else
 namespace std {
@@ -258,8 +253,8 @@ struct hash<Vector3<T>> {
   inline static hash<T> hasher{};
   size_t operator()(Vector3<T> const& v) const noexcept {
     size_t h = hasher(v.x);
-    Hash::hashCombine<T>(h, v.y);
-    Hash::hashCombine<T>(h, v.z);
+    Hash::template hashCombine<T>(h, v.y);
+    Hash::template hashCombine<T>(h, v.z);
     return h;
   }
 };
