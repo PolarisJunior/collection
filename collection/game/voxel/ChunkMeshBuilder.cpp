@@ -41,12 +41,19 @@ Mesh ChunkMeshBuilder::buildMesh(const Chunk& chunk) const {
   for (auto it = chunk.blocksInChunk.begin(); it != chunk.blocksInChunk.end();
        ++it) {
     const Vector3<int32_t> blockPos = it->first;
-    const Block::Type blockType = it->second;
+    Block::Type blockType = it->second;
+
+    // convert uncovered dirt to grass
+    Block::Type blockAbove = chunk.getBlockType(vec::up() + blockPos);
+    if (blockAbove == Block::Type::AIR) {
+      blockType = Block::Type::GRASS;
+    }
 
     int32_t i = 0;
     for (const vec& direction : allDirections) {
       const vec adjacentPos = blockPos + direction;
       Block::Type adjacentBlockType = chunk.getBlockType(adjacentPos);
+
       if (adjacentBlockType == Block::Type::AIR) {
         Block::Face face = Block::indicesToFaces.at(i);
         // int32_t blockIdx = atlas.textureIndex(3, 1);

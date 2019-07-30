@@ -146,7 +146,8 @@ int main(int argc, char** argv) {
 
   std::cout << "Loading Voxel Texture Atlas" << std::endl;
   int32_t pixelType = GL_RGB;
-  TextureAtlas atlas("../res/minecraft.jpg", 64, 64);
+  // TextureAtlas atlas("../res/minecraft.jpg", 64, 64);
+  TextureAtlas atlas("../res/wac.png", 41, 41);
   // TextureAtlas atlas("../res/spritesheet_tiles2.png", 32, 32);
   if (atlas.hasAlpha()) {
     pixelType = GL_RGBA;
@@ -172,10 +173,17 @@ int main(int argc, char** argv) {
   std::vector<std::string> skyboxFaces = {"right",  "left",  "top",
                                           "bottom", "front", "back"};
   for (int i = 0; i < 6; i++) {
-    TextureAtlas skyboxFace("../res/skybox/" + skyboxFaces[i] + ".jpg");
-    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB,
-                 skyboxFace.width(), skyboxFace.height(), 0, GL_RGB,
-                 GL_UNSIGNED_BYTE, skyboxFace.dataPointer());
+    TextureAtlas skyboxFace("../res/toon_skybox2/" + skyboxFaces[i] + ".png");
+    if (skyboxFace.hasAlpha()) {
+      glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA,
+                   skyboxFace.width(), skyboxFace.height(), 0, GL_RGBA,
+                   GL_UNSIGNED_BYTE, skyboxFace.dataPointer());
+    } else {
+      glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB,
+                   skyboxFace.width(), skyboxFace.height(), 0, GL_RGB,
+                   GL_UNSIGNED_BYTE, skyboxFace.dataPointer());
+    }
+
     std::cout << "Loaded: " << skyboxFaces[i] << std::endl;
   }
   std::cout << "Skyboxes Loaded" << std::endl;

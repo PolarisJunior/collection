@@ -9,7 +9,7 @@ class Block {
   // Put transparent blocks first, and then we can index
   // if a block type is in the region of transparent blocks
   // we do not cull faces
-  enum class Type { AIR, DIRT };
+  enum class Type { AIR, DIRT, GRASS };
   enum class Face { TOP, BOTTOM, SIDE };
 
   static int32_t getAtlasIndex(Type type, Face face) {
