@@ -46,6 +46,7 @@ int32_t ShaderProgram::addShader(const std::string& src, ShaderType type) {
 
   glAttachShader(programHandle, shaderHandle);
   // glDeleteShader(shaderHandle);
+  wasLinked = false;
   return shaderHandle;
 }
 
@@ -67,9 +68,14 @@ void ShaderProgram::linkProgram() {
   if (!success) {
     exit(EXIT_FAILURE);
   }
+
+  wasLinked = true;
 }
 
 void ShaderProgram::useProgram() {
+  if (!wasLinked) {
+    linkProgram();
+  }
   glUseProgram(this->getProgramHandle());
   GlContext::context.setActiveShader(*this);
 }

@@ -132,7 +132,6 @@ int main(int argc, char** argv) {
   prog->loadVertFromFile("../res/simple.vert");
   prog->loadFragFromFile("../res/simple.frag");
 
-  prog->linkProgram();
   prog->useProgram();
 
   Transform groundPlaneTransform;
@@ -141,6 +140,8 @@ int main(int argc, char** argv) {
 
   unsigned int texture;
   glGenTextures(1, &texture);
+  // active by default so we technically don't need this
+  glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, texture);
 
   int32_t pixelType = GL_RGB;
@@ -159,6 +160,61 @@ int main(int argc, char** argv) {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 1);
 
+  prog->uniform("u_texture", 0);
+
+  uint32_t skyboxId;
+  glGenTextures(1, &skyboxId);
+  glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxId);
+
+  std::vector<std::string> skyboxFaces = {"right",  "left",  "top",
+                                          "bottom", "front", "back"};
+  for (int i = 0; i < 6; i++) {
+    TextureAtlas skyboxFace("../res/skybox/" + skyboxFaces[i] + ".jpg");
+    glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB,
+                 skyboxFace.width(), skyboxFace.height(), 0, GL_RGB,
+                 GL_UNSIGNED_BYTE, skyboxFace.dataPointer());
+  }
+
+  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+  std::optional<ShaderProgram> skyboxShader = ShaderProgram::createProgram();
+  skyboxShader->loadVertFromFile("../res/skybox.vert");
+  skyboxShader->loadFragFromFile("../res/skybox.frag");
+
+  float skyboxVertices[] = {
+      // positions
+      -1.0f, 1.0f,  -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  -1.0f, -1.0f,
+      1.0f,  -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, -1.0f, 1.0f,  -1.0f,
+
+      -1.0f, -1.0f, 1.0f,  -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  -1.0f,
+      -1.0f, 1.0f,  -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, -1.0f, 1.0f,
+
+      1.0f,  -1.0f, -1.0f, 1.0f,  -1.0f, 1.0f,  1.0f,  1.0f,  1.0f,
+      1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  -1.0f, 1.0f,  -1.0f, -1.0f,
+
+      -1.0f, -1.0f, 1.0f,  -1.0f, 1.0f,  1.0f,  1.0f,  1.0f,  1.0f,
+      1.0f,  1.0f,  1.0f,  1.0f,  -1.0f, 1.0f,  -1.0f, -1.0f, 1.0f,
+
+      -1.0f, 1.0f,  -1.0f, 1.0f,  1.0f,  -1.0f, 1.0f,  1.0f,  1.0f,
+      1.0f,  1.0f,  1.0f,  -1.0f, 1.0f,  1.0f,  -1.0f, 1.0f,  -1.0f,
+
+      -1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, -1.0f,
+      1.0f,  -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, 1.0f};
+  unsigned int skyboxVAO, skyboxVBO;
+  glGenVertexArrays(1, &skyboxVAO);
+  glGenBuffers(1, &skyboxVBO);
+  glBindVertexArray(skyboxVAO);
+  glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices,
+               GL_STATIC_DRAW);
+  glEnableVertexAttribArray(0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+  // RenderUnit skyboxRenderUnit = RenderUnit(CubeMesh());
+
   std::vector<RenderActor> renderActors;
   ChunkMeshBuilder meshBuilder(atlas);
   for (Chunk& chunk : chunks) {
@@ -166,8 +222,6 @@ int main(int argc, char** argv) {
         RenderActor(meshBuilder.buildMesh(chunk), chunk.baseTransform()));
   }
   renderActors.push_back(RenderActor(QuadMesh(), groundPlaneTransform));
-
-  prog->uniform("u_texture", 0);
 
   Renderer& mainRenderer = Window::getMainRenderer();
 
@@ -350,6 +404,31 @@ int main(int argc, char** argv) {
 
     glClient.setClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClient.clearAllBuffers();
+
+    // skybox code
+    glDepthMask(GL_FALSE);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxId);
+    // glBindVertexArray(skyboxRenderUnit.vao);
+    glBindVertexArray(skyboxVAO);
+    skyboxShader->useProgram();
+    skyboxShader->uniform("PV", PV);
+    Mat4 viewMatrix = Camera::getMainCamera().getViewMatrix();
+    Mat4 pMatrix = Camera::getMainCamera().getProjectionMatrix();
+    skyboxShader->uniform("projection", pMatrix);
+    skyboxShader->uniform("view", viewMatrix);
+
+    // Transform skyboxTransform =
+    // Transform(mainCamera.transform.localPosition());
+    // skyboxRenderUnit.render(skyboxTransform);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+    // glDrawElements(GL_TRIANGLES, skyboxRenderUnit.mesh.triangles().size(),
+    //                GL_UNSIGNED_INT, 0);
+
+    // end skybox
+
+    glDepthMask(GL_TRUE);
+    prog->useProgram();
+    glBindTexture(GL_TEXTURE_2D, texture);
 
     for (RenderActor& renderActor : renderActors) {
       renderActor.render();

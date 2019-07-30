@@ -28,6 +28,7 @@ class ShaderProgram {
   void linkProgram();
 
   // Set GL to use this shader program for subsequent rendering
+  // links the program if not already linked
   void useProgram();
 
   // Returns the programHandle used by openGL
@@ -37,4 +38,5 @@ class ShaderProgram {
 
  private:
   int32_t programHandle;
+  bool wasLinked = false;
 };
