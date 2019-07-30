@@ -3,6 +3,8 @@
 
 #include <gl/glew.h>
 
+GlClient GlClient::client = GlClient();
+
 int32_t GlClient::createShaderProgram(const std::string& vertSource,
                                       const std::string& fragSource) {
   const char* vertexShaderSource = vertSource.c_str();
@@ -92,4 +94,12 @@ uint32_t GlClient::sendMesh(const Mesh& mesh) {
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
   return VAO;
+}
+
+void GlClient::clearAllBuffers() {
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+}
+
+GlClient& GlClient::instance() {
+  return GlClient::client;
 }

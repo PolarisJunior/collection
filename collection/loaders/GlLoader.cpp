@@ -15,6 +15,7 @@ std::string GlLoader::load() {
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+  SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
   SDL_GLContext context =
       SDL_GL_CreateContext(Window::getMainWindow().getSdlWindow());
@@ -29,6 +30,7 @@ std::string GlLoader::load() {
         reinterpret_cast<const char*>((glewGetErrorString(glewError))));
   }
 
+  // VSync
   if (SDL_GL_SetSwapInterval(1) < 0) {
     return std::string(SDL_GetError());
   }

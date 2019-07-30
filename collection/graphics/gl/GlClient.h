@@ -11,4 +11,11 @@ class GlClient {
   int32_t createShaderProgram(const char* vertSource, const char* fragSource);
 
   uint32_t sendMesh(const Mesh& mesh);
+
+  void clearAllBuffers();
+
+  static GlClient& instance();
+
+ private:
+  static GlClient client;
 };

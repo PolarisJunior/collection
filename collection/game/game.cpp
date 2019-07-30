@@ -1,5 +1,3 @@
-#define DEBUG
-
 #include <gl/glew.h>
 
 #include <SDL.h>
@@ -39,11 +37,13 @@
 
 #include "game/voxel/BlockDatabase.h"
 #include "game/voxel/Chunk.h"
+#include "game/voxel/ChunkManager.h"
 #include "game/voxel/ChunkMeshBuilder.h"
-#include "game/voxel/TerrainGenerator.h"
 
 #include "graphics/Color.h"
 #include "graphics/Image.h"
+#include "graphics/RenderActor.h"
+#include "graphics/RenderUnit.h"
 #include "graphics/Renderer.h"
 #include "graphics/Sprite.h"
 #include "graphics/Texture.h"
@@ -123,11 +123,10 @@ int main(int argc, char** argv) {
   mainCamera.fieldOfView = 90;
   mainCamera.projectionType = Camera::ProjectionType::PERSPECTIVE;
 
-  GlClient glClient;
-
-  Chunk chunk(1, -1, 1);
-  TerrainGenerator terrainGenerator;
-  terrainGenerator.generateTerrain(chunk, 0, 0, 0);
+  GlClient& glClient = GlClient::instance();
+  ChunkManager chunkManager;
+  chunkManager.refreshLoadedChunks(0, 0, 0);
+  std::vector<Chunk>& chunks = chunkManager.loadedChunks();
 
   std::optional<ShaderProgram> prog = ShaderProgram::createProgram();
   prog->loadVertFromFile("../res/simple.vert");
@@ -165,18 +164,15 @@ int main(int argc, char** argv) {
   // PlaneMesh planeMesh;
   QuadMesh quadMesh;
 
-  Mesh chunkMesh;
+  std::vector<RenderActor> renderActors;
   ChunkMeshBuilder meshBuilder(atlas);
-  chunkMesh = meshBuilder.buildMesh(chunk);
-  Mesh& usedMesh = chunkMesh;
-
-  // unsigned int VBO, VAO, EBO;
-  uint32_t vao = glClient.sendMesh(usedMesh);
+  for (Chunk& chunk : chunks) {
+    renderActors.push_back(
+        RenderActor(meshBuilder.buildMesh(chunk), chunk.baseTransform()));
+  }
   uint32_t vao2 = glClient.sendMesh(quadMesh);
-  glDeleteVertexArrays(1, &vao2);
+  // glDeleteVertexArrays(1, &vao2);
 
-  Mat4 pMatrix = Camera::getMainCamera().getProjectionMatrix();
-  prog->uniform("projection", pMatrix);
   prog->uniform("u_texture", 0);
 
   Renderer& mainRenderer = Window::getMainRenderer();
@@ -233,7 +229,7 @@ int main(int argc, char** argv) {
   TTF_CloseFont(font);
 
   Vector2<float>& pos = posManager.get(entityId);
-  eventPoller.addListener(SDL_KEYDOWN, [&](const SDL_Event& event) {
+  eventPoller.addListener(SDL_KEYDOWN, [](const SDL_Event& event) {
     if (event.key.repeat) {
       return;
     }
@@ -249,7 +245,7 @@ int main(int argc, char** argv) {
     }
   });
 
-  eventPoller.addListener(SDL_KEYUP, [&](const SDL_Event& event) {
+  eventPoller.addListener(SDL_KEYUP, [](const SDL_Event& event) {
     switch (event.key.keysym.sym) {
       case SDLK_UP:
         break;
@@ -335,8 +331,9 @@ int main(int argc, char** argv) {
       pos += velocity;
 
       Mat4 viewMatrix = Camera::getMainCamera().getViewMatrix();
+      Mat4 pMatrix = Camera::getMainCamera().getProjectionMatrix();
       PV = pMatrix * viewMatrix;
-      prog->uniform("pv", PV);
+      prog->uniform("PV", PV);
       // game code end
 
       lastUpdate += UPDATE_PERIOD;
@@ -355,35 +352,39 @@ int main(int argc, char** argv) {
     // spriteManager.renderAll(interpolation);
     // mainRenderer.setColor(Colors::WHITE);
     // mainRenderer.present();
-
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    // prog->uniform("view", viewMatrix);
     prog->uniform("u_time", (float)Time::getTicks());
 
-    glBindVertexArray(vao);
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glClient.clearAllBuffers();
 
-    Mat4 model = chunk.baseTransform().getModelMatrix();
-    // prog->uniform("model", model);
-    prog->uniform("MVP", PV * model);
-    prog->uniform("model_normal",
-                  chunk.baseTransform().localRotation().toMatrix());
+    // glBindVertexArray(renderUnits[0].vao);
 
-    glDrawElements(GL_TRIANGLES, usedMesh.triangles().size(), GL_UNSIGNED_INT,
-                   0);
+    for (RenderActor& renderActor : renderActors) {
+      glBindVertexArray(renderActor.renderUnit.vao);
+      prog->uniform("model", renderActor.transform.getModelMatrix());
+      prog->uniform("model_normal",
+                    renderActor.transform.localRotation().toMatrix());
+      glDrawElements(GL_TRIANGLES,
+                     renderActor.renderUnit.mesh.triangles().size(),
+                     GL_UNSIGNED_INT, 0);
+    }
+
+    // for (Chunk& chunk : chunks) {
+    //   prog->uniform("model", chunk.baseTransform().getModelMatrix());
+    //   prog->uniform("model_normal",
+    //                 chunk.baseTransform().localRotation().toMatrix());
+    //   glDrawElements(GL_TRIANGLES, usedMesh.triangles().size(),
+    //   GL_UNSIGNED_INT,
+    //                  0);
+    // }
 
     glBindVertexArray(vao2);
-    prog->uniform("MVP", PV * groundPlaneTransform.getModelMatrix());
+    prog->uniform("model", groundPlaneTransform.getModelMatrix());
     prog->uniform("model_normal",
                   groundPlaneTransform.localRotation().toMatrix());
+
     glDrawElements(GL_TRIANGLES, quadMesh.triangles().size(), GL_UNSIGNED_INT,
                    0);
-
-    // prog->uniform("MVP", PV * transform.getModelMatrix());
-    // prog->uniform("model_normal", transform.localRotation().toMatrix());
-    // glDrawElements(GL_TRIANGLES, CubeMesh::cubeTriangles.size(),
-    //                GL_UNSIGNED_INT, 0);
 
     // glDrawArrays(GL_TRIANGLES, 0, 6);
     Window::getMainWindow().swapBufferWindow();

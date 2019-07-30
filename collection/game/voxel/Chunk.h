@@ -6,6 +6,10 @@
 #include "math/Mathf.h"
 #include "math/Vector3.h"
 
+#ifdef DEBUG
+#include <iostream>
+#endif
+
 class ChunkIterator;
 
 class Chunk {
@@ -23,7 +27,11 @@ class Chunk {
 
   Type defaultBlockType = Type::AIR;
 
-  Chunk(int32_t x, int32_t y, int32_t z) : x(x), y(y), z(z) {}
+  Chunk(int32_t x, int32_t y, int32_t z) : x(x), y(y), z(z) {
+#ifdef DEBUG
+    std::cout << "Chunk created at: " << Vector3<int32_t>(x, y, z) << std::endl;
+#endif
+  }
 
   void setBlockType(int32_t x, int32_t y, int32_t z, Block::Type type) {
     if (Mathf::inRange(x, 0, width) && Mathf::inRange(y, 0, height) &&
