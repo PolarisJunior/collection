@@ -10,6 +10,9 @@ void TerrainGenerator::generateTerrain(Chunk& chunk,
                                        int32_t x,
                                        int32_t y,
                                        int32_t z) {
+#ifdef DEBUG
+  std::cout << "Creating Terrain for chunk: " << Vec3(x, y, z) << std::endl;
+#endif
   auto heightMap = generateHeightMap(chunk);
 
   for (auto it = chunk.begin(); it != chunk.end(); ++it) {

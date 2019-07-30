@@ -21,3 +21,7 @@ dependants -> deallocate resources
 ensure flow such that resources don't get deallocated first
 
 delete vertex arrays and buffers, delete shaders?
+
+render groupings
+SAME_SHADER | SAME_TEXTURE | etc
+so that groups can be rendered at once

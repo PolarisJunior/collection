@@ -144,6 +144,7 @@ int main(int argc, char** argv) {
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, texture);
 
+  std::cout << "Loading Voxel Texture Atlas" << std::endl;
   int32_t pixelType = GL_RGB;
   TextureAtlas atlas("../res/minecraft.jpg", 64, 64);
   // TextureAtlas atlas("../res/spritesheet_tiles2.png", 32, 32);
@@ -162,6 +163,8 @@ int main(int argc, char** argv) {
 
   prog->uniform("u_texture", 0);
 
+  std::cout << "Loading Skybox Textures" << std::endl;
+
   uint32_t skyboxId;
   glGenTextures(1, &skyboxId);
   glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxId);
@@ -173,7 +176,9 @@ int main(int argc, char** argv) {
     glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB,
                  skyboxFace.width(), skyboxFace.height(), 0, GL_RGB,
                  GL_UNSIGNED_BYTE, skyboxFace.dataPointer());
+    std::cout << "Loaded: " << skyboxFaces[i] << std::endl;
   }
+  std::cout << "Skyboxes Loaded" << std::endl;
 
   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -213,8 +218,10 @@ int main(int argc, char** argv) {
                GL_STATIC_DRAW);
   glEnableVertexAttribArray(0);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-  // RenderUnit skyboxRenderUnit = RenderUnit(CubeMesh());
 
+  RenderUnit skyboxRenderUnit = RenderUnit(CubeMesh());
+
+  std::cout << "Building Meshes" << std::endl;
   std::vector<RenderActor> renderActors;
   ChunkMeshBuilder meshBuilder(atlas);
   for (Chunk& chunk : chunks) {
@@ -407,9 +414,10 @@ int main(int argc, char** argv) {
 
     // skybox code
     glDepthMask(GL_FALSE);
+    glFrontFace(GL_CCW);
     glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxId);
     // glBindVertexArray(skyboxRenderUnit.vao);
-    glBindVertexArray(skyboxVAO);
+    // glBindVertexArray(skyboxVAO);
     skyboxShader->useProgram();
     skyboxShader->uniform("PV", PV);
     Mat4 viewMatrix = Camera::getMainCamera().getViewMatrix();
@@ -417,19 +425,17 @@ int main(int argc, char** argv) {
     skyboxShader->uniform("projection", pMatrix);
     skyboxShader->uniform("view", viewMatrix);
 
-    // Transform skyboxTransform =
-    // Transform(mainCamera.transform.localPosition());
-    // skyboxRenderUnit.render(skyboxTransform);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
+    Transform skyboxTransform = Transform(mainCamera.transform.localPosition());
+    skyboxRenderUnit.render(skyboxTransform);
+    // glDrawArrays(GL_TRIANGLES, 0, 36);
     // glDrawElements(GL_TRIANGLES, skyboxRenderUnit.mesh.triangles().size(),
     //                GL_UNSIGNED_INT, 0);
-
+    glDepthMask(GL_TRUE);
+    glFrontFace(GL_CW);
     // end skybox
 
-    glDepthMask(GL_TRUE);
     prog->useProgram();
     glBindTexture(GL_TEXTURE_2D, texture);
-
     for (RenderActor& renderActor : renderActors) {
       renderActor.render();
     }
