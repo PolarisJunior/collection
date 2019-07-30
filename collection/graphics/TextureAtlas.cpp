@@ -54,9 +54,14 @@ TextureAtlas::TextureAtlas(const std::string& imgPath, int32_t cw, int32_t ch)
     //           reinterpret_cast<uint8_t*>(surf->pixels) + numBytes,
     //           pixelBuffer.begin());
 
-    pixelBuffer.insert(pixelBuffer.begin(),
-                       reinterpret_cast<uint8_t*>(surf->pixels),
-                       reinterpret_cast<uint8_t*>(surf->pixels) + numBytes);
+    // fast
+    pixelBuffer =
+        std::vector(reinterpret_cast<uint8_t*>(surf->pixels),
+                    reinterpret_cast<uint8_t*>(surf->pixels) + numBytes);
+    // fast
+    // pixelBuffer.insert(pixelBuffer.begin(),
+    //                    reinterpret_cast<uint8_t*>(surf->pixels),
+    //                    reinterpret_cast<uint8_t*>(surf->pixels) + numBytes);
     std::cout << "INSERTION DONE" << std::endl;
     SDL_UnlockSurface(surf);
   }

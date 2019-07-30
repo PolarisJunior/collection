@@ -413,8 +413,10 @@ int main(int argc, char** argv) {
     glClient.clearAllBuffers();
 
     // skybox code
-    glDepthMask(GL_FALSE);
+    // glDepthMask(GL_FALSE);
     glFrontFace(GL_CCW);
+    // allows the skybox to pass with a depth value of all 1.0s
+    glDepthFunc(GL_LEQUAL);
     glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxId);
     // glBindVertexArray(skyboxRenderUnit.vao);
     // glBindVertexArray(skyboxVAO);
@@ -430,8 +432,9 @@ int main(int argc, char** argv) {
     // glDrawArrays(GL_TRIANGLES, 0, 36);
     // glDrawElements(GL_TRIANGLES, skyboxRenderUnit.mesh.triangles().size(),
     //                GL_UNSIGNED_INT, 0);
-    glDepthMask(GL_TRUE);
+    // glDepthMask(GL_TRUE);
     glFrontFace(GL_CW);
+    glDepthFunc(GL_LESS);
     // end skybox
 
     prog->useProgram();
