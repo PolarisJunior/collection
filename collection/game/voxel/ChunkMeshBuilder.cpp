@@ -61,15 +61,18 @@ Mesh ChunkMeshBuilder::buildMesh(const Chunk& chunk) const {
         int32_t blockIdx = BlockDatabase::getAtlasId(blockType, face);
         std::vector<Vec2> newUvs;
 
+        // Size of a pixel on the texture in UV space
         float pixelWidth = 1.0 / atlas.width();
         float pixelHeight = 1.0 / atlas.height();
 
+        // Offset from the start of the subtexture in uv coordinates
         const Vec2 uvOffset =
             Vec2((float)(blockIdx % atlas.numCols()) / atlas.numCols() +
                      pixelWidth / 2,
-                 (float)(blockIdx / atlas.numRows()) / atlas.numRows() +
+                 ((float)blockIdx / atlas.numCols()) / atlas.numRows() +
                      pixelHeight / 2);
 
+        // number of textures in both dimensions of the atlas
         const Vec2 numTextures = Vec2(atlas.numCols(), atlas.numRows());
 
         std::transform(
