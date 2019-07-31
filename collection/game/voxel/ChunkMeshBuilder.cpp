@@ -65,7 +65,7 @@ Mesh ChunkMeshBuilder::buildMesh(const Chunk& chunk) const {
         float pixelWidth = 1.0 / atlas.width();
         float pixelHeight = 1.0 / atlas.height();
 
-        // Offset from the start of the subtexture in uv coordinates
+        // least magnitude corner of the subtexture
         const Vec2 uvOffset =
             Vec2((float)(blockIdx % atlas.numCols()) / atlas.numCols() +
                      pixelWidth / 2,

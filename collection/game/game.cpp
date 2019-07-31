@@ -129,8 +129,8 @@ int main(int argc, char** argv) {
   std::vector<Chunk>& chunks = chunkManager.loadedChunks();
 
   std::optional<ShaderProgram> prog = ShaderProgram::createProgram();
-  prog->loadVertFromFile("../res/simple.vert");
-  prog->loadFragFromFile("../res/simple.frag");
+  prog->loadVertFromFile("../res/shaders/lighting.vert");
+  prog->loadFragFromFile("../res/shaders/lighting.frag");
 
   prog->useProgram();
 
@@ -174,7 +174,7 @@ int main(int argc, char** argv) {
   std::vector<std::string> skyboxFaces = {"right",  "left",  "top",
                                           "bottom", "front", "back"};
   for (int i = 0; i < 6; i++) {
-    TextureAtlas skyboxFace("../res/toon_skybox2/" + skyboxFaces[i] + ".png");
+    TextureAtlas skyboxFace("../res/toon_skybox/" + skyboxFaces[i] + ".png");
     if (skyboxFace.hasAlpha()) {
       glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA,
                    skyboxFace.width(), skyboxFace.height(), 0, GL_RGBA,
@@ -196,8 +196,8 @@ int main(int argc, char** argv) {
   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
   std::optional<ShaderProgram> skyboxShader = ShaderProgram::createProgram();
-  skyboxShader->loadVertFromFile("../res/skybox.vert");
-  skyboxShader->loadFragFromFile("../res/skybox.frag");
+  skyboxShader->loadVertFromFile("../res/shaders/skybox.vert");
+  skyboxShader->loadFragFromFile("../res/shaders/skybox.frag");
 
   float skyboxVertices[] = {
       // positions
