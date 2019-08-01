@@ -27,6 +27,7 @@ class Chunk {
 
   Type defaultBlockType = Type::AIR;
 
+  Chunk() = default;
   Chunk(int32_t x, int32_t y, int32_t z) : x(x), y(y), z(z) {
 #ifdef DEBUG
     std::cout << "Chunk created at: " << Vector3<int32_t>(x, y, z) << std::endl;
@@ -63,11 +64,12 @@ class Chunk {
   // transform representing the base transform without any additional transforms
   Transform baseTransform() const { return Transform(worldPosition()); }
 
+  // use a vector for this instead
+  std::unordered_map<Vector3<int32_t>, Block::Type> blocksInChunk;
+
   ChunkIterator begin() const;
 
   ChunkIterator end() const;
-
-  std::unordered_map<Vector3<int32_t>, Block::Type> blocksInChunk;
 
   // std::vector<std::vector<std::vector<Vector3<int32_t>>>> allBlocksInChunk;
 };

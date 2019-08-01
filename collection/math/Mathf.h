@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 
 struct Mathf {
   static constexpr float pi = 3.14159265f;
@@ -29,6 +30,7 @@ struct Mathf {
   static float trunc(float x);
 
   static float max(float x, float y);
+  static int32_t abs(int32_t x);
   static float abs(float v);
 
   static float cos(float v);
@@ -37,4 +39,6 @@ struct Mathf {
   static float acos(float v);
   static float atan2(float y, float x);
   static float asin(float v);
+
+  static int32_t sign(int32_t x);
 };

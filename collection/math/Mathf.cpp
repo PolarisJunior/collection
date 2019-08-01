@@ -9,6 +9,10 @@ float Mathf::sqrt(float x) {
   return std::sqrt(x);
 }
 
+int32_t Mathf::abs(int32_t x) {
+  return std::abs(x);
+}
+
 float Mathf::abs(float v) {
   return fabs(v);
 }
@@ -87,4 +91,8 @@ float Mathf::atan2(float y, float x) {
 
 float Mathf::asin(float v) {
   return std::asin(v);
+}
+
+int32_t Mathf::sign(int32_t x) {
+  return (0 < x) - (x < 0);
 }

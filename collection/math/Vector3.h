@@ -30,6 +30,7 @@ class Vector3 {
   Vector3& operator/=(float divisor);
 
   bool operator==(const Vector3& other) const;
+  bool operator!=(const Vector3& other) const { return !(*this == other); }
 
   friend std::ostream& operator<<(std::ostream& out, const Vector3& vec) {
     return out << "(" << vec.x << ", " << vec.y << ", " << vec.z << ")";
@@ -135,7 +136,7 @@ inline Vector3<Numeric>& Vector3<Numeric>::operator/=(float divisor) {
 
 template <class Numeric>
 inline bool Vector3<Numeric>::operator==(const Vector3<Numeric>& other) const {
-  return this->x == other.x && this->y == other.y && this->z == other.z;
+  return (this->x == other.x) && (this->y == other.y) && (this->z == other.z);
 }
 
 template <class Numeric>

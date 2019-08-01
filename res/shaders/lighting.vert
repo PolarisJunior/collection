@@ -15,7 +15,7 @@ out vec3 lightDir;
 
 void main()
 {
-    lightDir = normalize(vec3(.2, -.4, .8));
+    lightDir = normalize(vec3(.3, -.8, .8));
     // lightDir = normalize(vec3(.8*sin(u_time * .001), -.4, .8));
     gl_Position = PV * model * vec4(aPos, 1.0);
     texCoord = aTexCoord;

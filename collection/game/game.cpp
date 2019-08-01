@@ -45,6 +45,7 @@
 #include "graphics/RenderActor.h"
 #include "graphics/RenderUnit.h"
 #include "graphics/Renderer.h"
+#include "graphics/Skybox.h"
 #include "graphics/Sprite.h"
 #include "graphics/Texture.h"
 #include "graphics/TextureAtlas.h"
@@ -80,6 +81,7 @@
 
 #include "references/gl_examples.h"
 
+#include "test/test_collection.h"
 #include "util/Macros.h"
 
 static bool running;
@@ -94,6 +96,7 @@ static Actor actor;
 EventScheduler eventScheduler;
 
 int main(int argc, char** argv) {
+  test::runBasicTests();
 #ifdef DEBUG
   std::cout << "Starting game..." << std::endl;
 #endif
@@ -140,7 +143,7 @@ int main(int argc, char** argv) {
 
   unsigned int texture;
   glGenTextures(1, &texture);
-  // active by default so we technically don't need this
+  // 0 is active by default so we technically don't need this
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, texture);
 
@@ -165,70 +168,14 @@ int main(int argc, char** argv) {
 
   prog->uniform("u_texture", 0);
 
-  std::cout << "Loading Skybox Textures" << std::endl;
+  std::array<std::string, 6> skyboxFaces = {"right",  "left",  "top",
+                                            "bottom", "front", "back"};
 
-  uint32_t skyboxId;
-  glGenTextures(1, &skyboxId);
-  glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxId);
+  std::transform(skyboxFaces.begin(), skyboxFaces.end(), skyboxFaces.begin(),
+                 [](auto& f) { return "../res/toon_skybox/" + f + ".png"; });
 
-  std::vector<std::string> skyboxFaces = {"right",  "left",  "top",
-                                          "bottom", "front", "back"};
-  for (int i = 0; i < 6; i++) {
-    TextureAtlas skyboxFace("../res/toon_skybox/" + skyboxFaces[i] + ".png");
-    if (skyboxFace.hasAlpha()) {
-      glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGBA,
-                   skyboxFace.width(), skyboxFace.height(), 0, GL_RGBA,
-                   GL_UNSIGNED_BYTE, skyboxFace.dataPointer());
-    } else {
-      glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB,
-                   skyboxFace.width(), skyboxFace.height(), 0, GL_RGB,
-                   GL_UNSIGNED_BYTE, skyboxFace.dataPointer());
-    }
-
-    std::cout << "Loaded: " << skyboxFaces[i] << std::endl;
-  }
-  std::cout << "Skyboxes Loaded" << std::endl;
-
-  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-
-  std::optional<ShaderProgram> skyboxShader = ShaderProgram::createProgram();
-  skyboxShader->loadVertFromFile("../res/shaders/skybox.vert");
-  skyboxShader->loadFragFromFile("../res/shaders/skybox.frag");
-
-  float skyboxVertices[] = {
-      // positions
-      -1.0f, 1.0f,  -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  -1.0f, -1.0f,
-      1.0f,  -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, -1.0f, 1.0f,  -1.0f,
-
-      -1.0f, -1.0f, 1.0f,  -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  -1.0f,
-      -1.0f, 1.0f,  -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, -1.0f, 1.0f,
-
-      1.0f,  -1.0f, -1.0f, 1.0f,  -1.0f, 1.0f,  1.0f,  1.0f,  1.0f,
-      1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  -1.0f, 1.0f,  -1.0f, -1.0f,
-
-      -1.0f, -1.0f, 1.0f,  -1.0f, 1.0f,  1.0f,  1.0f,  1.0f,  1.0f,
-      1.0f,  1.0f,  1.0f,  1.0f,  -1.0f, 1.0f,  -1.0f, -1.0f, 1.0f,
-
-      -1.0f, 1.0f,  -1.0f, 1.0f,  1.0f,  -1.0f, 1.0f,  1.0f,  1.0f,
-      1.0f,  1.0f,  1.0f,  -1.0f, 1.0f,  1.0f,  -1.0f, 1.0f,  -1.0f,
-
-      -1.0f, -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, -1.0f,
-      1.0f,  -1.0f, -1.0f, -1.0f, -1.0f, 1.0f,  1.0f,  -1.0f, 1.0f};
-  unsigned int skyboxVAO, skyboxVBO;
-  glGenVertexArrays(1, &skyboxVAO);
-  glGenBuffers(1, &skyboxVBO);
-  glBindVertexArray(skyboxVAO);
-  glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices,
-               GL_STATIC_DRAW);
-  glEnableVertexAttribArray(0);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-
-  RenderUnit skyboxRenderUnit = RenderUnit(CubeMesh());
+  Skybox skybox(skyboxFaces, "../res/shaders/skybox.vert",
+                "../res/shaders/skybox.frag");
 
   std::cout << "Building Meshes" << std::endl;
   std::vector<RenderActor> renderActors;
@@ -377,11 +324,11 @@ int main(int argc, char** argv) {
       }
       if (keyboard.keyDown(SDL_SCANCODE_W)) {
         Camera::getMainCamera().transform.rotate(-Time::deltaTime(),
-                                                 Vec3::right());
+                                                 mainCamera.transform.right());
       }
       if (keyboard.keyDown(SDL_SCANCODE_S)) {
         Camera::getMainCamera().transform.rotate(Time::deltaTime(),
-                                                 Vec3::right());
+                                                 mainCamera.transform.right());
       }
       if (keyboard.keyDown(SDL_SCANCODE_A)) {
         Camera::getMainCamera().transform.rotate(-Time::deltaTime(),
@@ -390,6 +337,8 @@ int main(int argc, char** argv) {
       if (keyboard.keyDown(SDL_SCANCODE_D)) {
         Camera::getMainCamera().transform.rotate(Time::deltaTime(), Vec3::up());
       }
+
+      chunkManager.moveCenter(mainCamera.transform.worldPosition());
 
       velocity.normalize() *= speed;
       pos += velocity;
@@ -421,30 +370,7 @@ int main(int argc, char** argv) {
     glClient.setClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClient.clearAllBuffers();
 
-    // skybox code
-    // glDepthMask(GL_FALSE);
-    glFrontFace(GL_CCW);
-    // allows the skybox to pass with a depth value of all 1.0s
-    glDepthFunc(GL_LEQUAL);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxId);
-    // glBindVertexArray(skyboxRenderUnit.vao);
-    // glBindVertexArray(skyboxVAO);
-    skyboxShader->useProgram();
-    skyboxShader->uniform("PV", PV);
-    Mat4 viewMatrix = Camera::getMainCamera().getViewMatrix();
-    Mat4 pMatrix = Camera::getMainCamera().getProjectionMatrix();
-    skyboxShader->uniform("projection", pMatrix);
-    skyboxShader->uniform("view", viewMatrix);
-
-    Transform skyboxTransform = Transform(mainCamera.transform.localPosition());
-    skyboxRenderUnit.render(skyboxTransform);
-    // glDrawArrays(GL_TRIANGLES, 0, 36);
-    // glDrawElements(GL_TRIANGLES, skyboxRenderUnit.mesh.triangles().size(),
-    //                GL_UNSIGNED_INT, 0);
-    // glDepthMask(GL_TRUE);
-    glFrontFace(GL_CW);
-    glDepthFunc(GL_LESS);
-    // end skybox
+    skybox.render();
 
     prog->useProgram();
     glBindTexture(GL_TEXTURE_2D, texture);
@@ -452,7 +378,6 @@ int main(int argc, char** argv) {
       renderActor.render();
     }
 
-    // glDrawArrays(GL_TRIANGLES, 0, 6);
     Window::getMainWindow().swapBufferWindow();
 
     // For calculating FPS
@@ -461,7 +386,7 @@ int main(int argc, char** argv) {
       uint32_t msSinceLastFpsCalc =
           std::max<int>(Time::getTicks() - lastRender, 1);
 
-      std::cout << 100 * 1000 / msSinceLastFpsCalc << "fps" << std::endl;
+      // std::cout << 100 * 1000 / msSinceLastFpsCalc << "fps" << std::endl;
       uint32_t curFps = 100 * 1000 / msSinceLastFpsCalc;
       fpsText = std::to_string(curFps);
       lastRender += msSinceLastFpsCalc;
