@@ -12,9 +12,13 @@ class Transform {
   Transform(const Vec3& pos) : Transform(pos.x, pos.y, pos.z) {}
 
   Vec3 localPosition() const { return this->localPosition_; }
+  Vec3 worldPosition() const { return localPosition(); }
+
   Quaternion localRotation() const { return this->localRotation_; }
-  // Vec3 localEulerAngles() { return this->localEulers_; }
+  Quaternion worldRotation() const { return this->localRotation(); }
+
   Vec3 localScale() const { return this->localScale_; }
+  Vec3 worldScale() const { return localScale(); }
 
   void translate(const Vec3& offset) {
     localPosition_ += offset;
@@ -37,7 +41,7 @@ class Transform {
   }
 
   void rotate(const Quaternion& quat) {
-    localRotation_ *= quat;
+    localRotation_ = quat * localRotation_;
     matrixUpToDate = false;
   }
 
