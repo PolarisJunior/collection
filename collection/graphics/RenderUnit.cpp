@@ -9,6 +9,14 @@ RenderUnit::RenderUnit(Mesh&& m) : mesh(std::move(m)) {
   this->vao = GlClient::instance().sendMesh(this->mesh);
 }
 
+RenderUnit::RenderUnit(RenderUnit&& u) : mesh(std::move(u.mesh)), vao(u.vao) {
+  u.vao = 0;
+}
+
+RenderUnit::~RenderUnit() {
+  glDeleteVertexArrays(1, &this->vao);
+}
+
 void RenderUnit::render(Transform& transform) {
   ShaderProgram& prog = GlContext::context.activeShader();
   prog.uniform("model", transform.getModelMatrix());

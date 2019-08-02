@@ -7,6 +7,8 @@ class Transform;
 class RenderUnit {
  public:
   RenderUnit(Mesh&& m);
+  RenderUnit(RenderUnit&& u);
+  ~RenderUnit();
 
   void render(Transform& transform);
 

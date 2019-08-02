@@ -58,17 +58,19 @@ void ChunkManager::moveCenter(const Vec3& newCenter) {
     for (int i = otherEdge.x; i != edge.x; i -= sgn.x) {
       for (int32_t z = center.z - chunkLoadRadius;
            z <= center.z + chunkLoadRadius; z++) {
-        std::cout << "Loading Chunks: " << Vec3i(i, -1, z) << std::endl;
         loadChunk(Vec3i(i, -1, z));
+        break;
       }
+      break;
     }
 
     for (int i = otherEdge.z; i != edge.z; i -= sgn.z) {
       for (int32_t x = center.x - chunkLoadRadius;
            x <= center.x + chunkLoadRadius; x++) {
-        std::cout << "Loading Chunks: " << Vec3i(x, -1, i) << std::endl;
         loadChunk(Vec3i(x, -1, i));
+        break;
       }
+      break;
     }
 
     // UNLOAD CHUNKS
@@ -77,7 +79,6 @@ void ChunkManager::moveCenter(const Vec3& newCenter) {
     for (int i = edge.x; i != otherEdge.x; i += sgn.x) {
       for (int32_t z = center.z - chunkLoadRadius;
            z <= center.z + chunkLoadRadius; z++) {
-        std::cout << "Unloading Chunks: " << Vec3i(i, -1, z) << std::endl;
         unloadChunk(Vec3i(i, -1, z));
       }
     }
@@ -85,7 +86,6 @@ void ChunkManager::moveCenter(const Vec3& newCenter) {
     for (int i = edge.z; i != otherEdge.z; i += sgn.z) {
       for (int32_t x = center.x - chunkLoadRadius;
            x <= center.x + chunkLoadRadius; x++) {
-        std::cout << "Unloading Chunks: " << Vec3i(x, -1, i) << std::endl;
         unloadChunk(Vec3i(x, -1, i));
       }
     }
@@ -111,7 +111,13 @@ void ChunkManager::renderChunks() {
   }
 }
 
-void ChunkManager::loadChunk(const Vec3i& chunkPos) {}
+void ChunkManager::loadChunk(const Vec3i& chunkPos) {
+  nearbyChunksMap[chunkPos] = Chunk(chunkPos.x, chunkPos.y, chunkPos.z);
+  Chunk& chunk = nearbyChunksMap[chunkPos];
+  terrainGenerator.generateTerrain(chunk);
+  chunkRenders.insert(std::pair(
+      chunkPos, RenderActor(builder.buildMesh(chunk), chunk.baseTransform())));
+}
 
 void ChunkManager::unloadChunk(const Vec3i& chunkPos) {
   nearbyChunksMap.erase(chunkPos);
