@@ -1,6 +1,7 @@
 
 #include "ChunkMeshBuilder.h"
 #include <algorithm>
+#include <execution>
 #include <iostream>
 #include "game/voxel/Block.h"
 #include "game/voxel/BlockDatabase.h"
@@ -37,6 +38,14 @@ Mesh ChunkMeshBuilder::buildMesh(const Chunk& chunk) const {
   frontFace.rotateVertices(Quaternion(-Mathf::pi_2, Vec3::right()));
   backFace.rotateVertices(Quaternion(Mathf::pi, Vec3::up()) *
                           Quaternion(-Mathf::pi_2, Vec3::right()));
+
+  // number of textures in both dimensions of the atlas
+  const Vec2 numTextures = Vec2(atlas.numCols(), atlas.numRows());
+
+  // Size of a pixel on the texture in UV space
+  float pixelWidth = 1.0 / atlas.width();
+  float pixelHeight = 1.0 / atlas.height();
+
   // for (auto it = chunk.begin(); it != chunk.end(); ++it) {
   for (auto it = chunk.blocksInChunk.begin(); it != chunk.blocksInChunk.end();
        ++it) {
@@ -65,11 +74,7 @@ Mesh ChunkMeshBuilder::buildMesh(const Chunk& chunk) const {
         // int32_t blockIdx = atlas.textureIndex(3, 1);
         // int32_t blockIdx = Block::getAtlasIndex(adjacentBlockType, face);
         int32_t blockIdx = BlockDatabase::getAtlasId(blockType, face);
-        std::vector<Vec2> newUvs;
-
-        // Size of a pixel on the texture in UV space
-        float pixelWidth = 1.0 / atlas.width();
-        float pixelHeight = 1.0 / atlas.height();
+        std::vector<Vec2> newUvs(faceMesh.uvs().size());
 
         // least magnitude corner of the subtexture
         const Vec2 uvOffset =
@@ -78,12 +83,8 @@ Mesh ChunkMeshBuilder::buildMesh(const Chunk& chunk) const {
                  ((float)blockIdx / atlas.numCols()) / atlas.numRows() +
                      pixelHeight / 2);
 
-        // number of textures in both dimensions of the atlas
-        const Vec2 numTextures = Vec2(atlas.numCols(), atlas.numRows());
-
         std::transform(
-            faceMesh.uvs().begin(), faceMesh.uvs().end(),
-            std::back_inserter(newUvs),
+            faceMesh.uvs().begin(), faceMesh.uvs().end(), newUvs.begin(),
             [&numTextures, &uvOffset, pixelWidth, pixelHeight](const Vec2& st) {
               return st / numTextures + uvOffset +
                      Vec2(pixelWidth / 2 * (1 - st.x) - pixelWidth * st.x,

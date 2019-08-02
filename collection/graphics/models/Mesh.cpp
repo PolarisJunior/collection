@@ -5,10 +5,10 @@
 #include "util/Macros.h"
 
 void Mesh::joinMesh(const Mesh& otherMesh,
+                    const Quaternion& rotation,
                     float x,
                     float y,
-                    float z,
-                    const Quaternion& rotation) {
+                    float z) {
   int32_t dist = std::distance(vertices_.begin(), vertices_.end());
 
   Mat4 rotationMatrix = rotation.toMatrix();
@@ -18,6 +18,29 @@ void Mesh::joinMesh(const Mesh& otherMesh,
                  [x, y, z, &rotationMatrix](const Vec3& p) -> Vec3 {
                    return (rotationMatrix * p) + Vec3(x, y, z);
                  });
+
+  std::transform(otherMesh.triangles().begin(), otherMesh.triangles().end(),
+                 std::back_inserter(triangles_),
+                 [dist](int32_t idx) { return idx + dist; });
+
+  uvs_.insert(uvs_.end(), otherMesh.uvs().begin(), otherMesh.uvs().end());
+  // std::transform(
+  //     otherMesh.uvs().begin(), otherMesh.uvs().end(),
+  //     std::back_inserter(uvs_),
+  //     [](const Vec2& st) { return st / 16.f + Vec2(1.0f / 16.f * 3, 0); });
+
+  normals_.insert(normals_.end(), otherMesh.normals().begin(),
+                  otherMesh.normals().end());
+}
+
+void Mesh::joinMesh(const Mesh& otherMesh, float x, float y, float z) {
+  int32_t dist = std::distance(vertices_.begin(), vertices_.end());
+
+  // add all vertices
+  std::transform(
+      otherMesh.vertices().begin(), otherMesh.vertices().end(),
+      std::back_inserter(vertices_),
+      [x, y, z](const Vec3& p) -> Vec3 { return p + Vec3(x, y, z); });
 
   std::transform(otherMesh.triangles().begin(), otherMesh.triangles().end(),
                  std::back_inserter(triangles_),

@@ -26,11 +26,15 @@ class Mesh {
 
   // Join two meshes together with an offset and rotation
   void joinMesh(const Mesh& otherMesh,
+                const Quaternion& rotation,
                 float offsetX = 0,
                 float offsetY = 0,
-                float offsetZ = 0,
-                const Quaternion& rotation = Quaternion::identity);
+                float offsetZ = 0);
   void joinMesh(const Mesh& otherMesh, const Transform& t);
+  void joinMesh(const Mesh& otherMesh,
+                float offsetX = 0,
+                float offsetY = 0,
+                float offsetZ = 0);
 
   void translateVertices(const Vec3& v);
   void translateVertices(float x, float y, float z);
