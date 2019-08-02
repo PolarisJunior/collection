@@ -1,7 +1,6 @@
 
 #include "ChunkMeshBuilder.h"
 #include <algorithm>
-#include <execution>
 #include <iostream>
 #include "game/voxel/Block.h"
 #include "game/voxel/BlockDatabase.h"
@@ -43,10 +42,11 @@ Mesh ChunkMeshBuilder::buildMesh(const Chunk& chunk) const {
   const Vec2 numTextures = Vec2(atlas.numCols(), atlas.numRows());
 
   // Size of a pixel on the texture in UV space
-  float pixelWidth = 1.0 / atlas.width();
-  float pixelHeight = 1.0 / atlas.height();
+  const float pixelWidth = 1.0 / atlas.width();
+  const float pixelHeight = 1.0 / atlas.height();
 
   // for (auto it = chunk.begin(); it != chunk.end(); ++it) {
+
   for (auto it = chunk.blocksInChunk.begin(); it != chunk.blocksInChunk.end();
        ++it) {
     // for (int j = 0; j < chunk.width * chunk.height * chunk.length; j++) {
@@ -56,13 +56,13 @@ Mesh ChunkMeshBuilder::buildMesh(const Chunk& chunk) const {
     // const Vector3<int32_t> blockPos = chunk.indexToPos(j);
 
     // Block::Type blockType = it->second;
-    Block::Type blockType = chunk.getBlockType(blockPos);
 
     // convert uncovered dirt to grass
-    Block::Type blockAbove = chunk.getBlockType(vec::up() + blockPos);
-    if (blockAbove == Block::Type::AIR) {
-      blockType = Block::Type::GRASS;
-    }
+    const Block::Type blockAbove = chunk.getBlockType(vec::up() + blockPos);
+
+    const Block::Type blockType = blockAbove == Block::Type::AIR
+                                      ? Block::Type::GRASS
+                                      : chunk.getBlockType(blockPos);
 
     int32_t i = 0;
     for (const vec& direction : allDirections) {

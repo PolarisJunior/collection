@@ -2,11 +2,11 @@
 #include "ChunkManager.h"
 #include <math.h>
 #include <algorithm>
+#include <execution>
+#include <iostream>
 #include <numeric>
 #include "VoxelServiceLocator.h"
 #include "math/Mathf.h"
-
-#include <iostream>
 
 ChunkManager::ChunkManager(ChunkMeshBuilder&& b)
     : terrainGenerator(VoxelServiceLocator::instance().terrainGenerator()),
@@ -23,9 +23,13 @@ bool ChunkManager::refreshLoadedChunks(float x, float y, float z) {
     }
   }
 
-  for (auto& posChunkPair : nearbyChunksMap) {
-    terrainGenerator.generateTerrain(posChunkPair.second);
-  }
+  std::for_each(std::execution::par, nearbyChunksMap.begin(),
+                nearbyChunksMap.end(), [this](auto& posChunkPair) {
+                  terrainGenerator.generateTerrain(posChunkPair.second);
+                });
+  // for (auto& posChunkPair : nearbyChunksMap) {
+  //   terrainGenerator.generateTerrain(posChunkPair.second);
+  // }
 
   return true;
 }
@@ -46,16 +50,6 @@ void ChunkManager::moveCenter(const Vec3& newCenter) {
     Vec3i edge = center + sgn * chunkLoadRadius;
     Vec3i otherEdge = edge + delta;
 
-    // Vec3i axes[] = {Vec3i(1, 0, 0), Vec3i(0, 0, 1)};
-    // Vec3i orthoAxes[] = {Vec3i(0, 0, 1), Vec3i(1, 0, 0)};
-    // int j = 0;
-    // for (const Vec3i& axis : axes) {
-    //   // zero out irrelevant axes
-    //   for (Vec3i i = axis * otherEdge; i != edge * axis; i -= sgn * axis) {
-    //     for (int32_t k = )
-    //   }
-    //   j++;
-    // }
     // LOAD CHUNKS
     for (int i = otherEdge.x; i != edge.x; i -= sgn.x) {
       for (int32_t z = center.z - chunkLoadRadius;
