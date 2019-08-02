@@ -8,32 +8,22 @@
 
 #include <iostream>
 
-ChunkManager::ChunkManager()
+ChunkManager::ChunkManager(ChunkMeshBuilder&& b)
     : terrainGenerator(VoxelServiceLocator::instance().terrainGenerator()),
-      chunksInRange(
-          std::vector(numChunksInRow(), std::vector<Chunk>(numChunksInRow()))),
-      nearbyChunksMap() {}
+      chunkRenders(),
+      nearbyChunksMap(),
+      builder(b) {}
 
 bool ChunkManager::refreshLoadedChunks(float x, float y, float z) {
   for (int xPos = -chunkLoadRadius; xPos <= chunkLoadRadius; xPos++) {
     for (int zPos = -chunkLoadRadius; zPos <= chunkLoadRadius; zPos++) {
-      // chunksInRange[xPos + chunkLoadRadius][zPos + chunkLoadRadius] =
-      //     Chunk(xPos, -1, zPos);
       nearbyChunksMap[Vec3i(xPos, -1, zPos)] = Chunk(xPos, -1, zPos);
     }
   }
 
   for (auto& posChunkPair : nearbyChunksMap) {
     terrainGenerator.generateTerrain(posChunkPair.second);
-    loadedChunks_.push_back(std::move(posChunkPair.second));
   }
-
-  // for (auto& innerList : chunksInRange) {
-  //   for (Chunk& chunk : innerList) {
-  //     terrainGenerator.generateTerrain(chunk);
-  //     loadedChunks_.push_back(std::move(chunk));
-  //   }
-  // }
 
   return true;
 }
@@ -54,19 +44,49 @@ void ChunkManager::moveCenter(const Vec3& newCenter) {
     Vec3i edge = center + sgn * chunkLoadRadius;
     Vec3i otherEdge = edge + delta;
 
+    // Vec3i axes[] = {Vec3i(1, 0, 0), Vec3i(0, 0, 1)};
+    // Vec3i orthoAxes[] = {Vec3i(0, 0, 1), Vec3i(1, 0, 0)};
+    // int j = 0;
+    // for (const Vec3i& axis : axes) {
+    //   // zero out irrelevant axes
+    //   for (Vec3i i = axis * otherEdge; i != edge * axis; i -= sgn * axis) {
+    //     for (int32_t k = )
+    //   }
+    //   j++;
+    // }
+    // LOAD CHUNKS
     for (int i = otherEdge.x; i != edge.x; i -= sgn.x) {
       for (int32_t z = center.z - chunkLoadRadius;
            z <= center.z + chunkLoadRadius; z++) {
         std::cout << "Loading Chunks: " << Vec3i(i, -1, z) << std::endl;
+        loadChunk(Vec3i(i, -1, z));
       }
     }
 
+    for (int i = otherEdge.z; i != edge.z; i -= sgn.z) {
+      for (int32_t x = center.x - chunkLoadRadius;
+           x <= center.x + chunkLoadRadius; x++) {
+        std::cout << "Loading Chunks: " << Vec3i(x, -1, i) << std::endl;
+        loadChunk(Vec3i(x, -1, i));
+      }
+    }
+
+    // UNLOAD CHUNKS
     edge = -(edge - center) + center;
     otherEdge = edge + delta;
     for (int i = edge.x; i != otherEdge.x; i += sgn.x) {
       for (int32_t z = center.z - chunkLoadRadius;
            z <= center.z + chunkLoadRadius; z++) {
         std::cout << "Unloading Chunks: " << Vec3i(i, -1, z) << std::endl;
+        unloadChunk(Vec3i(i, -1, z));
+      }
+    }
+
+    for (int i = edge.z; i != otherEdge.z; i += sgn.z) {
+      for (int32_t x = center.x - chunkLoadRadius;
+           x <= center.x + chunkLoadRadius; x++) {
+        std::cout << "Unloading Chunks: " << Vec3i(x, -1, i) << std::endl;
+        unloadChunk(Vec3i(x, -1, i));
       }
     }
 
@@ -75,13 +95,32 @@ void ChunkManager::moveCenter(const Vec3& newCenter) {
   }
 }
 
+void ChunkManager::buildRenders() {
+  for (auto& posChunkPair : nearbyChunksMap) {
+    Chunk& chunk = posChunkPair.second;
+    chunkRenders.insert(std::pair(
+        posChunkPair.first,
+        RenderActor(builder.buildMesh(chunk), chunk.baseTransform())));
+  }
+}
+
+void ChunkManager::renderChunks() {
+  // std::cout << chunkRenders.size() << std::endl;
+  for (auto& posRenderPair : chunkRenders) {
+    posRenderPair.second.render();
+  }
+}
+
+void ChunkManager::loadChunk(const Vec3i& chunkPos) {}
+
+void ChunkManager::unloadChunk(const Vec3i& chunkPos) {
+  nearbyChunksMap.erase(chunkPos);
+  chunkRenders.erase(chunkPos);
+}
+
 Vec3i ChunkManager::worldPositionToChunkPosition(const Vec3& worldPos) const {
   Vec3i offsetForNegatives(worldPos.x < 0, worldPos.y < 0, worldPos.z < 0);
   return Vec3i(worldPos.x / chunkWidth, worldPos.y / chunkHeight,
                worldPos.z / chunkLength) -
          offsetForNegatives;
-}
-
-std::vector<Chunk>& ChunkManager::loadedChunks() {
-  return loadedChunks_;
 }

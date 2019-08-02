@@ -127,9 +127,6 @@ int main(int argc, char** argv) {
   mainCamera.projectionType = Camera::ProjectionType::PERSPECTIVE;
 
   GlClient& glClient = GlClient::instance();
-  ChunkManager chunkManager;
-  chunkManager.refreshLoadedChunks(0, 0, 0);
-  std::vector<Chunk>& chunks = chunkManager.loadedChunks();
 
   std::optional<ShaderProgram> prog = ShaderProgram::createProgram();
   prog->loadVertFromFile("../res/shaders/lighting.vert");
@@ -179,11 +176,12 @@ int main(int argc, char** argv) {
 
   std::cout << "Building Meshes" << std::endl;
   std::vector<RenderActor> renderActors;
-  ChunkMeshBuilder meshBuilder(atlas);
-  for (Chunk& chunk : chunks) {
-    renderActors.push_back(
-        RenderActor(meshBuilder.buildMesh(chunk), chunk.baseTransform()));
-  }
+
+  ChunkManager chunkManager = ChunkManager(ChunkMeshBuilder(atlas));
+
+  chunkManager.refreshLoadedChunks(0, 0, 0);
+  chunkManager.buildRenders();
+
   renderActors.push_back(RenderActor(QuadMesh(), groundPlaneTransform));
 
   Renderer& mainRenderer = Window::getMainRenderer();
@@ -374,6 +372,8 @@ int main(int argc, char** argv) {
 
     prog->useProgram();
     glBindTexture(GL_TEXTURE_2D, texture);
+
+    chunkManager.renderChunks();
     for (RenderActor& renderActor : renderActors) {
       renderActor.render();
     }

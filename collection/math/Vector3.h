@@ -18,7 +18,10 @@ class Vector3 {
 
   Vector3 operator+(const Vector3& other) const;
   Vector3 operator-(const Vector3& other) const;
+
   Vector3 operator*(float scale) const;
+  Vector3 operator*(const Vector3& other) const;
+
   Vector3 operator/(float divisor) const;
 
   Vector3 operator-() const;
@@ -84,6 +87,12 @@ inline Vector3<Numeric> Vector3<Numeric>::operator-() const {
 template <class Numeric>
 inline Vector3<Numeric> Vector3<Numeric>::operator*(float scale) const {
   return Vector3(this->x * scale, this->y * scale, this->z * scale);
+}
+
+template <class Numeric>
+inline Vector3<Numeric> Vector3<Numeric>::operator*(
+    const Vector3<Numeric>& other) const {
+  return Vector3(this->x * other.x, this->y * other.y, this->z * other.z);
 }
 
 template <class Numeric>
