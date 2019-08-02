@@ -43,7 +43,7 @@ class ChunkManager {
   const uint32_t chunkLength = 16;
 
   // we load chunks in a square around the player of width  r*2+1
-  const int32_t chunkLoadRadius = 3;
+  const int32_t chunkLoadRadius = 1;
 
  private:
   void loadChunk(const Vec3i& chunkPos);

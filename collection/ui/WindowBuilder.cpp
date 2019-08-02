@@ -52,6 +52,11 @@ WindowBuilder& WindowBuilder::setResizable() {
   return *this;
 }
 
+WindowBuilder& WindowBuilder::fullScreen() {
+  this->flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+  return *this;
+}
+
 Window WindowBuilder::getWindow() {
   return Window(this->title, xPos, yPos, width, height, flags);
 }

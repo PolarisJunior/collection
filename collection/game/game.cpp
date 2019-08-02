@@ -336,7 +336,7 @@ int main(int argc, char** argv) {
         Camera::getMainCamera().transform.rotate(Time::deltaTime(), Vec3::up());
       }
 
-      chunkManager.moveCenter(mainCamera.transform.worldPosition());
+      // chunkManager.moveCenter(mainCamera.transform.worldPosition());
 
       velocity.normalize() *= speed;
       pos += velocity;
@@ -374,9 +374,9 @@ int main(int argc, char** argv) {
     glBindTexture(GL_TEXTURE_2D, texture);
 
     chunkManager.renderChunks();
-    for (RenderActor& renderActor : renderActors) {
-      renderActor.render();
-    }
+    // for (RenderActor& renderActor : renderActors) {
+    //   renderActor.render();
+    // }
 
     Window::getMainWindow().swapBufferWindow();
 

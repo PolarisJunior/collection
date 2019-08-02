@@ -21,6 +21,8 @@ class WindowBuilder {
   WindowBuilder& setResizable();
   WindowBuilder& setVisible();
 
+  WindowBuilder& fullScreen();
+
   Window getWindow();
 
  private:
