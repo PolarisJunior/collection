@@ -27,17 +27,28 @@ class Chunk {
 
   Type defaultBlockType = Type::AIR;
 
-  Chunk() = default;
-  Chunk(int32_t x, int32_t y, int32_t z) : x(x), y(y), z(z) {
+  Chunk()
+      : blockTypesInChunk(std::vector<Block::Type>(width * length * height)) {
+    // std::fill(blockTypesInChunk.begin(), blockTypesInChunk.end(),
+    //           Block::Type::AIR);
+  }
+  Chunk(int32_t x, int32_t y, int32_t z)
+      : x(x),
+        y(y),
+        z(z),
+        blockTypesInChunk(std::vector<Block::Type>(width * length * height)) {
 #ifdef DEBUG
     std::cout << "Chunk created at: " << Vector3<int32_t>(x, y, z) << std::endl;
 #endif
+    // std::fill(blockTypesInChunk.begin(), blockTypesInChunk.end(),
+    //           Block::Type::AIR);
   }
 
   void setBlockType(int32_t x, int32_t y, int32_t z, Block::Type type) {
-    if (Mathf::inRange(x, 0, width) && Mathf::inRange(y, 0, height) &&
-        Mathf::inRange(z, 0, length)) {
+    if (Mathf::inRange(x, 0, width - 1) && Mathf::inRange(y, 0, height - 1) &&
+        Mathf::inRange(z, 0, length - 1)) {
       blocksInChunk[Vector3<int32_t>(x, y, z)] = type;
+      blockTypesInChunk[posToIndex(x, y, z)] = type;
     }
   }
 
@@ -50,9 +61,14 @@ class Chunk {
   }
 
   Type getBlockType(int32_t x, int32_t y, int32_t z) const {
-    auto it = blocksInChunk.find(Vector3(x, y, z));
-    if (it != blocksInChunk.end()) {
-      return it->second;
+    // auto it = blocksInChunk.find(Vector3(x, y, z));
+    // if (it != blocksInChunk.end()) {
+    //   return it->second;
+    // }
+
+    if (Mathf::inRange(x, 0, width - 1) && Mathf::inRange(y, 0, height - 1) &&
+        Mathf::inRange(z, 0, length - 1)) {
+      return blockTypesInChunk[posToIndex(x, y, z)];
     }
     return defaultBlockType;
   }
@@ -65,13 +81,21 @@ class Chunk {
   Transform baseTransform() const { return Transform(worldPosition()); }
 
   // use a vector for this instead
+
   std::unordered_map<Vector3<int32_t>, Block::Type> blocksInChunk;
 
   ChunkIterator begin() const;
-
   ChunkIterator end() const;
 
-  // std::vector<std::vector<std::vector<Vector3<int32_t>>>> allBlocksInChunk;
+  Vec3i indexToPos(int32_t idx) const {
+    return Vec3i(idx % width, (idx / width) % height, idx / (width * length));
+  }
+
+ private:
+  int32_t posToIndex(int x, int y, int z) const {
+    return x + z * width + y * (width * length);
+  }
+  std::vector<Block::Type> blockTypesInChunk;
 };
 
 /*

@@ -386,7 +386,7 @@ int main(int argc, char** argv) {
       uint32_t msSinceLastFpsCalc =
           std::max<int>(Time::getTicks() - lastRender, 1);
 
-      // std::cout << 100 * 1000 / msSinceLastFpsCalc << "fps" << std::endl;
+      std::cout << 100 * 1000 / msSinceLastFpsCalc << "fps" << std::endl;
       uint32_t curFps = 100 * 1000 / msSinceLastFpsCalc;
       fpsText = std::to_string(curFps);
       lastRender += msSinceLastFpsCalc;

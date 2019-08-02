@@ -17,7 +17,9 @@ ChunkManager::ChunkManager(ChunkMeshBuilder&& b)
 bool ChunkManager::refreshLoadedChunks(float x, float y, float z) {
   for (int xPos = -chunkLoadRadius; xPos <= chunkLoadRadius; xPos++) {
     for (int zPos = -chunkLoadRadius; zPos <= chunkLoadRadius; zPos++) {
-      nearbyChunksMap[Vec3i(xPos, -1, zPos)] = Chunk(xPos, -1, zPos);
+      // nearbyChunksMap[Vec3i(xPos, -1, zPos)] = Chunk(xPos, -1, zPos);
+      nearbyChunksMap.insert(
+          std::pair(Vec3i(xPos, -1, zPos), Chunk(xPos, -1, zPos)));
     }
   }
 
@@ -59,18 +61,14 @@ void ChunkManager::moveCenter(const Vec3& newCenter) {
       for (int32_t z = center.z - chunkLoadRadius;
            z <= center.z + chunkLoadRadius; z++) {
         loadChunk(Vec3i(i, -1, z));
-        break;
       }
-      break;
     }
 
     for (int i = otherEdge.z; i != edge.z; i -= sgn.z) {
       for (int32_t x = center.x - chunkLoadRadius;
            x <= center.x + chunkLoadRadius; x++) {
         loadChunk(Vec3i(x, -1, i));
-        break;
       }
-      break;
     }
 
     // UNLOAD CHUNKS

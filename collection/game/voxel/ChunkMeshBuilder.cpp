@@ -37,11 +37,17 @@ Mesh ChunkMeshBuilder::buildMesh(const Chunk& chunk) const {
   frontFace.rotateVertices(Quaternion(-Mathf::pi_2, Vec3::right()));
   backFace.rotateVertices(Quaternion(Mathf::pi, Vec3::up()) *
                           Quaternion(-Mathf::pi_2, Vec3::right()));
-
+  // for (auto it = chunk.begin(); it != chunk.end(); ++it) {
   for (auto it = chunk.blocksInChunk.begin(); it != chunk.blocksInChunk.end();
        ++it) {
+    // for (int j = 0; j < chunk.width * chunk.height * chunk.length; j++) {
+
+    // chunk space position
     const Vector3<int32_t> blockPos = it->first;
-    Block::Type blockType = it->second;
+    // const Vector3<int32_t> blockPos = chunk.indexToPos(j);
+
+    // Block::Type blockType = it->second;
+    Block::Type blockType = chunk.getBlockType(blockPos);
 
     // convert uncovered dirt to grass
     Block::Type blockAbove = chunk.getBlockType(vec::up() + blockPos);
@@ -95,5 +101,6 @@ Mesh ChunkMeshBuilder::buildMesh(const Chunk& chunk) const {
       i++;
     }
   }
+
   return mesh;
 }
