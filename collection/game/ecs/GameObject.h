@@ -1,6 +1,8 @@
 #pragma once
 
 #include <cstdint>
+#include <functional>
+#include <vector>
 
 class GameObject {
  public:
@@ -9,9 +11,17 @@ class GameObject {
     uid = uidCounter;
   }
 
+  GameObject(const GameObject& other) = delete;
+  ~GameObject();
+
+  int32_t getInstanceId() const { return uid; }
+
+  GameObject& operator=(const GameObject& other) = delete;
+
   template <typename T>
   T& addComponent() {
-    return T::addComponent(uid);
+    destroyFuncs.push_back(T::destroyComponent);
+    return T::addComponent(*this);
   }
 
   template <typename T>
@@ -26,5 +36,9 @@ class GameObject {
 
  private:
   int32_t uid = 0;
+
+  // Functions to call to destroy all the attached components
+  std::vector<std::function<void(int32_t)>> destroyFuncs;
+
   inline static int32_t uidCounter = 0;
 };
