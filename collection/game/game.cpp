@@ -208,9 +208,6 @@ int main(int argc, char** argv) {
   mainCamera.setWidth(static_cast<float>(Window::getMainWindow().getWidth()));
   mainCamera.setHeight(static_cast<float>(Window::getMainWindow().getHeight()));
 
-  mainCamera.attachToActor(&actor);
-  mainCamera.setAttachOffset(Vector2(100.0f, 100.0f));
-
   TTF_Font* font = TTF_OpenFont("../res/ROCK.ttf", 28);
   SDL_Color color = {34, 34, 34, 255};
   SDL_Surface* surface = TTF_RenderText_Solid(font, "FOO BAR", color);
@@ -352,9 +349,9 @@ int main(int argc, char** argv) {
     glBindTexture(GL_TEXTURE_2D, texture);
 
     chunkManager.renderChunks();
-    // for (RenderActor& renderActor : renderActors) {
-    //   renderActor.render();
-    // }
+    for (RenderActor& renderActor : renderActors) {
+      renderActor.render();
+    }
 
     Window::getMainWindow().swapBufferWindow();
 

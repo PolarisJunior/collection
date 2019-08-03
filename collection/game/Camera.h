@@ -4,9 +4,6 @@
 #include "math/Mat4.h"
 #include "math/Vector2.h"
 
-class Actor;
-class PositionManager;
-
 class Camera {
  public:
   Camera();
@@ -28,15 +25,6 @@ class Camera {
   Vector2<float> toScreenCoords(const Vector2<float>& worldPos);
   Vector2<float> toWorldCoords(const Vector2<float>& screenPos);
 
-  void attachToActor(Actor* actor);
-  void unAttach();
-
-  void attachToEntity(uint32_t eid);
-  void unAttachFromEntity();
-  void setPositionManager(PositionManager& posManager);
-
-  void setAttachOffset(Vector2<float> offset);
-
   Mat4 getViewMatrix();
   Mat4 getProjectionMatrix();
 
@@ -54,14 +42,6 @@ class Camera {
   float farClipPlane = 1000.0f;
 
  protected:
-  Actor* attachedActor = nullptr;
-  uint32_t attachedEntity = 0;
-  PositionManager* positionManager;
-  bool isAttachedToEntity = false;
-
-  // Vector2<float> position;
-  // Vector2<float> attachOffset;
-
   float width;
   float height;
 
@@ -69,23 +49,6 @@ class Camera {
 };
 
 inline Camera::Camera(float w, float h) : width(w), height(h) {}
-
-inline void Camera::setAttachOffset(Vector2<float> offset) {
-  // this->attachOffset = offset;
-}
-
-inline void Camera::attachToEntity(uint32_t eid) {
-  attachedEntity = eid;
-  isAttachedToEntity = true;
-}
-
-inline void Camera::unAttachFromEntity() {
-  isAttachedToEntity = false;
-}
-
-inline void Camera::setPositionManager(PositionManager& posManager) {
-  positionManager = &posManager;
-}
 
 inline Vector2<float> Camera::getShape() {
   return Vector2(width, height);

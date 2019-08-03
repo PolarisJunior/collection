@@ -14,29 +14,6 @@ Camera::Camera()
     : width(Window::getMainWindow().getWidth()),
       height(Window::getMainWindow().getHeight()) {}
 
-// Vector2<float> Camera::getPosition() {
-//   if (isAttachedToEntity) {
-//     return positionManager->get(attachedEntity) + this->attachOffset;
-//   }
-//   if (attachedActor) {
-//     return Vector2(attachedActor->x, attachedActor->y) + this->attachOffset;
-//   } else {
-//     return position;
-//   }
-// }
-
-void Camera::attachToActor(Actor* actor) {
-  this->attachedActor = actor;
-}
-
-// void Camera::unAttach() {
-//   if (this->attachedActor) {
-//     position.x = attachedActor->x;
-//     position.y = attachedActor->y;
-//     attachedActor = nullptr;
-//   }
-// }
-
 Mat4 Camera::getProjectionMatrix() {
   switch (projectionType) {
     case ProjectionType::PERSPECTIVE:
