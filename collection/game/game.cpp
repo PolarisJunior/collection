@@ -24,15 +24,13 @@
 
 #include "game/Actor.h"
 #include "game/Camera.h"
-#include "game/Component.h"
+// #include "game/Component.h"
 #include "game/GameInstance.h"
-#include "game/RenderComponent.h"
-#include "game/RenderSystem.h"
-#include "game/Stage.h"
-#include "game/ecs/EntityManager.h"
-#include "game/ecs/PositionManager.h"
-#include "game/ecs/SpriteManager.h"
 
+#include "game/Stage.h"
+
+#include "game/ecs/GameObject.h"
+#include "game/ecs/TestComponent.h"
 #include "game/ecs/Transform.h"
 
 #include "game/voxel/BlockDatabase.h"
@@ -120,6 +118,10 @@ int main(int argc, char** argv) {
       std::cout << "Could not load OpenGL because of: " << res << std::endl;
     }
   }
+
+  GameObject go;
+  go.addComponent<TestComponent>();
+  // go.getComponent<TestComponent>().hello();
 
   Camera mainCamera;
   Camera::setMainCamera(mainCamera);
@@ -209,23 +211,6 @@ int main(int argc, char** argv) {
   mainCamera.attachToActor(&actor);
   mainCamera.setAttachOffset(Vector2(100.0f, 100.0f));
 
-  RenderComponent renderComp;
-  Sprite playerSprite("../res/monkey.png");
-  actor.attachComponent(renderComp);
-  actor.attachComponent(playerSprite);
-
-  EntityManager& manager = GameInstance::instance().entityManager();
-  uint32_t entityId = manager.addEntity();
-
-  PositionManager& posManager = GameInstance::instance().posManager();
-  posManager.registerEntity(entityId, {5.0f, 3.0f});
-
-  SpriteManager spriteManager(posManager, mainCamera);
-  Texture monkey("../res/monkey.png");
-  spriteManager.registerEntity(entityId, monkey);
-  mainCamera.setPositionManager(posManager);
-  mainCamera.attachToEntity(entityId);
-
   TTF_Font* font = TTF_OpenFont("../res/ROCK.ttf", 28);
   SDL_Color color = {34, 34, 34, 255};
   SDL_Surface* surface = TTF_RenderText_Solid(font, "FOO BAR", color);
@@ -237,7 +222,7 @@ int main(int argc, char** argv) {
   System::delay(100);
   TTF_CloseFont(font);
 
-  Vector2<float>& pos = posManager.get(entityId);
+  // Vector2<float>& pos = posManager.get(entityId);
   eventPoller.addListener(SDL_KEYDOWN, [](const SDL_Event& event) {
     if (event.key.repeat) {
       return;
@@ -339,7 +324,7 @@ int main(int argc, char** argv) {
       // chunkManager.moveCenter(mainCamera.transform.worldPosition());
 
       velocity.normalize() *= speed;
-      pos += velocity;
+      // pos += velocity;
 
       Mat4 viewMatrix = Camera::getMainCamera().getViewMatrix();
       Mat4 pMatrix = Camera::getMainCamera().getProjectionMatrix();
@@ -356,13 +341,6 @@ int main(int argc, char** argv) {
     float interpolation =
         fmin(1.f, static_cast<float>(currentMs - lastUpdate) / UPDATE_PERIOD);
 
-    // mainRenderer.setColor(Colors::BLACK);
-    // mainRenderer.clear();
-    // stage.render(mainRenderer, mainCamera);
-    // renderSystem.renderAll(interpolation);
-    // spriteManager.renderAll(interpolation);
-    // mainRenderer.setColor(Colors::WHITE);
-    // mainRenderer.present();
     prog->uniform("u_time", (float)Time::getTicks());
 
     glClient.setClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -386,7 +364,7 @@ int main(int argc, char** argv) {
       uint32_t msSinceLastFpsCalc =
           std::max<int>(Time::getTicks() - lastRender, 1);
 
-      std::cout << 100 * 1000 / msSinceLastFpsCalc << "fps" << std::endl;
+      // std::cout << 100 * 1000 / msSinceLastFpsCalc << "fps" << std::endl;
       uint32_t curFps = 100 * 1000 / msSinceLastFpsCalc;
       fpsText = std::to_string(curFps);
       lastRender += msSinceLastFpsCalc;

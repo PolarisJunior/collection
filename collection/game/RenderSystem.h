@@ -1,19 +1,19 @@
 
-#pragma once
+// #pragma once
 
-#include <vector>
+// #include <vector>
 
-class RenderComponent;
+// class RenderComponent;
 
-class RenderSystem {
- public:
-  void registerComponent(RenderComponent* comp);
-  void unRegisterComponent(RenderComponent* comp);
+// class RenderSystem {
+//  public:
+//   void registerComponent(RenderComponent* comp);
+//   void unRegisterComponent(RenderComponent* comp);
 
-  void renderAll(float interp);
+//   void renderAll(float interp);
 
- private:
-  std::vector<RenderComponent*> registered;
-};
+//  private:
+//   std::vector<RenderComponent*> registered;
+// };
 
-extern RenderSystem renderSystem;
+// extern RenderSystem renderSystem;
