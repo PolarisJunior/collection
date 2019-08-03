@@ -29,7 +29,7 @@ Mat4 Camera::getProjectionMatrix() {
 }
 
 Mat4 Camera::getViewMatrix() {
-  return transform.getModelMatrix().inverse();
+  return transform().getModelMatrix().inverse();
 }
 
 Camera& Camera::getMainCamera() {

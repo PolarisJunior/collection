@@ -58,7 +58,7 @@ void Skybox::render() {
   shader->uniform("projection", projection);
   shader->uniform("view", view);
 
-  Transform transform = Transform(mainCamera.transform.worldPosition());
+  Transform transform = Transform(mainCamera.transform().worldPosition());
   skyboxRenderer.render(transform);
 
   glFrontFace(GL_CW);

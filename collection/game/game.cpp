@@ -121,9 +121,8 @@ int main(int argc, char** argv) {
 
   GameObject go;
   go.addComponent<TestComponent>();
-  // go.getComponent<TestComponent>().hello();
+  Camera& mainCamera = go.addComponent<Camera>();
 
-  Camera mainCamera;
   Camera::setMainCamera(mainCamera);
   mainCamera.fieldOfView = 90;
   mainCamera.projectionType = Camera::ProjectionType::PERSPECTIVE;
@@ -284,38 +283,39 @@ int main(int argc, char** argv) {
       float speedScale = 5.0;
       if (keyboard.keyDown(SDL_SCANCODE_UP)) {
         velocity += Dir2d::dirVectors[Dir2d::UP];
-        Camera::getMainCamera().transform.translate(
-            mainCamera.transform.front() * Time::deltaTime() * speedScale);
+        Camera::getMainCamera().transform().translate(
+            mainCamera.transform().front() * Time::deltaTime() * speedScale);
       }
       if (keyboard.keyDown(SDL_SCANCODE_RIGHT)) {
         velocity += Dir2d::dirVectors[Dir2d::RIGHT];
-        Camera::getMainCamera().transform.translate(
-            mainCamera.transform.right() * Time::deltaTime() * speedScale);
+        Camera::getMainCamera().transform().translate(
+            mainCamera.transform().right() * Time::deltaTime() * speedScale);
       }
       if (keyboard.keyDown(SDL_SCANCODE_LEFT)) {
         velocity += Dir2d::dirVectors[Dir2d::LEFT];
-        Camera::getMainCamera().transform.translate(
-            mainCamera.transform.left() * Time::deltaTime() * speedScale);
+        Camera::getMainCamera().transform().translate(
+            mainCamera.transform().left() * Time::deltaTime() * speedScale);
       }
       if (keyboard.keyDown(SDL_SCANCODE_DOWN)) {
         velocity += Dir2d::dirVectors[Dir2d::DOWN];
-        Camera::getMainCamera().transform.translate(
-            mainCamera.transform.back() * Time::deltaTime() * speedScale);
+        Camera::getMainCamera().transform().translate(
+            mainCamera.transform().back() * Time::deltaTime() * speedScale);
       }
       if (keyboard.keyDown(SDL_SCANCODE_W)) {
-        Camera::getMainCamera().transform.rotate(-Time::deltaTime(),
-                                                 mainCamera.transform.right());
+        Camera::getMainCamera().transform().rotate(
+            -Time::deltaTime(), mainCamera.transform().right());
       }
       if (keyboard.keyDown(SDL_SCANCODE_S)) {
-        Camera::getMainCamera().transform.rotate(Time::deltaTime(),
-                                                 mainCamera.transform.right());
+        Camera::getMainCamera().transform().rotate(
+            Time::deltaTime(), mainCamera.transform().right());
       }
       if (keyboard.keyDown(SDL_SCANCODE_A)) {
-        Camera::getMainCamera().transform.rotate(-Time::deltaTime(),
-                                                 Vec3::up());
+        Camera::getMainCamera().transform().rotate(-Time::deltaTime(),
+                                                   Vec3::up());
       }
       if (keyboard.keyDown(SDL_SCANCODE_D)) {
-        Camera::getMainCamera().transform.rotate(Time::deltaTime(), Vec3::up());
+        Camera::getMainCamera().transform().rotate(Time::deltaTime(),
+                                                   Vec3::up());
       }
 
       // chunkManager.moveCenter(mainCamera.transform.worldPosition());

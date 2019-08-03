@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <functional>
 #include <vector>
+#include "Transform.h"
 
 class GameObject {
  public:
@@ -15,6 +16,8 @@ class GameObject {
   ~GameObject();
 
   int32_t getInstanceId() const { return uid; }
+
+  Transform& transform() { return transform_; }
 
   GameObject& operator=(const GameObject& other) = delete;
 
@@ -36,6 +39,7 @@ class GameObject {
 
  private:
   int32_t uid = 0;
+  Transform transform_{};
 
   // Functions to call to destroy all the attached components
   std::vector<std::function<void(int32_t)>> destroyFuncs;

@@ -1,10 +1,11 @@
 #pragma once
 #include <cstdint>
+#include "game/ecs/Component.h"
 #include "game/ecs/Transform.h"
 #include "math/Mat4.h"
 #include "math/Vector2.h"
 
-class Camera {
+class Camera : public Component<Camera> {
  public:
   Camera();
   Camera(float w, float h);
@@ -33,7 +34,7 @@ class Camera {
 
   enum class ProjectionType { ORTHOGRAPHIC, PERSPECTIVE };
 
-  Transform transform;
+  // Transform transform;
   ProjectionType projectionType = ProjectionType::PERSPECTIVE;
 
   // Field of view in degrees

@@ -21,7 +21,7 @@ class Component {
   Component& operator=(Component&& other) = delete;
 
   GameObject& gameObject() { return *gameObject_; }
-  Transform& transform() { return gameObject()->getComponent<Transform>(); }
+  Transform& transform() { return gameObject().transform(); }
 
  private:
   GameObject* gameObject_ = nullptr;
