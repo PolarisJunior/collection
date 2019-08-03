@@ -1,6 +1,8 @@
 #pragma once
 
 #include <string>
+#include <utility>
+#include <vector>
 #include "graphics/models/Mesh.h"
 
 class GlClient {
@@ -10,7 +12,8 @@ class GlClient {
 
   int32_t createShaderProgram(const char* vertSource, const char* fragSource);
 
-  uint32_t sendMesh(const Mesh& mesh);
+  // uint32_t sendMesh(const Mesh& mesh);
+  std::pair<uint32_t, std::vector<uint32_t>> sendMesh(const Mesh& mesh);
 
   void setClearColor(float r, float g, float b, float a);
 

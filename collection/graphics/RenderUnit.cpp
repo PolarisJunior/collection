@@ -6,15 +6,24 @@
 #include "graphics/gl/GlContext.h"
 
 RenderUnit::RenderUnit(Mesh&& m) : mesh(std::move(m)) {
-  this->vao = GlClient::instance().sendMesh(this->mesh);
+  std::pair<uint32_t, std::vector<uint32_t>> res =
+      GlClient::instance().sendMesh(this->mesh);
+
+  this->vao = res.first;
+  this->bufferIds = res.second;
 }
 
-RenderUnit::RenderUnit(RenderUnit&& u) : mesh(std::move(u.mesh)), vao(u.vao) {
+RenderUnit::RenderUnit(RenderUnit&& u)
+    : mesh(std::move(u.mesh)),
+      vao(u.vao),
+      bufferIds(u.bufferIds.begin(), u.bufferIds.end()) {
   u.vao = 0;
+  u.bufferIds.clear();
 }
 
 RenderUnit::~RenderUnit() {
   glDeleteVertexArrays(1, &this->vao);
+  glDeleteBuffers(bufferIds.size(), bufferIds.data());
 }
 
 void RenderUnit::render(Transform& transform) {

@@ -31,6 +31,6 @@ class Component {
   static Derived& getComponent(int32_t id) { return entityToComponent.at(id); }
 
   static bool hasComponent(int32_t id) {
-    return entityToComponent.count(id) == 0;
+    return entityToComponent.count(id) > 0;
   }
 };

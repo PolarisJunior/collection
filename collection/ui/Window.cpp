@@ -45,7 +45,7 @@ Window::Window(std::string& title,
 }
 
 Window::~Window() {
-  delete sdlWindow;
+  SDL_DestroyWindow(sdlWindow);
 };
 
 SDL_Window* Window::getSdlWindow() {

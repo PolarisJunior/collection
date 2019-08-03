@@ -13,5 +13,8 @@ class RenderUnit {
   void render(Transform& transform);
 
   Mesh mesh;
+
+ private:
   uint32_t vao = 0;
+  std::vector<uint32_t> bufferIds;
 };

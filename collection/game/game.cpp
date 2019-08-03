@@ -94,7 +94,7 @@ static Actor actor;
 EventScheduler eventScheduler;
 
 int main(int argc, char** argv) {
-  test::runBasicTests();
+  // test::runBasicTests();
 #ifdef DEBUG
   std::cout << "Starting game..." << std::endl;
 #endif

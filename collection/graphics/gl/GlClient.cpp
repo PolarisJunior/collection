@@ -52,14 +52,18 @@ int32_t GlClient::createShaderProgram(const char* vertSource,
 
   return programHandle;
 }
-
-uint32_t GlClient::sendMesh(const Mesh& mesh) {
-  unsigned int VBO, VAO, EBO, UV, NORMS;
+std::pair<uint32_t, std::vector<uint32_t>> GlClient::sendMesh(
+    const Mesh& mesh) {
+  uint32_t VBO, VAO, EBO, UV, NORMS;
   glGenVertexArrays(1, &VAO);
-  glGenBuffers(1, &VBO);
-  glGenBuffers(1, &EBO);
-  glGenBuffers(1, &UV);
-  glGenBuffers(1, &NORMS);
+
+  std::vector<uint32_t> buffers(4);
+  glGenBuffers(4, buffers.data());
+
+  VBO = buffers[0];
+  EBO = buffers[1];
+  UV = buffers[2];
+  NORMS = buffers[3];
 
   glBindVertexArray(VAO);
 
@@ -93,7 +97,8 @@ uint32_t GlClient::sendMesh(const Mesh& mesh) {
 
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindVertexArray(0);
-  return VAO;
+
+  return std::make_pair(VAO, buffers);
 }
 
 void GlClient::setClearColor(float r, float g, float b, float a) {
