@@ -1,6 +1,5 @@
 
 #include "game/Camera.h"
-#include "Actor.h"
 #include "game/ecs/PositionManager.h"
 
 #include "math/Mathf.h"

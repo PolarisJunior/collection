@@ -22,9 +22,8 @@
 #include "ui/WindowBuilder.h"
 #include "util/time/Time.h"
 
-#include "game/Actor.h"
 #include "game/Camera.h"
-// #include "game/Component.h"
+
 #include "game/GameInstance.h"
 
 #include "game/Stage.h"
@@ -46,6 +45,7 @@
 #include "graphics/Skybox.h"
 #include "graphics/Sprite.h"
 #include "graphics/Texture.h"
+#include "graphics/Texture2d.h"
 #include "graphics/TextureAtlas.h"
 #include "graphics/TileMap.h"
 #include "graphics/TileSet.h"
@@ -89,8 +89,6 @@ static const uint32_t UPDATE_FREQUENCY = 60;
 static const uint32_t UPDATE_PERIOD = 1000 / UPDATE_FREQUENCY;
 static const uint32_t MAX_LOOPS = 10;
 
-static Actor actor;
-
 EventScheduler eventScheduler;
 
 int main(int argc, char** argv) {
@@ -119,9 +117,9 @@ int main(int argc, char** argv) {
     }
   }
 
-  GameObject go;
-  go.addComponent<TestComponent>();
-  Camera& mainCamera = go.addComponent<Camera>();
+  GameObject sceneCamera;
+  sceneCamera.addComponent<TestComponent>();
+  Camera& mainCamera = sceneCamera.addComponent<Camera>();
 
   Camera::setMainCamera(mainCamera);
   mainCamera.fieldOfView = 90;
