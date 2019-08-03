@@ -52,7 +52,7 @@ class Transform {
   Vec3 left() const { return localRotation_ * Vec3::left(); }
   Vec3 up() const { return localRotation_ * Vec3::up(); }
   Vec3 down() const { return localRotation_ * Vec3::down(); }
-  // Vec3 forward() const { return localR}
+  Vec3 forward() const { return worldRotation() * Vec3::forward(); }
   Vec3 front() const { return localRotation_ * Vec3::front(); }
   Vec3 back() const { return localRotation_ * Vec3::back(); }
 

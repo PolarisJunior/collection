@@ -81,8 +81,16 @@ float Mathf::sin(float v) {
   return std::sin(v);
 }
 
+float Mathf::tan(float x) {
+  return std::tan(x);
+}
+
 float Mathf::acos(float v) {
   return std::acos(v);
+}
+
+float Mathf::atan(float x) {
+  return std::atan(x);
 }
 
 float Mathf::atan2(float y, float x) {

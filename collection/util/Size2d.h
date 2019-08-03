@@ -14,4 +14,7 @@ class Size2d {
  protected:
   T width_;
   T height_;
+
+  Size2d() : Size2d(0, 0) {}
+  Size2d(T w, T h) : width_(w), height_(h) {}
 };

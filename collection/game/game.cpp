@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <iostream>
 #include <memory>
+#include <thread>
 
 // Note instead of using relative paths, set the include directories
 #include "loaders/GlLoader.h"
@@ -91,6 +92,12 @@ static const uint32_t MAX_LOOPS = 10;
 
 EventScheduler eventScheduler;
 
+void checkChunks(ChunkManager* manager) {
+  // while (true) {
+  //   manager->moveCenter(Camera::getMainCamera().transform().worldPosition());
+  // }
+}
+
 int main(int argc, char** argv) {
   // test::runBasicTests();
 #ifdef DEBUG
@@ -106,7 +113,7 @@ int main(int argc, char** argv) {
   }
 
   WindowBuilder windowBuilder;
-  windowBuilder.setTitle("Game").setDims(800, 600).setVisible();
+  windowBuilder.setTitle("Game").setDims(1280, 720).setVisible();
   Window::initMainWindow(windowBuilder);
 
   {
@@ -122,7 +129,6 @@ int main(int argc, char** argv) {
   Camera& mainCamera = sceneCamera.addComponent<Camera>();
 
   Camera::setMainCamera(mainCamera);
-  mainCamera.fieldOfView = 90;
   mainCamera.projectionType = Camera::ProjectionType::PERSPECTIVE;
 
   GlClient& glClient = GlClient::instance();
@@ -132,12 +138,14 @@ int main(int argc, char** argv) {
   prog->loadFragFromFile("../res/shaders/lighting.frag");
 
   prog->useProgram();
+  prog->uniform("u_texture", 0);
 
   Transform groundPlaneTransform;
   groundPlaneTransform.scale(100, 1, 100);
   groundPlaneTransform.translate(0, -20, 0);
 
   unsigned int texture;
+
   glGenTextures(1, &texture);
   // 0 is active by default so we technically don't need this
   glActiveTexture(GL_TEXTURE0);
@@ -145,10 +153,8 @@ int main(int argc, char** argv) {
 
   std::cout << "Loading Voxel Texture Atlas" << std::endl;
   int32_t pixelType = GL_RGB;
-  // TextureAtlas atlas("../res/minecraft.jpg", 64, 64);
-  // TextureAtlas atlas("../res/wac.png", 41, 41);
+
   TextureAtlas atlas("../res/toon_voxel.png", 41, 41);
-  // TextureAtlas atlas("../res/spritesheet_tiles2.png", 32, 32);
   if (atlas.hasAlpha()) {
     pixelType = GL_RGBA;
   }
@@ -161,8 +167,6 @@ int main(int argc, char** argv) {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 1);
-
-  prog->uniform("u_texture", 0);
 
   std::array<std::string, 6> skyboxFaces = {"right",  "left",  "top",
                                             "bottom", "front", "back"};
@@ -201,9 +205,6 @@ int main(int argc, char** argv) {
 
   eventPoller.addListener(SDL_QUIT,
                           [](const SDL_Event& event) { running = false; });
-
-  mainCamera.setWidth(static_cast<float>(Window::getMainWindow().getWidth()));
-  mainCamera.setHeight(static_cast<float>(Window::getMainWindow().getHeight()));
 
   TTF_Font* font = TTF_OpenFont("../res/ROCK.ttf", 28);
   SDL_Color color = {34, 34, 34, 255};
@@ -247,15 +248,17 @@ int main(int argc, char** argv) {
   });
 
   eventPoller.addListener(SDL_MOUSEBUTTONDOWN, [](const SDL_Event& event) {
-    Vector2 worldPos = Camera::getMainCamera().toWorldCoords(
-        Vector2(static_cast<float>(event.button.x),
-                static_cast<float>(event.button.y)));
-    printf("screen coords: (%d, %d), world coords: (%.3f, %.3f)\n",
-           event.button.x, event.button.y, worldPos.x, worldPos.y);
+    Ray ray = Camera::getMainCamera().screenPointToRay(
+        Vec2(event.button.x, event.button.y));
+    std::cout << "screen point and rot" << ray.origin() << " "
+              << ray.direction() << " clicked on"
+              << Vec2(event.button.x, event.button.y) << std::endl;
   });
 
   eventScheduler.scheduleEvent(
       []() { std::cout << "scheduled event ran" << std::endl; }, 3.0);
+
+  std::thread chunkThread(checkChunks, &chunkManager);
 
   std::string fpsText = "";
   uint32_t lastRender = Time::getTicks();
@@ -316,8 +319,7 @@ int main(int argc, char** argv) {
                                                    Vec3::up());
       }
 
-      // chunkManager.moveCenter(mainCamera.transform.worldPosition());
-
+      chunkManager.moveCenter(mainCamera.transform().worldPosition());
       velocity.normalize() *= speed;
       // pos += velocity;
 

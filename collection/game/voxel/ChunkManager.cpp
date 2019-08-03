@@ -27,18 +27,14 @@ bool ChunkManager::refreshLoadedChunks(float x, float y, float z) {
                 nearbyChunksMap.end(), [this](auto& posChunkPair) {
                   terrainGenerator.generateTerrain(posChunkPair.second);
                 });
-  // for (auto& posChunkPair : nearbyChunksMap) {
-  //   terrainGenerator.generateTerrain(posChunkPair.second);
-  // }
-
   return true;
 }
 
 void ChunkManager::moveCenter(const Vec3& newCenter) {
   // TODO add checks for big jumps
+
   Vec3i newCenterChunkPos = worldPositionToChunkPosition(newCenter);
   if (newCenterChunkPos != lastCenterPosition) {
-    std::cout << newCenterChunkPos << " last" << lastCenterPosition << "\n";
     // Reference OneNote Programming/Iterating 2d Matrix
     Vec3i delta = newCenterChunkPos - lastCenterPosition;
     // if delta points left, chunks on right need to be unloaded and chunks on
@@ -88,32 +84,42 @@ void ChunkManager::moveCenter(const Vec3& newCenter) {
 }
 
 void ChunkManager::buildRenders() {
+  chunkRendersLock.lock();
   for (auto& posChunkPair : nearbyChunksMap) {
     Chunk& chunk = posChunkPair.second;
+
     chunkRenders.insert(std::pair(
         posChunkPair.first,
         RenderActor(builder.buildMesh(chunk), chunk.baseTransform())));
   }
+  chunkRendersLock.unlock();
 }
 
 void ChunkManager::renderChunks() {
   // std::cout << chunkRenders.size() << std::endl;
+  chunkRendersLock.lock();
   for (auto& posRenderPair : chunkRenders) {
     posRenderPair.second.render();
   }
+  chunkRendersLock.unlock();
 }
 
 void ChunkManager::loadChunk(const Vec3i& chunkPos) {
+  chunkRendersLock.lock();
   nearbyChunksMap[chunkPos] = Chunk(chunkPos.x, chunkPos.y, chunkPos.z);
   Chunk& chunk = nearbyChunksMap[chunkPos];
   terrainGenerator.generateTerrain(chunk);
+
   chunkRenders.insert(std::pair(
       chunkPos, RenderActor(builder.buildMesh(chunk), chunk.baseTransform())));
+  chunkRendersLock.unlock();
 }
 
 void ChunkManager::unloadChunk(const Vec3i& chunkPos) {
+  chunkRendersLock.lock();
   nearbyChunksMap.erase(chunkPos);
   chunkRenders.erase(chunkPos);
+  chunkRendersLock.unlock();
 }
 
 Vec3i ChunkManager::worldPositionToChunkPosition(const Vec3& worldPos) const {

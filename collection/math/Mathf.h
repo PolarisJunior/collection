@@ -35,10 +35,12 @@ struct Mathf {
 
   static float cos(float v);
   static float sin(float v);
+  static float tan(float v);
 
-  static float acos(float v);
   static float atan2(float y, float x);
   static float asin(float v);
+  static float acos(float v);
+  static float atan(float v);
 
   static int32_t sign(int32_t x);
 };

@@ -7,6 +7,7 @@
 #include "graphics/models/Mesh.h"
 #include "math/Vector3.h"
 
+#include <mutex>
 #include <unordered_map>
 
 class ChunkManager {
@@ -53,6 +54,7 @@ class ChunkManager {
   std::unordered_map<Vec3i, Chunk> nearbyChunksMap;
 
   std::unordered_map<Vec3i, RenderActor> chunkRenders;
+  std::mutex chunkRendersLock;
 
   // Last chunk that was the center chunk
   Vec3i lastCenterPosition = Vec3i(0, 0, 0);
