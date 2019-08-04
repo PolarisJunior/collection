@@ -26,6 +26,18 @@ RenderUnit::~RenderUnit() {
   glDeleteBuffers(bufferIds.size(), bufferIds.data());
 }
 
+RenderUnit& RenderUnit::operator=(RenderUnit&& other) {
+  if (this != &other) {
+    mesh = std::move(other.mesh);
+    vao = other.vao;
+    bufferIds = std::move(other.bufferIds);
+
+    other.bufferIds.clear();
+    other.vao = 0;
+  }
+  return *this;
+}
+
 void RenderUnit::render(Transform& transform) {
   ShaderProgram& prog = GlContext::context.activeShader();
   prog.uniform("model", transform.getModelMatrix());

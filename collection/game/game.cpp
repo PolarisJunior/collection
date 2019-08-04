@@ -21,10 +21,10 @@
 #include "ui/SdlEventPoller.h"
 #include "ui/Window.h"
 #include "ui/WindowBuilder.h"
-#include "util/time/Time.h"
 
 #include "game/Camera.h"
 
+#include "game/GameConstants.h"
 #include "game/GameInstance.h"
 
 #include "game/Stage.h"
@@ -32,6 +32,8 @@
 #include "game/ecs/GameObject.h"
 #include "game/ecs/TestComponent.h"
 #include "game/ecs/Transform.h"
+#include "game/fps/FpsCameraController.h"
+#include "graphics/MeshRenderer.h"
 
 #include "game/voxel/BlockDatabase.h"
 #include "game/voxel/Chunk.h"
@@ -40,9 +42,9 @@
 
 #include "graphics/Color.h"
 #include "graphics/Image.h"
-#include "graphics/RenderActor.h"
 #include "graphics/RenderUnit.h"
 #include "graphics/Renderer.h"
+#include "graphics/ShaderProgram.h"
 #include "graphics/Skybox.h"
 #include "graphics/Sprite.h"
 #include "graphics/Texture.h"
@@ -50,18 +52,16 @@
 #include "graphics/TextureAtlas.h"
 #include "graphics/TileMap.h"
 #include "graphics/TileSet.h"
+#include "graphics/gl/GlClient.h"
 #include "graphics/models/CubeMesh.h"
 #include "graphics/models/Mesh.h"
 #include "graphics/models/PlaneMesh.h"
 #include "graphics/models/QuadMesh.h"
 #include "graphics/models/SphereMesh.h"
 
-#include "graphics/ShaderProgram.h"
-#include "graphics/gl/GlClient.h"
-
-#include "math/geometry/Rect.h"
 #include "util/Dir2d.h"
 #include "util/EventScheduler.h"
+#include "util/time/Time.h"
 
 #include "io/File.h"
 
@@ -74,6 +74,9 @@
 #include "math/Mat4.h"
 #include "math/Mathf.h"
 #include "math/Vector3.h"
+#include "math/geometry/Rect.h"
+
+#include "physics/RigidBody.h"
 
 #include "database/RelationalDatabase.h"
 #include "io/FileInputStream.h"
@@ -86,17 +89,7 @@
 static bool running;
 static SdlEventPoller eventPoller;
 
-static const uint32_t UPDATE_FREQUENCY = 60;
-static const uint32_t UPDATE_PERIOD = 1000 / UPDATE_FREQUENCY;
-static const uint32_t MAX_LOOPS = 10;
-
 EventScheduler eventScheduler;
-
-void checkChunks(ChunkManager* manager) {
-  // while (true) {
-  //   manager->moveCenter(Camera::getMainCamera().transform().worldPosition());
-  // }
-}
 
 int main(int argc, char** argv) {
   // test::runBasicTests();
@@ -126,6 +119,8 @@ int main(int argc, char** argv) {
 
   GameObject sceneCamera;
   sceneCamera.addComponent<TestComponent>();
+  sceneCamera.addComponent<FpsCameraController>();
+  sceneCamera.addComponent<RigidBody>();
   Camera& mainCamera = sceneCamera.addComponent<Camera>();
 
   Camera::setMainCamera(mainCamera);
@@ -140,7 +135,11 @@ int main(int argc, char** argv) {
   prog->useProgram();
   prog->uniform("u_texture", 0);
 
-  Transform groundPlaneTransform;
+  GameObject groundPlane;
+  Transform& groundPlaneTransform = groundPlane.transform();
+  MeshRenderer& groundRenderer = groundPlane.addComponent<MeshRenderer>();
+  groundRenderer.mesh(QuadMesh());
+
   groundPlaneTransform.scale(100, 1, 100);
   groundPlaneTransform.translate(0, -20, 0);
 
@@ -178,14 +177,11 @@ int main(int argc, char** argv) {
                 "../res/shaders/skybox.frag");
 
   std::cout << "Building Meshes" << std::endl;
-  std::vector<RenderActor> renderActors;
 
   ChunkManager chunkManager = ChunkManager(ChunkMeshBuilder(atlas));
 
   chunkManager.refreshLoadedChunks(0, 0, 0);
   chunkManager.buildRenders();
-
-  renderActors.push_back(RenderActor(QuadMesh(), groundPlaneTransform));
 
   Renderer& mainRenderer = Window::getMainRenderer();
 
@@ -258,47 +254,51 @@ int main(int argc, char** argv) {
   eventScheduler.scheduleEvent(
       []() { std::cout << "scheduled event ran" << std::endl; }, 3.0);
 
-  std::thread chunkThread(checkChunks, &chunkManager);
+  // std::thread chunkThread(checkChunks, &chunkManager);
 
   std::string fpsText = "";
-  uint32_t lastRender = Time::getTicks();
+  // uint32_t lastRender = Time::getTicks();
+
   uint32_t renderCount = 0;
   /* Main Game Loop */
   running = true;
-  uint32_t lastUpdate = Time::getTicks();
+  // uint32_t lastUpdate = Time::getTicks();
+  double lastRenderTime = Time::programTime();
+  double lastUpdate = Time::programTime();
+  Time::Internal::init(lastUpdate);
   while (running) {
-    uint32_t currentMs = Time::getTicks();
-    uint32_t frameTime = 0;
+    // uint32_t currentMs = Time::getTicks();
+    double currentTime = Time::programTime();
+    // uint32_t frameTime = 0;
+    double frameTime = 0;
     uint32_t numLoops = 0;
 
     Mat4 PV;
-    while ((currentMs - lastUpdate) > UPDATE_PERIOD && numLoops < MAX_LOOPS) {
+    while ((currentTime - lastUpdate) > GameConstants::frameTime() &&
+           numLoops < GameConstants::MAX_LOOPS) {
+      // while ((currentMs - lastUpdate) > UPDATE_PERIOD && numLoops <
+      // MAX_LOOPS) {
       Time::Internal::startLoop(lastUpdate);
       eventScheduler.runUpTo(lastUpdate);
 
       // game code
-      Vector2<float> velocity{0.0f, 0.0f};
       int32_t speed = 10;
       Keyboard& keyboard = GameInstance::instance().keyboard();
 
       float speedScale = 5.0;
       if (keyboard.keyDown(SDL_SCANCODE_UP)) {
-        velocity += Dir2d::dirVectors[Dir2d::UP];
         Camera::getMainCamera().transform().translate(
             mainCamera.transform().front() * Time::deltaTime() * speedScale);
       }
       if (keyboard.keyDown(SDL_SCANCODE_RIGHT)) {
-        velocity += Dir2d::dirVectors[Dir2d::RIGHT];
         Camera::getMainCamera().transform().translate(
             mainCamera.transform().right() * Time::deltaTime() * speedScale);
       }
       if (keyboard.keyDown(SDL_SCANCODE_LEFT)) {
-        velocity += Dir2d::dirVectors[Dir2d::LEFT];
         Camera::getMainCamera().transform().translate(
             mainCamera.transform().left() * Time::deltaTime() * speedScale);
       }
       if (keyboard.keyDown(SDL_SCANCODE_DOWN)) {
-        velocity += Dir2d::dirVectors[Dir2d::DOWN];
         Camera::getMainCamera().transform().translate(
             mainCamera.transform().back() * Time::deltaTime() * speedScale);
       }
@@ -320,8 +320,8 @@ int main(int argc, char** argv) {
       }
 
       chunkManager.moveCenter(mainCamera.transform().worldPosition());
-      velocity.normalize() *= speed;
-      // pos += velocity;
+      sceneCamera.getComponent<RigidBody>().update(Time::deltaTime());
+      sceneCamera.getComponent<FpsCameraController>().update(Time::deltaTime());
 
       Mat4 viewMatrix = Camera::getMainCamera().getViewMatrix();
       Mat4 pMatrix = Camera::getMainCamera().getProjectionMatrix();
@@ -329,14 +329,20 @@ int main(int argc, char** argv) {
       prog->uniform("PV", PV);
       // game code end
 
-      lastUpdate += UPDATE_PERIOD;
-      frameTime += UPDATE_PERIOD;
+      // lastUpdate += UPDATE_PERIOD;
+      // frameTime += UPDATE_PERIOD;
+      lastUpdate += GameConstants::frameTime();
+      frameTime += GameConstants::frameTime();
       numLoops++;
     }
     eventPoller.pollEvents();
 
+    // float interpolation =
+    //     fmin(1.f, static_cast<float>(currentMs - lastUpdate) /
+    //     UPDATE_PERIOD);
     float interpolation =
-        fmin(1.f, static_cast<float>(currentMs - lastUpdate) / UPDATE_PERIOD);
+        fmin(1.f, static_cast<float>(currentTime - lastUpdate) /
+                      GameConstants::frameTime());
 
     prog->uniform("u_time", (float)Time::getTicks());
 
@@ -349,22 +355,21 @@ int main(int argc, char** argv) {
     glBindTexture(GL_TEXTURE_2D, texture);
 
     chunkManager.renderChunks();
-    for (RenderActor& renderActor : renderActors) {
-      renderActor.render();
-    }
+    groundRenderer.render();
 
     Window::getMainWindow().swapBufferWindow();
 
     // For calculating FPS
     renderCount++;
     if (renderCount % 100 == 0) {
-      uint32_t msSinceLastFpsCalc =
-          std::max<int>(Time::getTicks() - lastRender, 1);
+      // uint32_t msSinceLastFpsCalc =
+      //     std::max<int>(Time::getTicks() - lastRender, 1);
 
       // std::cout << 100 * 1000 / msSinceLastFpsCalc << "fps" << std::endl;
-      uint32_t curFps = 100 * 1000 / msSinceLastFpsCalc;
-      fpsText = std::to_string(curFps);
-      lastRender += msSinceLastFpsCalc;
+
+      // uint32_t curFps = 100 * 1000 / msSinceLastFpsCalc;
+      // fpsText = std::to_string(curFps);
+      // lastRender += msSinceLastFpsCalc;
 
       // 100 / msSinceLastFpsCalc = renders per ms
       // 1000*100/ msSinceLastFpsCount = renders per second

@@ -23,6 +23,9 @@ class Component {
   GameObject& gameObject() { return *gameObject_; }
   Transform& transform() { return gameObject().transform(); }
 
+  // Called when the component is first built
+  virtual void built(){};
+
  private:
   GameObject* gameObject_ = nullptr;
 
@@ -40,6 +43,7 @@ class Component {
              .first)
             ->second;
     comp.gameObject_ = &go;
+    comp.built();
     return comp;
   }
 

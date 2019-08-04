@@ -8,10 +8,12 @@ class Mouse {
   Mouse() = default;
 
   // true if right mouse button down
-  bool right();
-  bool left();
-  bool middle();
+  static bool right();
+  static bool left();
+  static bool middle();
 
   // gets the current mouse screen pos
-  Vector2<int32_t> pos();
+  static Vector2<int32_t> pos();
+
+  enum class Button { LEFT = 0, RIGHT = 1, MIDDLE = 2 };
 };

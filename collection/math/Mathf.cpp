@@ -18,9 +18,7 @@ float Mathf::abs(float v) {
 }
 
 float Mathf::max(float x, float y) {
-  // bugged?
-  // return std::max(x, y);
-  return -1;
+  return std::max(x, y);
 }
 
 float Mathf::mod(float x, float y) {
