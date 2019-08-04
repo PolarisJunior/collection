@@ -5,15 +5,19 @@
 /* Requires events to be pumped to have
 valid keyStates */
 class Keyboard {
+  struct KeyStates {
+    const uint8_t* keyStates;
+  };
+
   // Does not need to be free'd
-  const uint8_t* keyStates;
+  static KeyStates states;
 
  public:
-  Keyboard();
-
   /* true if key, by scanCode, is held down */
-  bool keyDown(uint32_t scanCode);
-  bool keyUp(uint32_t scanCode);
+  static bool keyDown(uint32_t scanCode);
+  static bool keyUp(uint32_t scanCode);
+
+  static void init();
 
   enum ScanCode {
     Alpha1 = 30,

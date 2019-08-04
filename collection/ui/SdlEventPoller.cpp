@@ -2,8 +2,43 @@
 #include "SdlEventPoller.h"
 #include <SDL.h>
 #include <functional>
+#include "game/GameInstance.h"
 
 typedef void (*Callback)(const SDL_Event&);
+
+SdlEventPoller::SdlEventPoller() {
+  addListener(SDL_KEYUP, [](const SDL_Event& event) {
+    switch (event.key.keysym.sym) {
+      case SDLK_UP:
+        break;
+      case SDLK_RIGHT:
+        break;
+      case SDLK_DOWN:
+        break;
+      case SDLK_LEFT:
+        break;
+    }
+  });
+
+  addListener(SDL_KEYDOWN, [](const SDL_Event& event) {
+    if (event.key.repeat) {
+      return;
+    }
+    switch (event.key.keysym.sym) {
+      case SDLK_UP:
+        break;
+      case SDLK_RIGHT:
+        break;
+      case SDLK_DOWN:
+        break;
+      case SDLK_LEFT:
+        break;
+    }
+  });
+
+  addListener(SDL_QUIT,
+              [](const SDL_Event& event) { GameInstance::isRunning = false; });
+}
 
 void SdlEventPoller::pollEvents() {
   SDL_Event event;

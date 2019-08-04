@@ -86,7 +86,6 @@
 #include "test/test_collection.h"
 #include "util/Macros.h"
 
-static bool running;
 static SdlEventPoller eventPoller;
 
 EventScheduler eventScheduler;
@@ -108,6 +107,8 @@ int main(int argc, char** argv) {
   WindowBuilder windowBuilder;
   windowBuilder.setTitle("Game").setDims(1280, 720).setVisible();
   Window::initMainWindow(windowBuilder);
+
+  Keyboard::init();
 
   {
     GlLoader loader;
@@ -199,9 +200,6 @@ int main(int argc, char** argv) {
   stage.setTileMap(*rogueMap);
   stage.setMapOffset({10, 10});
 
-  eventPoller.addListener(SDL_QUIT,
-                          [](const SDL_Event& event) { running = false; });
-
   TTF_Font* font = TTF_OpenFont("../res/ROCK.ttf", 28);
   SDL_Color color = {34, 34, 34, 255};
   SDL_Surface* surface = TTF_RenderText_Solid(font, "FOO BAR", color);
@@ -212,36 +210,6 @@ int main(int argc, char** argv) {
 
   System::delay(100);
   TTF_CloseFont(font);
-
-  // Vector2<float>& pos = posManager.get(entityId);
-  eventPoller.addListener(SDL_KEYDOWN, [](const SDL_Event& event) {
-    if (event.key.repeat) {
-      return;
-    }
-    switch (event.key.keysym.sym) {
-      case SDLK_UP:
-        break;
-      case SDLK_RIGHT:
-        break;
-      case SDLK_DOWN:
-        break;
-      case SDLK_LEFT:
-        break;
-    }
-  });
-
-  eventPoller.addListener(SDL_KEYUP, [](const SDL_Event& event) {
-    switch (event.key.keysym.sym) {
-      case SDLK_UP:
-        break;
-      case SDLK_RIGHT:
-        break;
-      case SDLK_DOWN:
-        break;
-      case SDLK_LEFT:
-        break;
-    }
-  });
 
   eventPoller.addListener(SDL_MOUSEBUTTONDOWN, [](const SDL_Event& event) {
     Ray ray = Camera::getMainCamera().screenPointToRay(
@@ -254,67 +222,60 @@ int main(int argc, char** argv) {
   eventScheduler.scheduleEvent(
       []() { std::cout << "scheduled event ran" << std::endl; }, 3.0);
 
-  // std::thread chunkThread(checkChunks, &chunkManager);
-
   std::string fpsText = "";
-  // uint32_t lastRender = Time::getTicks();
 
   uint32_t renderCount = 0;
   /* Main Game Loop */
-  running = true;
-  // uint32_t lastUpdate = Time::getTicks();
+
   double lastRenderTime = Time::programTime();
   double lastUpdate = Time::programTime();
   Time::Internal::init(lastUpdate);
-  while (running) {
-    // uint32_t currentMs = Time::getTicks();
-    double currentTime = Time::programTime();
-    // uint32_t frameTime = 0;
-    double frameTime = 0;
+
+  GameInstance::isRunning = true;
+  while (GameInstance::isRunning) {
+    double mainLoopStart = Time::programTime();
+    double timeSpentUpdating = 0;
     uint32_t numLoops = 0;
 
     Mat4 PV;
-    while ((currentTime - lastUpdate) > GameConstants::frameTime() &&
+    while ((mainLoopStart - lastUpdate) > GameConstants::frameTime() &&
            numLoops < GameConstants::MAX_LOOPS) {
-      // while ((currentMs - lastUpdate) > UPDATE_PERIOD && numLoops <
-      // MAX_LOOPS) {
       Time::Internal::startLoop(lastUpdate);
       eventScheduler.runUpTo(lastUpdate);
 
       // game code
       int32_t speed = 10;
-      Keyboard& keyboard = GameInstance::instance().keyboard();
 
       float speedScale = 5.0;
-      if (keyboard.keyDown(SDL_SCANCODE_UP)) {
+      if (Keyboard::keyDown(SDL_SCANCODE_UP)) {
         Camera::getMainCamera().transform().translate(
             mainCamera.transform().front() * Time::deltaTime() * speedScale);
       }
-      if (keyboard.keyDown(SDL_SCANCODE_RIGHT)) {
+      if (Keyboard::keyDown(SDL_SCANCODE_RIGHT)) {
         Camera::getMainCamera().transform().translate(
             mainCamera.transform().right() * Time::deltaTime() * speedScale);
       }
-      if (keyboard.keyDown(SDL_SCANCODE_LEFT)) {
+      if (Keyboard::keyDown(SDL_SCANCODE_LEFT)) {
         Camera::getMainCamera().transform().translate(
             mainCamera.transform().left() * Time::deltaTime() * speedScale);
       }
-      if (keyboard.keyDown(SDL_SCANCODE_DOWN)) {
+      if (Keyboard::keyDown(SDL_SCANCODE_DOWN)) {
         Camera::getMainCamera().transform().translate(
             mainCamera.transform().back() * Time::deltaTime() * speedScale);
       }
-      if (keyboard.keyDown(SDL_SCANCODE_W)) {
+      if (Keyboard::keyDown(SDL_SCANCODE_W)) {
         Camera::getMainCamera().transform().rotate(
             -Time::deltaTime(), mainCamera.transform().right());
       }
-      if (keyboard.keyDown(SDL_SCANCODE_S)) {
+      if (Keyboard::keyDown(SDL_SCANCODE_S)) {
         Camera::getMainCamera().transform().rotate(
             Time::deltaTime(), mainCamera.transform().right());
       }
-      if (keyboard.keyDown(SDL_SCANCODE_A)) {
+      if (Keyboard::keyDown(SDL_SCANCODE_A)) {
         Camera::getMainCamera().transform().rotate(-Time::deltaTime(),
                                                    Vec3::up());
       }
-      if (keyboard.keyDown(SDL_SCANCODE_D)) {
+      if (Keyboard::keyDown(SDL_SCANCODE_D)) {
         Camera::getMainCamera().transform().rotate(Time::deltaTime(),
                                                    Vec3::up());
       }
@@ -329,19 +290,14 @@ int main(int argc, char** argv) {
       prog->uniform("PV", PV);
       // game code end
 
-      // lastUpdate += UPDATE_PERIOD;
-      // frameTime += UPDATE_PERIOD;
       lastUpdate += GameConstants::frameTime();
-      frameTime += GameConstants::frameTime();
+      timeSpentUpdating += GameConstants::frameTime();
       numLoops++;
     }
     eventPoller.pollEvents();
 
-    // float interpolation =
-    //     fmin(1.f, static_cast<float>(currentMs - lastUpdate) /
-    //     UPDATE_PERIOD);
     float interpolation =
-        fmin(1.f, static_cast<float>(currentTime - lastUpdate) /
+        fmin(1.f, static_cast<float>(mainLoopStart - lastUpdate) /
                       GameConstants::frameTime());
 
     prog->uniform("u_time", (float)Time::getTicks());
@@ -358,6 +314,8 @@ int main(int argc, char** argv) {
     groundRenderer.render();
 
     Window::getMainWindow().swapBufferWindow();
+
+    lastRenderTime = Time::programTime();
 
     // For calculating FPS
     renderCount++;

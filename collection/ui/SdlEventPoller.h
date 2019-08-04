@@ -8,6 +8,8 @@ union SDL_Event;
 
 class SdlEventPoller {
  public:
+  SdlEventPoller();
+
   void pollEvents();
 
   // void addListener(uint32_t eventType, void (*callback)(const SDL_Event&));
