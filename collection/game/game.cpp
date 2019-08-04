@@ -27,6 +27,7 @@
 #include "game/GameConstants.h"
 #include "game/GameInstance.h"
 
+#include "game/Scene.h"
 #include "game/Stage.h"
 
 #include "game/ecs/GameObject.h"
@@ -118,7 +119,10 @@ int main(int argc, char** argv) {
     }
   }
 
-  GameObject sceneCamera;
+  Scene scene;
+  Scene::mainScene(scene);
+
+  GameObject& sceneCamera = scene.addGameObject();
   sceneCamera.addComponent<TestComponent>();
   sceneCamera.addComponent<FpsCameraController>();
   sceneCamera.addComponent<RigidBody>();
@@ -222,11 +226,7 @@ int main(int argc, char** argv) {
   eventScheduler.scheduleEvent(
       []() { std::cout << "scheduled event ran" << std::endl; }, 3.0);
 
-  std::string fpsText = "";
-
-  uint32_t renderCount = 0;
   /* Main Game Loop */
-
   double lastRenderTime = Time::programTime();
   double lastUpdate = Time::programTime();
   Time::Internal::init(lastUpdate);
@@ -316,22 +316,6 @@ int main(int argc, char** argv) {
     Window::getMainWindow().swapBufferWindow();
 
     lastRenderTime = Time::programTime();
-
-    // For calculating FPS
-    renderCount++;
-    if (renderCount % 100 == 0) {
-      // uint32_t msSinceLastFpsCalc =
-      //     std::max<int>(Time::getTicks() - lastRender, 1);
-
-      // std::cout << 100 * 1000 / msSinceLastFpsCalc << "fps" << std::endl;
-
-      // uint32_t curFps = 100 * 1000 / msSinceLastFpsCalc;
-      // fpsText = std::to_string(curFps);
-      // lastRender += msSinceLastFpsCalc;
-
-      // 100 / msSinceLastFpsCalc = renders per ms
-      // 1000*100/ msSinceLastFpsCount = renders per second
-    }
   }
 
   return EXIT_SUCCESS;

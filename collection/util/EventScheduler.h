@@ -3,7 +3,6 @@
 #include <cstdint>
 #include <functional>
 #include <queue>
-#include "Dir2d.h"
 
 struct ScheduledEvent;
 

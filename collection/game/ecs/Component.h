@@ -7,10 +7,12 @@
 #include "GameObject.h"
 #include "Transform.h"
 
+class ComponentBase {};
+
 // Uses CRTP to create the static map per template instance
 
 template <typename Derived>
-class Component {
+class Component : public ComponentBase {
   using RealComponent = Derived;
 
  public:
@@ -29,7 +31,7 @@ class Component {
  private:
   GameObject* gameObject_ = nullptr;
 
-  inline static std::unordered_map<int32_t, RealComponent> objectIdToComponent;
+  inline static std::unordered_map<int64_t, RealComponent> objectIdToComponent;
 
   friend class GameObject;
 
@@ -47,13 +49,31 @@ class Component {
     return comp;
   }
 
-  static void destroyComponent(int32_t id) { objectIdToComponent.erase(id); }
+  // Called by the owning game object when it is destructed
+  static void destroyComponent(int64_t id) { objectIdToComponent.erase(id); }
 
-  static RealComponent& getComponent(int32_t id) {
+  static void accessComponent(GameObject& go, GameObject::OpType op) {
+    using Op = GameObject::OpType;
+    switch (op) {
+      case Op::DESTROY: {
+        objectIdToComponent.erase(go.getInstanceId());
+        break;
+      }
+      case Op::MOVE: {
+        RealComponent& comp = objectIdToComponent[go.getInstanceId()];
+        comp.gameObject_ = &go;
+        break;
+      }
+    }
+  }
+
+  // Get the component associated with the gameobject
+  static RealComponent& getComponent(int64_t id) {
     return objectIdToComponent.at(id);
   }
 
-  static bool hasComponent(int32_t id) {
+  // gameobject has component?
+  static bool hasComponent(int64_t id) {
     return objectIdToComponent.count(id) > 0;
   }
 };

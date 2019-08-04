@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <functional>
 #include <vector>
+
 #include "Transform.h"
 
 class GameObject {
@@ -12,10 +13,12 @@ class GameObject {
     uid = uidCounter;
   }
 
+  GameObject(GameObject&& other);
+  // copy constructor would require copying components
   GameObject(const GameObject& other) = delete;
   ~GameObject();
 
-  int32_t getInstanceId() const { return uid; }
+  int64_t getInstanceId() const { return uid; }
 
   Transform& transform() { return transform_; }
 
@@ -23,7 +26,7 @@ class GameObject {
 
   template <typename T>
   T& addComponent() {
-    destroyFuncs.push_back(T::destroyComponent);
+    accessFuncs.push_back(T::accessComponent);
     return T::addComponent(*this);
   }
 
@@ -37,12 +40,14 @@ class GameObject {
     return T::hasComponent(uid);
   }
 
+  enum class OpType { DESTROY, MOVE };
+
  private:
-  int32_t uid = 0;
+  int64_t uid = 0;
   Transform transform_{};
 
-  // Functions to call to destroy all the attached components
-  std::vector<std::function<void(int32_t)>> destroyFuncs;
+  // Functions to call to access instances of components
+  std::vector<std::function<void(GameObject&, OpType)>> accessFuncs;
 
-  inline static int32_t uidCounter = 0;
+  inline static int64_t uidCounter = 0;
 };
