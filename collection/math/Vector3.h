@@ -23,6 +23,7 @@ class Vector3 {
   Vector3 operator*(const Vector3& other) const;
 
   Vector3 operator/(float divisor) const;
+  Vector3 operator/(const Vector3& other) const;
 
   Vector3 operator-() const;
 
@@ -98,6 +99,12 @@ inline Vector3<Numeric> Vector3<Numeric>::operator*(
 template <class Numeric>
 inline Vector3<Numeric> Vector3<Numeric>::operator/(float divisor) const {
   return Vector3(this->x / divisor, this->y / divisor, this->z / divisor);
+}
+
+template <class Numeric>
+inline Vector3<Numeric> Vector3<Numeric>::operator/(
+    const Vector3<Numeric>& other) const {
+  return Vector3(this->x / other.x, this->y / other.y, this->z / other.z);
 }
 
 template <class Numeric>

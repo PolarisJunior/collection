@@ -54,6 +54,17 @@ Vec3 Quaternion::eulers() const {
   return Vec3(v.x, v.y, v.z);
 }
 
+Quaternion Quaternion::inverse() const {
+  float norm = w * w + x * x + y * y + z * z;
+
+  if (norm > 0.0) {
+    float invNorm = 1.0 / norm;
+    return Quaternion(-x * invNorm, -y * invNorm, -z * invNorm, w * invNorm);
+  }
+  // Error
+  return Quaternion(0, 0, 0, 0);
+}
+
 Mat4 Quaternion::toMatrix() const {
   glm::qua gq = toGlmQua(*this);
   glm::mat4x4 m = glm::toMat4(gq);

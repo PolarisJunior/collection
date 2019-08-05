@@ -15,16 +15,9 @@ Mat4 Transform::getModelMatrix() {
 }
 
 Mat4 Transform::getInverseModelMatrix() {
-  return getModelMatrix().inverse();
-  // Vec3 t;
-  // Vec3 s;
-  // Quaternion r;
-
-  // t = -localPosition_;
-
-  // s.x = 1.0 / localScale_.x;
-  // s.y = 1.0 / localScale_.y;
-  // s.z = 1.0 / localScale_.z;
-
-  // return Mat4::scale(s) * Mat4::translate(t);
+  Vec3 trans = -worldPosition();
+  Vec3 sc = Vec3(Vec3::one() / worldScale());
+  Quaternion rot = worldRotation().inverse();
+  return Mat4::scale(sc) * rot.toMatrix() * Mat4::translate(trans);
+  // return getModelMatrix().inverse();
 }

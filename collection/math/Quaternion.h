@@ -34,6 +34,8 @@ class Quaternion {
     return res;
   }
 
+  Quaternion inverse() const;
+
   Mat4 toMatrix() const;
 
   Vec3 operator*(const Vec3& v) const {

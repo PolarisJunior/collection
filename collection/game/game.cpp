@@ -87,6 +87,8 @@
 #include "test/test_collection.h"
 #include "util/Macros.h"
 
+#include "datastructures/ObjectPool.h"
+
 static SdlEventPoller eventPoller;
 
 EventScheduler eventScheduler;
@@ -123,10 +125,16 @@ int main(int argc, char** argv) {
   Scene::mainScene(scene);
 
   GameObject& sceneCamera = scene.addGameObject();
+  Camera& mainCamera = sceneCamera.addComponent<Camera>();
   sceneCamera.addComponent<TestComponent>();
   sceneCamera.addComponent<FpsCameraController>();
   sceneCamera.addComponent<RigidBody>();
-  Camera& mainCamera = sceneCamera.addComponent<Camera>();
+
+  ObjectPool<GameObject> objectPool;
+
+  GameObject& sphere = scene.addGameObject();
+  MeshRenderer& sphereRenderer = sphere.addComponent<MeshRenderer>();
+  sphereRenderer.mesh(SphereMesh());
 
   Camera::setMainCamera(mainCamera);
   mainCamera.projectionType = Camera::ProjectionType::PERSPECTIVE;
@@ -312,6 +320,7 @@ int main(int argc, char** argv) {
 
     chunkManager.renderChunks();
     groundRenderer.render();
+    sphereRenderer.render();
 
     Window::getMainWindow().swapBufferWindow();
 
