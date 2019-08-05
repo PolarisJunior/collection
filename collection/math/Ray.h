@@ -4,6 +4,9 @@
 
 class Ray {
  public:
+  Ray() = default;
+  Ray(const Vec3& o, const Vec3& d) : origin_(o), direction_(d.normalized()) {}
+
   Vec3 origin() const { return origin_; }
   Vec3 direction() const { return direction_; }
 

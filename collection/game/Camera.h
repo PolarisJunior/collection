@@ -17,6 +17,9 @@ class Camera : public Component<Camera>, public Size2d<float> {
 
   // origin is camera's world position
   Ray screenPointToRay(const Vec2& screenPos);
+  Ray screenPointToRay(int32_t x, int32_t y) {
+    return screenPointToRay(Vec2(x, y));
+  }
 
   float aspect() const { return width() / height(); }
   float hFov() const { return fieldOfView; }

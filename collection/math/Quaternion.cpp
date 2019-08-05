@@ -34,9 +34,7 @@ Quaternion::Quaternion(const Vec3& eulerRot) {
 Quaternion::Quaternion(float x, float y, float z) : Quaternion(Vec3(x, y, z)) {}
 
 Quaternion::Quaternion(float rfAngle, const Vec3& rkAxis) {
-  // assert:  axis[] is unit length
-  //
-  // The quaternion representing the rotation is
+  // axis[] is unit length
   //   q = cos(A/2)+sin(A/2)*(x*i+y*j+z*k)
   Vec3 axis = rkAxis.normalized();
 

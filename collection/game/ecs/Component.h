@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <cstdint>
 #include <functional>
 #include <unordered_map>
@@ -27,6 +28,15 @@ class Component : public ComponentBase {
 
   // Called when the component is first built
   virtual void built(){};
+
+  inline static std::vector<RealComponent*> all() {
+    std::vector<RealComponent*> out =
+        std::vector<RealComponent*>(objectIdToComponent.size());
+    std::transform(objectIdToComponent.begin(), objectIdToComponent.end(),
+                   out.begin(),
+                   [](auto& idCompPair) { return &idCompPair.second; });
+    return out;
+  }
 
  private:
   GameObject* gameObject_ = nullptr;

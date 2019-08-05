@@ -14,10 +14,16 @@ Mat4 Transform::getModelMatrix() {
   }
 }
 
+Mat4 Transform::inverseScaleMatrix() const {
+  return Mat4::scale(Vec3(Vec3::one() / worldScale()));
+}
+
+Mat4 Transform::inverseTranslateMatrix() const {
+  return Mat4::translate(-worldPosition());
+}
+
 Mat4 Transform::getInverseModelMatrix() {
-  Vec3 trans = -worldPosition();
-  Vec3 sc = Vec3(Vec3::one() / worldScale());
   Quaternion rot = worldRotation().inverse();
-  return Mat4::scale(sc) * rot.toMatrix() * Mat4::translate(trans);
+  return inverseScaleMatrix() * rot.toMatrix() * inverseTranslateMatrix();
   // return getModelMatrix().inverse();
 }

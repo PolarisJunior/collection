@@ -78,6 +78,7 @@
 #include "math/geometry/Rect.h"
 
 #include "physics/RigidBody.h"
+#include "physics/SphereCollider.h"
 
 #include "database/RelationalDatabase.h"
 #include "io/FileInputStream.h"
@@ -128,12 +129,14 @@ int main(int argc, char** argv) {
   Camera& mainCamera = sceneCamera.addComponent<Camera>();
   sceneCamera.addComponent<TestComponent>();
   sceneCamera.addComponent<FpsCameraController>();
-  sceneCamera.addComponent<RigidBody>();
+  RigidBody& rbd = sceneCamera.addComponent<RigidBody>();
+  rbd.gravityScale = 0;
 
   ObjectPool<GameObject> objectPool;
 
   GameObject& sphere = scene.addGameObject();
   MeshRenderer& sphereRenderer = sphere.addComponent<MeshRenderer>();
+  sphere.addComponent<SphereCollider>();
   sphereRenderer.mesh(SphereMesh());
 
   Camera::setMainCamera(mainCamera);
@@ -229,6 +232,7 @@ int main(int argc, char** argv) {
     std::cout << "screen point and rot" << ray.origin() << " "
               << ray.direction() << " clicked on"
               << Vec2(event.button.x, event.button.y) << std::endl;
+    Mouse::downThisFrame[0] = true;
   });
 
   eventScheduler.scheduleEvent(
@@ -292,6 +296,8 @@ int main(int argc, char** argv) {
       sceneCamera.getComponent<RigidBody>().update(Time::deltaTime());
       sceneCamera.getComponent<FpsCameraController>().update(Time::deltaTime());
 
+      Mouse::update();
+
       Mat4 viewMatrix = Camera::getMainCamera().getViewMatrix();
       Mat4 pMatrix = Camera::getMainCamera().getProjectionMatrix();
       PV = pMatrix * viewMatrix;
@@ -319,8 +325,10 @@ int main(int argc, char** argv) {
     glBindTexture(GL_TEXTURE_2D, texture);
 
     chunkManager.renderChunks();
-    groundRenderer.render();
-    sphereRenderer.render();
+    std::vector<MeshRenderer*> meshRenderers = MeshRenderer::all();
+    for (auto r : meshRenderers) {
+      r->render();
+    }
 
     Window::getMainWindow().swapBufferWindow();
 

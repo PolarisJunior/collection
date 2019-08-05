@@ -45,6 +45,9 @@ class Transform {
     matrixUpToDate = false;
   }
 
+  Mat4 inverseScaleMatrix() const;
+  Mat4 inverseTranslateMatrix() const;
+
   Mat4 getModelMatrix();
   Mat4 getInverseModelMatrix();
 
