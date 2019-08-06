@@ -5,6 +5,7 @@
 #include "game/Scene.h"
 #include "graphics/MeshRenderer.h"
 #include "graphics/models/SphereMesh.h"
+#include "physics/QuadCollider.h"
 #include "physics/SphereCollider.h"
 #include "ui/Input.h"
 #include "ui/Mouse.h"
@@ -18,6 +19,11 @@ void FpsCameraController::update(float deltaTime) {
     std::vector<SphereCollider*> colliders = SphereCollider::all();
     for (auto col : colliders) {
       std::cout << col->intersects(ray) << std::endl;
+    }
+
+    std::vector<QuadCollider*> quadColliders = QuadCollider::all();
+    for (auto q : quadColliders) {
+      std::cout << "intesrect quad" << q->intersects(ray) << std::endl;
     }
 
     Scene& scene = Scene::mainScene();

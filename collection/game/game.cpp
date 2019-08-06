@@ -77,6 +77,7 @@
 #include "math/Vector3.h"
 #include "math/geometry/Rect.h"
 
+#include "physics/QuadCollider.h"
 #include "physics/RigidBody.h"
 #include "physics/SphereCollider.h"
 
@@ -135,9 +136,16 @@ int main(int argc, char** argv) {
   ObjectPool<GameObject> objectPool;
 
   GameObject& sphere = scene.addGameObject();
+  sphere.transform().translate(-5, 5, 9);
   MeshRenderer& sphereRenderer = sphere.addComponent<MeshRenderer>();
   sphere.addComponent<SphereCollider>();
   sphereRenderer.mesh(SphereMesh());
+
+  GameObject& quad = scene.addGameObject();
+  MeshRenderer& quadRenderer = quad.addComponent<MeshRenderer>();
+  quad.addComponent<QuadCollider>();
+  quadRenderer.mesh(QuadMesh());
+  quad.transform().translate(5, -5, 9);
 
   Camera::setMainCamera(mainCamera);
   mainCamera.projectionType = Camera::ProjectionType::PERSPECTIVE;

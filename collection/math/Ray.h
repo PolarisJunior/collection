@@ -9,9 +9,11 @@ class Ray {
 
   Vec3 origin() const { return origin_; }
   Vec3 direction() const { return direction_; }
+  Vec3 dir() const { return direction(); }
 
   void origin(const Vec3& v) { origin_ = v; }
   void direction(const Vec3& v) { direction_ = v.normalized(); }
+  void dir(const Vec3& v) { direction(v); }
 
   Vec3 getPoint(float d) { origin() + direction() * d; }
 
