@@ -26,24 +26,13 @@ class Quaternion {
 
   Vec3 eulers() const;
 
-  Vec3 degrees() const {
-    Vec3 res = eulers();
-    res.x *= Mathf::rad2Deg;
-    res.y *= Mathf::rad2Deg;
-    res.z *= Mathf::rad2Deg;
-    return res;
-  }
+  Vec3 degrees() const { return eulers() * Mathf::rad2Deg; }
 
   Quaternion inverse() const;
 
   Mat4 toMatrix() const;
 
-  Vec3 operator*(const Vec3& v) const {
-    Vec3 Q(x, y, z);
-    Vec3 T = Q.cross(v) * 2.0f;
-    Vec3 res = v + (T * w) + Q.cross(T);
-    return res;
-  }
+  Vec3 operator*(const Vec3& v) const;
 
   Quaternion operator*(const Quaternion& rhs) const;
 
@@ -52,4 +41,5 @@ class Quaternion {
   std::string toString() const;
 
   static const Quaternion identity;
+  static const Quaternion zero;
 };

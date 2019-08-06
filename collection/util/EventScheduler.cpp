@@ -42,3 +42,7 @@ void EventScheduler::runUpTo(uint32_t ms) {
     scheduledEventQueue.pop();
   }
 }
+
+void EventScheduler::runUpTo(double s) {
+  runUpTo((uint32_t)s * 1000);
+}

@@ -91,10 +91,6 @@
 
 #include "datastructures/ObjectPool.h"
 
-static SdlEventPoller eventPoller;
-
-EventScheduler eventScheduler;
-
 int main(int argc, char** argv) {
   test::runBasicTests();
 #ifdef DEBUG
@@ -137,6 +133,7 @@ int main(int argc, char** argv) {
 
   GameObject& sphere = scene.addGameObject();
   sphere.transform().translate(-5, 5, 9);
+  sphere.transform().scale(2, 3, 1);
   MeshRenderer& sphereRenderer = sphere.addComponent<MeshRenderer>();
   sphere.addComponent<SphereCollider>();
   sphereRenderer.mesh(SphereMesh());
@@ -145,7 +142,8 @@ int main(int argc, char** argv) {
   MeshRenderer& quadRenderer = quad.addComponent<MeshRenderer>();
   quad.addComponent<QuadCollider>();
   quadRenderer.mesh(QuadMesh());
-  quad.transform().translate(5, -5, 9);
+  quad.transform().scale(10, 1, 10);
+  quad.transform().translate(-5, -5, 9);
 
   Camera::setMainCamera(mainCamera);
   mainCamera.projectionType = Camera::ProjectionType::PERSPECTIVE;
@@ -234,7 +232,7 @@ int main(int argc, char** argv) {
   System::delay(100);
   TTF_CloseFont(font);
 
-  eventPoller.addListener(SDL_MOUSEBUTTONDOWN, [](const SDL_Event& event) {
+  SdlEventPoller::addListener(SDL_MOUSEBUTTONDOWN, [](const SDL_Event& event) {
     Ray ray = Camera::getMainCamera().screenPointToRay(
         Vec2(event.button.x, event.button.y));
     std::cout << "screen point and rot" << ray.origin() << " "
@@ -243,7 +241,7 @@ int main(int argc, char** argv) {
     Mouse::downThisFrame[0] = true;
   });
 
-  eventScheduler.scheduleEvent(
+  EventScheduler::scheduleEvent(
       []() { std::cout << "scheduled event ran" << std::endl; }, 3.0);
 
   /* Main Game Loop */
@@ -261,7 +259,7 @@ int main(int argc, char** argv) {
     while ((mainLoopStart - lastUpdate) > GameConstants::frameTime() &&
            numLoops < GameConstants::MAX_LOOPS) {
       Time::Internal::startLoop(lastUpdate);
-      eventScheduler.runUpTo(lastUpdate);
+      EventScheduler::runUpTo(lastUpdate);
 
       // game code
       int32_t speed = 10;
@@ -316,7 +314,7 @@ int main(int argc, char** argv) {
       timeSpentUpdating += GameConstants::frameTime();
       numLoops++;
     }
-    eventPoller.pollEvents();
+    SdlEventPoller::pollEvents();
 
     float interpolation =
         fmin(1.f, static_cast<float>(mainLoopStart - lastUpdate) /

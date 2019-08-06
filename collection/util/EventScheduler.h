@@ -8,18 +8,19 @@ struct ScheduledEvent;
 
 class EventScheduler {
  public:
-  void scheduleEvent(void (*f)(), double s);
+  static void scheduleEvent(void (*f)(), double s);
 
-  void runOnNextTick(std::function<void(void)> f);
+  static void runOnNextTick(std::function<void(void)> f);
 
-  void runUpTo(uint32_t ms);
+  static void runUpTo(uint32_t ms);
+  static void runUpTo(double t);
 
  private:
-  void scheduleEvent(void (*f)(), uint32_t ms);
+  static void scheduleEvent(void (*f)(), uint32_t ms);
 
-  std::priority_queue<ScheduledEvent*> scheduledEventQueue;
-  std::vector<ScheduledEvent*> awaitingSchedule;
-  std::queue<std::function<void(void)>> nextUpdateQueue;
+  inline static std::priority_queue<ScheduledEvent*> scheduledEventQueue;
+  inline static std::vector<ScheduledEvent*> awaitingSchedule;
+  inline static std::queue<std::function<void(void)>> nextUpdateQueue;
 };
 
 extern EventScheduler eventScheduler;

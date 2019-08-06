@@ -76,6 +76,13 @@ Quaternion Quaternion::operator*(const Quaternion& rhs) const {
                     w * rhs.w - x * rhs.x - y * rhs.y - z * rhs.z);
 }
 
+Vec3 Quaternion::operator*(const Vec3& v) const {
+  Vec3 Q(x, y, z);
+  Vec3 T = Q.cross(v) * 2.0f;
+  Vec3 res = v + (T * w) + Q.cross(T);
+  return res;
+}
+
 Quaternion& Quaternion::operator*=(const Quaternion& rhs) {
   Quaternion q = *this * rhs;
   x = q.x;
@@ -92,3 +99,4 @@ std::string Quaternion::toString() const {
 }
 
 const Quaternion Quaternion::identity(0, 0, 0, 1);
+const Quaternion Quaternion::zero(0, 0, 0, 0);

@@ -2,11 +2,31 @@
 #include "SdlEventPoller.h"
 #include <SDL.h>
 #include <functional>
+
+#include "game/Camera.h"
 #include "game/GameInstance.h"
+
+#include "math/Ray.h"
+#include "ui/Mouse.h"
 
 typedef void (*Callback)(const SDL_Event&);
 
-SdlEventPoller::SdlEventPoller() {
+void SdlEventPoller::pollEvents() {
+  SDL_Event event;
+  while (SDL_PollEvent(&event)) {
+    if (listeners.count(event.type)) {
+      listeners[event.type](event);
+    }
+  }
+}
+
+void SdlEventPoller::addListener(
+    uint32_t eventType,
+    std::function<void(const SDL_Event&)> callback) {
+  listeners[eventType] = callback;
+}
+
+void SdlEventPoller::init() {
   addListener(SDL_KEYUP, [](const SDL_Event& event) {
     switch (event.key.keysym.sym) {
       case SDLK_UP:
@@ -38,20 +58,10 @@ SdlEventPoller::SdlEventPoller() {
 
   addListener(SDL_QUIT,
               [](const SDL_Event& event) { GameInstance::isRunning = false; });
-}
 
-void SdlEventPoller::pollEvents() {
-  SDL_Event event;
-  while (SDL_PollEvent(&event)) {
-    if (listeners.count(event.type)) {
-      listeners[event.type](event);
-    }
-    // SDL_EventType
-  }
-}
-
-void SdlEventPoller::addListener(
-    uint32_t eventType,
-    std::function<void(const SDL_Event&)> callback) {
-  listeners[eventType] = callback;
+  SdlEventPoller::addListener(SDL_MOUSEBUTTONDOWN, [](const SDL_Event& event) {
+    Ray ray = Camera::getMainCamera().screenPointToRay(
+        Vec2(event.button.x, event.button.y));
+    Mouse::downThisFrame[0] = true;
+  });
 }
