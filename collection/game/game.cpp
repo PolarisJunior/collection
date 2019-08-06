@@ -95,7 +95,7 @@ static SdlEventPoller eventPoller;
 EventScheduler eventScheduler;
 
 int main(int argc, char** argv) {
-  // test::runBasicTests();
+  test::runBasicTests();
 #ifdef DEBUG
   std::cout << "Starting game..." << std::endl;
 #endif
@@ -292,7 +292,7 @@ int main(int argc, char** argv) {
                                                    Vec3::up());
       }
 
-      chunkManager.moveCenter(mainCamera.transform().worldPosition());
+      // chunkManager.moveCenter(mainCamera.transform().worldPosition());
       sceneCamera.getComponent<RigidBody>().update(Time::deltaTime());
       sceneCamera.getComponent<FpsCameraController>().update(Time::deltaTime());
 

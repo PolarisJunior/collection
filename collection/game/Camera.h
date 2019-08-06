@@ -14,6 +14,7 @@ class Camera : public Component<Camera>, public Size2d<float> {
 
   Mat4 getViewMatrix();
   Mat4 getProjectionMatrix();
+  Mat4 getInverseProjectionMatrix() { return getProjectionMatrix().inverse(); }
 
   // origin is camera's world position
   Ray screenPointToRay(const Vec2& screenPos);

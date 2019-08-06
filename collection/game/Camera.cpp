@@ -4,6 +4,7 @@
 
 #include "math/Mathf.h"
 
+#include <iostream>
 #include "glm/gtc/matrix_transform.hpp"
 #include "ui/Window.h"
 
@@ -30,7 +31,7 @@ Mat4 Camera::getProjectionMatrix() {
 }
 
 Mat4 Camera::getViewMatrix() {
-  return transform().getModelMatrix().inverse();
+  return transform().getInverseModelMatrix();
 }
 
 float Camera::vFov() const {
@@ -39,17 +40,12 @@ float Camera::vFov() const {
 }
 
 Ray Camera::screenPointToRay(const Vec2& screenPos) {
-  Ray ray;
-  ray.origin(transform().worldPosition());
-  Vec3 dir = transform().forward();
-  // theta is fov * (dist from center / width )
-  Vec2 center(width() / 2, height() / 2);
-  Vec2 fracOfScreen = (screenPos - center) / Vec2(width(), height());
-  Vec2 theta = Vec2(hFov() * fracOfScreen.x, vFov() * fracOfScreen.y);
-
-  Quaternion rotH(Mathf::deg2Rad * theta.x, Vec3::up());
-  Quaternion rotV(Mathf::deg2Rad * theta.y, Vec3::right());
-  ray.direction(rotH * rotV * dir);
+  // convert screen to normalized device coordinates, and then transform by
+  // perspective matrix to get view space position
+  Vec3 ndc((screenPos.x / width() - .5) * 2, -(screenPos.y / height() - .5) * 2,
+           -1);
+  Ray ray(transform().worldPosition(), transform().worldRotation().toMatrix() *
+                                           getInverseProjectionMatrix() * ndc);
   return ray;
 }
 
