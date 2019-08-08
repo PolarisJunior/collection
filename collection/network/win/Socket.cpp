@@ -29,7 +29,7 @@ std::string Socket::receive() {
   std::stringstream ss;
 
   do {
-    printf("about to recv %x %x\n", socketId, buf);
+    printf("about to recv\n");
     res = recv(this->socketId, buf, BUF_SIZE - 1, 0);
     printf("recvd\n");
     if (res > 0) {

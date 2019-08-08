@@ -18,9 +18,9 @@
 #include "ui/Input.h"
 #include "ui/Keyboard.h"
 #include "ui/Mouse.h"
-#include "ui/SdlEventPoller.h"
 #include "ui/Window.h"
 #include "ui/WindowBuilder.h"
+#include "util/SdlEventPoller.h"
 
 #include "game/Camera.h"
 
@@ -66,10 +66,6 @@
 
 #include "io/File.h"
 
-#include "network/ClientSocket.h"
-#include "network/ServerSocket.h"
-#include "network/Socket.h"
-
 #include "sys/System.h"
 
 #include "math/Mat4.h"
@@ -93,6 +89,7 @@
 
 int main(int argc, char** argv) {
   test::runBasicTests();
+
 #ifdef DEBUG
   std::cout << "Starting game..." << std::endl;
 #endif
@@ -232,15 +229,6 @@ int main(int argc, char** argv) {
   System::delay(100);
   TTF_CloseFont(font);
 
-  SdlEventPoller::addListener(SDL_MOUSEBUTTONDOWN, [](const SDL_Event& event) {
-    Ray ray = Camera::getMainCamera().screenPointToRay(
-        Vec2(event.button.x, event.button.y));
-    std::cout << "screen point and rot" << ray.origin() << " "
-              << ray.direction() << " clicked on"
-              << Vec2(event.button.x, event.button.y) << std::endl;
-    Mouse::downThisFrame[0] = true;
-  });
-
   EventScheduler::scheduleEvent(
       []() { std::cout << "scheduled event ran" << std::endl; }, 3.0);
 
@@ -298,7 +286,7 @@ int main(int argc, char** argv) {
                                                    Vec3::up());
       }
 
-      // chunkManager.moveCenter(mainCamera.transform().worldPosition());
+      chunkManager.moveCenter(mainCamera.transform().worldPosition());
       sceneCamera.getComponent<RigidBody>().update(Time::deltaTime());
       sceneCamera.getComponent<FpsCameraController>().update(Time::deltaTime());
 

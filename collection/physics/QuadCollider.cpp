@@ -25,3 +25,9 @@ bool QuadCollider::intersects(const Ray& ray) {
   Vec3 intersection = origin + dir * t;
   return Mathf::abs(intersection.x) < r && Mathf::abs(intersection.z) < r;
 }
+
+bool QuadCollider::intersects(SphereCollider& sphere) {
+  Transform& t = sphere.transform();
+  Vec3 localPos = transform().getInverseModelMatrix() * t.worldPosition();
+  return false;
+}

@@ -11,11 +11,35 @@
 class Mesh {
  public:
   Mesh() = default;
+  Mesh(const Mesh& other) = default;
+  Mesh(Mesh&& other)
+      : vertices_(std::move(other.vertices_)),
+        triangles_(std::move(other.triangles_)),
+        uvs_(std::move(other.uvs_)),
+        normals_(std::move(other.normals_)) {}
+
   Mesh(const std::vector<Vec3>& verts,
        const std::vector<int32_t>& tris,
        const std::vector<Vec2>& uvs,
        const std::vector<Vec3>& norms)
       : vertices_(verts), triangles_(tris), uvs_(uvs), normals_(norms) {}
+
+  Mesh(std::vector<Vec3>&& verts,
+       std::vector<int32_t>&& tris,
+       std::vector<Vec2>&& uvs,
+       std::vector<Vec3>&& norms)
+      : vertices_(std::move(verts)),
+        triangles_(std::move(tris)),
+        uvs_(std::move(uvs)),
+        normals_(std::move(norms)) {}
+
+  Mesh& operator=(Mesh&& other) {
+    this->vertices_ = std::move(other.vertices_);
+    this->triangles_ = std::move(other.triangles_);
+    this->uvs_ = std::move(other.uvs_);
+    this->normals_ = std::move(other.normals_);
+    return *this;
+  }
 
   void setVertices(const std::vector<Vec3>& vs) { vertices_ = vs; }
   void setTriangles(const std::vector<int32_t>& ts) { triangles_ = ts; }

@@ -6,15 +6,17 @@
 #include <WinSock2.h>
 #include <cstdio>
 #include <cstring>
+#include <string>
 
 const char* LOCAL_HOST = "127.0.0.1";
 
 // add Ws2_32.lib in visual studio
 // #pragma comment(lib, "Ws2_32.lib")
-ServerSocket::ServerSocket() {
+ServerSocket::ServerSocket(int32_t port) {
   struct addrinfo *result = NULL, hints;
   ZeroMemory(&hints, sizeof(hints));
-  int32_t r = getaddrinfo(LOCAL_HOST, "27015", &hints, &result);
+  int32_t r =
+      getaddrinfo(LOCAL_HOST, std::to_string(port).c_str(), &hints, &result);
   hints.ai_family = AF_INET;
   hints.ai_socktype = SOCK_STREAM;
   hints.ai_protocol = 0;

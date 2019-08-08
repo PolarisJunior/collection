@@ -20,6 +20,8 @@ class Lexer {
 
   void consumeWhitespace();
 
+  bool isWhitespace(char c);
+
   bool isSpecial(char c);
 
   inline static const std::vector<char> specials = {'(', '[', '{',

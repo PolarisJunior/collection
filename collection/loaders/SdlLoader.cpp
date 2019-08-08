@@ -5,8 +5,6 @@
 #include <SDL_image.h>
 #include <SDL_ttf.h>
 
-#include "ui/SdlEventPoller.h"
-
 #ifdef DEBUG
 #include <iostream>
 #endif
@@ -30,8 +28,6 @@ std::pair<bool, std::string> SdlLoader::load() {
       goto fail;
     }
   }
-
-  SdlEventPoller::init();
 
 #ifdef DEBUG
   std::cout << "SDL Loaded successfully" << std::endl;

@@ -6,6 +6,7 @@
 #include "game/voxel/BlockDatabase.h"
 #include "graphics/TextureAtlas.h"
 #include "graphics/models/PlaneMesh.h"
+#include "graphics/util/MeshBuilder.h"
 #include "math/Mat4.h"
 
 using vec = Vector3<int32_t>;
@@ -15,7 +16,11 @@ std::vector<Vector3<int32_t>> allDirections = {vec::up(),      vec::down(),
 
 Mesh ChunkMeshBuilder::buildMesh(const Chunk& chunk) const {
   Mesh mesh;
-  Mesh faceMesh = PlaneMesh();
+  static Mesh faceMesh = PlaneMesh();
+
+  MeshBuilder builder(
+      faceMesh.vertices().size() * chunk.width * chunk.height * chunk.length,
+      faceMesh.triangles().size() * chunk.width * chunk.height * chunk.length);
 
   std::vector<Mesh> faces;
   std::fill_n(std::back_inserter(faces), 6, faceMesh);
@@ -45,17 +50,10 @@ Mesh ChunkMeshBuilder::buildMesh(const Chunk& chunk) const {
   const float pixelWidth = 1.0 / atlas.width();
   const float pixelHeight = 1.0 / atlas.height();
 
-  // for (auto it = chunk.begin(); it != chunk.end(); ++it) {
-
   for (auto it = chunk.blocksInChunk.begin(); it != chunk.blocksInChunk.end();
        ++it) {
-    // for (int j = 0; j < chunk.width * chunk.height * chunk.length; j++) {
-
     // chunk space position
     const Vector3<int32_t> blockPos = it->first;
-    // const Vector3<int32_t> blockPos = chunk.indexToPos(j);
-
-    // Block::Type blockType = it->second;
 
     // convert uncovered dirt to grass
     const Block::Type blockAbove = chunk.getBlockType(vec::up() + blockPos);
@@ -71,9 +69,8 @@ Mesh ChunkMeshBuilder::buildMesh(const Chunk& chunk) const {
 
       if (adjacentBlockType == Block::Type::AIR) {
         Block::Face face = Block::indicesToFaces.at(i);
-        // int32_t blockIdx = atlas.textureIndex(3, 1);
-        // int32_t blockIdx = Block::getAtlasIndex(adjacentBlockType, face);
         int32_t blockIdx = BlockDatabase::getAtlasId(blockType, face);
+
         std::vector<Vec2> newUvs(faceMesh.uvs().size());
 
         // least magnitude corner of the subtexture
@@ -91,17 +88,17 @@ Mesh ChunkMeshBuilder::buildMesh(const Chunk& chunk) const {
                           pixelHeight / 2 * (1 - st.y) - pixelHeight * st.y);
             });
 
-        faces[i].uvs(std::move(newUvs));
-
-        // faces[i].uvs()) Center and then reposition all sides are some
+        // Center and then reposition all sides are some
         // particular distance from the center point of a block
-        mesh.joinMesh(faces[i], blockPos.x + (float)direction.x / 2,
-                      blockPos.y + 0.5 + (float)direction.y / 2,
-                      blockPos.z + (float)direction.z / 2);
+        builder.append(faces[i].vertices(), faces[i].triangles(),
+                       std::move(newUvs), faces[i].normals(),
+                       Vec3(blockPos.x + (float)direction.x / 2,
+                            blockPos.y + 0.5 + (float)direction.y / 2,
+                            blockPos.z + (float)direction.z / 2));
       }
       i++;
     }
   }
 
-  return mesh;
+  return builder.build();
 }

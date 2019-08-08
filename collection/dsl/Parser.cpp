@@ -1,6 +1,7 @@
 
 #include "Parser.h"
 #include <iostream>
+#include <sstream>
 #include <unordered_map>
 #include "Lexer.h"
 
@@ -9,6 +10,7 @@ void Parser::parse(const std::vector<LexResult>& tokens) {
     auto it = std::find(Lexer::opening.begin(), Lexer::opening.end(), s.str);
     if (it != Lexer::opening.end()) {
       lastOpening.push(s.str);
+      continue;
     }
 
     it = std::find(Lexer::closing.begin(), Lexer::closing.end(), s.str);
@@ -16,17 +18,21 @@ void Parser::parse(const std::vector<LexResult>& tokens) {
       if (lastOpening.empty() ||
           lastOpening.top() !=
               (Lexer::opening[std::distance(Lexer::closing.begin(), it)])) {
-        std::cout << "Mismatched " << s.str << " line: " << s.lineNum
-                  << " char: " << s.linePos << std::endl;
+        std::stringstream ss;
+        ss << "Mismatched " << s.str << " line: " << s.lineNum
+           << " char: " << s.linePos;
+        throw ss.str();
+        break;
       }
 
       if (!lastOpening.empty()) {
         lastOpening.pop();
       }
+      continue;
     }
   }
 
   if (!lastOpening.empty()) {
-    std::cout << "not closed" << std::endl;
+    throw "Lisp program mismatched closing";
   }
 }

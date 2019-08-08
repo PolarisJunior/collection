@@ -6,6 +6,10 @@
 
 enum class LexerState { CONSUMING_WHITESPACE, MAKING_TOKEN };
 
+bool Lexer::isWhitespace(char c) {
+  return std::isspace || c == ',';
+}
+
 bool Lexer::isSpecial(char c) {
   return std::find(specials.begin(), specials.end(), c) != specials.end();
 }
@@ -23,7 +27,7 @@ std::vector<LexResult> Lexer::lex(const std::string& s) {
     char c = *it;
     switch (state) {
       case LexerState::CONSUMING_WHITESPACE: {
-        if (std::isspace(c)) {
+        if (isWhitespace(c)) {
           if (c == '\n') {
             lineNum++;
             linePos = -1;
@@ -36,7 +40,7 @@ std::vector<LexResult> Lexer::lex(const std::string& s) {
         break;
       }
       case LexerState::MAKING_TOKEN: {
-        if (std::isspace(c)) {
+        if (isWhitespace(c)) {
           tokens.push_back({currentToken, lineNum, linePos});
           currentToken = "";
           state = LexerState::CONSUMING_WHITESPACE;

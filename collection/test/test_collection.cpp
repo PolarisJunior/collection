@@ -3,21 +3,30 @@
 #include <cassert>
 #include <cctype>
 #include <iostream>
+#include <memory>
+#include <string>
 #include <vector>
-#include "datastructures/LinkedList.h"
+
+#include "io/File.h"
+
 #include "dsl/Lexer.h"
 #include "dsl/Parser.h"
-#include "io/File.h"
+
+#include "datastructures/LinkedList.h"
 #include "misc/MergeSort.h"
 #include "misc/QuickSort.h"
 
+#include "network/ClientSocket.h"
+#include "network/ServerSocket.h"
+#include "network/Socket.h"
+
 namespace test {
 void runBasicTests() {
-  // LinkedList<int32_t> ll(0);
-  // ll.push_back(5);
-  // ll.push_back(7);
-  // assert(ll.size() == 3);
-  // std::cout << "Tests Passed" << std::endl;
+  std::cout << "running basic tests" << std::endl;
+  LinkedList<int32_t> ll(0);
+  ll.push_back(5);
+  ll.push_back(7);
+  assert(ll.size() == 3);
 
   // std::vector<int32_t> vec{0, 1, 5, -1, -3, 8, 9, 10, -5, -6};
   // QuickSort::sort<int32_t>(vec);
@@ -33,7 +42,6 @@ void runBasicTests() {
   // }
   // std::cout << "\n";
 
-  std::cout << std::isspace('\n') << " " << std::isspace('\r') << std::endl;
   Lexer lexer;
   std::string src = File("../res/lisp/lisp.rkt").readAsString();
   auto result = lexer.lex(src);
@@ -42,6 +50,16 @@ void runBasicTests() {
   }
 
   Parser parser;
-  parser.parse(result);
+  try {
+    parser.parse(result);
+  } catch (std::string s) {
+    std::cout << s << std::endl;
+  }
+
+  // ServerSocket socket = ServerSocket(27015);
+  // std::unique_ptr<Socket> client = socket.acceptConnection();
+  // ClientSocket client = ClientSocket();
+  // client.sendMsg("weewHello there");
+  // std::cout << client.receive() << std::endl;
 }
 }  // namespace test

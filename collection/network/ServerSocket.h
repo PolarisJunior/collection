@@ -7,7 +7,7 @@
 
 class ServerSocket : public Socket {
  public:
-  ServerSocket();
+  ServerSocket(int32_t port);
   ~ServerSocket();
 
   std::unique_ptr<Socket> acceptConnection();
