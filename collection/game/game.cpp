@@ -89,6 +89,8 @@
 
 int main(int argc, char** argv) {
   test::runBasicTests();
+  const std::type_info& info = typeid(RigidBody);
+  std::cout << info.name() << std::endl;
 
 #ifdef DEBUG
   std::cout << "Starting game..." << std::endl;
@@ -124,7 +126,11 @@ int main(int argc, char** argv) {
   sceneCamera.addComponent<TestComponent>();
   sceneCamera.addComponent<FpsCameraController>();
   RigidBody& rbd = sceneCamera.addComponent<RigidBody>();
-  rbd.gravityScale = 0;
+  rbd.gravityScale = 3;
+
+  RigidBody rbd2 = rbd.copy();
+  std::cout << &rbd2.gameObject() << std::endl;
+  std::cout << rbd.gravityScale << std::endl;
 
   ObjectPool<GameObject> objectPool;
 

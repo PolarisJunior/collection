@@ -28,15 +28,18 @@ class Chunk {
   Type defaultBlockType = Type::AIR;
 
   Chunk()
-      : blockTypesInChunk(std::vector<Block::Type>(width * length * height)) {
+  // : blockTypesInChunk(std::vector<Block::Type>(width * length * height))
+  {
     // std::fill(blockTypesInChunk.begin(), blockTypesInChunk.end(),
     //           Block::Type::AIR);
   }
   Chunk(int32_t x, int32_t y, int32_t z)
       : x(x),
         y(y),
-        z(z),
-        blockTypesInChunk(std::vector<Block::Type>(width * length * height)) {
+        z(z)
+  // ,
+  // blockTypesInChunk(std::vector<Block::Type>(width * length * height))
+  {
 #ifdef DEBUG
     std::cout << "Chunk created at: " << Vector3<int32_t>(x, y, z) << std::endl;
 #endif
@@ -48,7 +51,7 @@ class Chunk {
     if (Mathf::inRange(x, 0, width - 1) && Mathf::inRange(y, 0, height - 1) &&
         Mathf::inRange(z, 0, length - 1)) {
       blocksInChunk[Vector3<int32_t>(x, y, z)] = type;
-      blockTypesInChunk[posToIndex(x, y, z)] = type;
+      // blockTypesInChunk[posToIndex(x, y, z)] = type;
     }
   }
 
@@ -61,15 +64,16 @@ class Chunk {
   }
 
   Type getBlockType(int32_t x, int32_t y, int32_t z) const {
-    // auto it = blocksInChunk.find(Vector3(x, y, z));
-    // if (it != blocksInChunk.end()) {
-    //   return it->second;
-    // }
-
-    if (Mathf::inRange(x, 0, width - 1) && Mathf::inRange(y, 0, height - 1) &&
-        Mathf::inRange(z, 0, length - 1)) {
-      return blockTypesInChunk[posToIndex(x, y, z)];
+    auto it = blocksInChunk.find(Vector3(x, y, z));
+    if (it != blocksInChunk.end()) {
+      return it->second;
     }
+
+    // if (Mathf::inRange(x, 0, width - 1) && Mathf::inRange(y, 0, height - 1)
+    // &&
+    //     Mathf::inRange(z, 0, length - 1)) {
+    //   return blockTypesInChunk[posToIndex(x, y, z)];
+    // }
     return defaultBlockType;
   }
 
@@ -80,7 +84,10 @@ class Chunk {
   // transform representing the base transform without any additional transforms
   Transform baseTransform() const { return Transform(worldPosition()); }
 
-  // use a vector for this instead
+  int32_t maxVolume() const { return width * height * length; }
+  int32_t numFilled() const { return blocksInChunk.size(); }
+
+  // use a vector for this instead ?
 
   std::unordered_map<Vector3<int32_t>, Block::Type> blocksInChunk;
 
@@ -95,7 +102,8 @@ class Chunk {
   int32_t posToIndex(int x, int y, int z) const {
     return x + z * width + y * (width * length);
   }
-  std::vector<Block::Type> blockTypesInChunk;
+
+  // std::vector<Block::Type> blockTypesInChunk;
 };
 
 /*

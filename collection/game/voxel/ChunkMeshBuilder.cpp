@@ -18,9 +18,8 @@ Mesh ChunkMeshBuilder::buildMesh(const Chunk& chunk) const {
   Mesh mesh;
   static Mesh faceMesh = PlaneMesh();
 
-  MeshBuilder builder(
-      faceMesh.vertices().size() * chunk.width * chunk.height * chunk.length,
-      faceMesh.triangles().size() * chunk.width * chunk.height * chunk.length);
+  MeshBuilder builder(faceMesh.vertices().size() * chunk.numFilled(),
+                      faceMesh.triangles().size() * chunk.numFilled());
 
   std::vector<Mesh> faces;
   std::fill_n(std::back_inserter(faces), 6, faceMesh);

@@ -46,5 +46,3 @@ void RenderUnit::render(Transform& transform) {
   glBindVertexArray(this->vao);
   glDrawElements(GL_TRIANGLES, mesh.triangles().size(), GL_UNSIGNED_INT, 0);
 }
-// setup deletion later
-// glDeleteVertexArrays(1, &vao2);

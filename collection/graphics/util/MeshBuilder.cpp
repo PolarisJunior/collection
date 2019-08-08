@@ -9,11 +9,6 @@ MeshBuilder::MeshBuilder(int32_t numVertices, int32_t numIndices)
       normals(numVertices) {}
 
 Mesh MeshBuilder::build() {
-  vertices.resize(vertsAdded);
-  indices.resize(indicesAdded);
-  uvs.resize(vertsAdded);
-  normals.resize(vertsAdded);
-
   vertsAdded = 0;
   indicesAdded = 0;
   return Mesh(vertices, indices, uvs, normals);

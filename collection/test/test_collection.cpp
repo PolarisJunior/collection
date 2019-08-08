@@ -20,8 +20,26 @@
 #include "network/ServerSocket.h"
 #include "network/Socket.h"
 
+#include "game/ecs/GameObject.h"
+#include "physics/RigidBody.h"
+
 namespace test {
+void testComponentCopying() {
+  GameObject go = GameObject();
+  RigidBody& rbd = go.addComponent<RigidBody>();
+  rbd.gravityScale = 6.0;
+
+  assert(&rbd.gameObject() != nullptr);
+  RigidBody clone = rbd.copy();
+
+  assert(rbd.gravityScale == clone.gravityScale);
+  assert(&clone.gameObject() == nullptr);
+  assert(&clone.gameObject() != &rbd.gameObject());
+  assert(&go.getComponent<RigidBody>() == &rbd);
+}
+
 void runBasicTests() {
+  testComponentCopying();
   std::cout << "running basic tests" << std::endl;
   LinkedList<int32_t> ll(0);
   ll.push_back(5);

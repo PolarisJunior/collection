@@ -17,18 +17,21 @@ class Component : public ComponentBase {
   using RealComponent = Derived;
 
  public:
-  Component() = default;
-  Component(const Component& c) = delete;
-
   Component& operator=(const Component& other) = delete;
   Component& operator=(Component&& other) = delete;
 
   GameObject& gameObject() { return *gameObject_; }
   Transform& transform() { return gameObject().transform(); }
 
+  // Copies the component except for its attached gameobject
+  RealComponent copy() {
+    return RealComponent(*dynamic_cast<RealComponent*>(this));
+  }
+
   // Called when the component is first built
   virtual void built(){};
 
+  // might be possible to optimize this
   inline static std::vector<RealComponent*> all() {
     std::vector<RealComponent*> out =
         std::vector<RealComponent*>(objectIdToComponent.size());
@@ -37,6 +40,10 @@ class Component : public ComponentBase {
                    [](auto& idCompPair) { return &idCompPair.second; });
     return out;
   }
+
+ protected:
+  Component() = default;
+  Component(const Component& c) : gameObject_(nullptr) {}
 
  private:
   GameObject* gameObject_ = nullptr;
@@ -60,7 +67,7 @@ class Component : public ComponentBase {
   }
 
   // Called by the owning game object when it is destructed
-  static void destroyComponent(int64_t id) { objectIdToComponent.erase(id); }
+  // static void destroyComponent(int64_t id) { objectIdToComponent.erase(id); }
 
   static void accessComponent(GameObject& go, GameObject::OpType op) {
     using Op = GameObject::OpType;

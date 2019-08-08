@@ -25,3 +25,20 @@ delete vertex arrays and buffers, delete shaders?
 render groupings
 SAME_SHADER | SAME_TEXTURE | etc
 so that groups can be rendered at once
+
+We can implement component copying as follows
+
+way #1
+component has .copy
+gameObject can addComponent
+component adds to the objectMap
+problem - original component returned by .copy is not used in any way
+way #2
+component copies, after having added to the map, and returns a reference
+map indices start negative and decrement to not collide with
+actual gameObject indices
+problem - more complicated
+way #3
+copyinto
+copy with a gameObject paired immediately
+less flexible but might be best
