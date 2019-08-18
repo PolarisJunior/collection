@@ -32,6 +32,6 @@ std::array<Vec2, 6> TextureAtlas::getFaceTexCoords(int32_t row,
   return texCoords;
 }
 
-uint8_t* TextureAtlas::dataPointer() {
+const uint8_t* TextureAtlas::dataPointer() const {
   return pixelBuffer.data();
 }

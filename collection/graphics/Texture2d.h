@@ -3,7 +3,8 @@
 #include <cstdint>
 #include <string>
 #include <vector>
-#include "util/Size2d.h"
+
+class TextureAtlas;
 
 // A texture in OpenGL
 class Texture2d {
@@ -18,11 +19,15 @@ class Texture2d {
 
  public:
   Texture2d(const std::string& fileName);
+  Texture2d(Texture2d&& other);
+  Texture2d(const TextureAtlas& atlas);
+  ~Texture2d();
 
-  const uint32_t textureId;
+  void bind() const;
+
+  uint32_t textureId;
   const int32_t width;
   const int32_t height;
-
   const bool isRgba;
 
  private:

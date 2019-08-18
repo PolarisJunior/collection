@@ -31,9 +31,9 @@ class TextureAtlas {
     return col + row * texturesPerRow();
   }
 
-  bool hasAlpha() { return hasAlpha_; }
+  bool hasAlpha() const { return hasAlpha_; }
 
-  uint8_t* dataPointer();
+  const uint8_t* dataPointer() const;
 
   // should be the same, and in powers of two
   int32_t cellWidth = 16;

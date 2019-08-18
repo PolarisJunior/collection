@@ -164,29 +164,13 @@ int main(int argc, char** argv) {
   groundPlaneTransform.scale(100, 1, 100);
   groundPlaneTransform.translate(0, -20, 0);
 
-  unsigned int texture;
-
-  glGenTextures(1, &texture);
-  // 0 is active by default so we technically don't need this
-  glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, texture);
-
   std::cout << "Loading Voxel Texture Atlas" << std::endl;
   int32_t pixelType = GL_RGB;
 
   TextureAtlas atlas("../res/toon_voxel.png", 41, 41);
-  if (atlas.hasAlpha()) {
-    pixelType = GL_RGBA;
-  }
-  glTexImage2D(GL_TEXTURE_2D, 0, pixelType, atlas.width(), atlas.height(), 0,
-               pixelType, GL_UNSIGNED_BYTE, atlas.dataPointer());
+  Texture2d atlasTexture(atlas);
 
-  glGenerateMipmap(GL_TEXTURE_2D);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 1);
+  Texture2d tex2d{"../res/monkey.png"};
 
   std::array<std::string, 6> skyboxFaces = {"right",  "left",  "top",
                                             "bottom", "front", "back"};
@@ -318,7 +302,7 @@ int main(int argc, char** argv) {
     skybox.render();
 
     prog->useProgram();
-    glBindTexture(GL_TEXTURE_2D, texture);
+    atlasTexture.bind();
 
     chunkManager.renderChunks();
     std::vector<MeshRenderer*> meshRenderers = MeshRenderer::all();
