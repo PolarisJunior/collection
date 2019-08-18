@@ -96,8 +96,7 @@ int main(int argc, char** argv) {
   std::cout << "Starting game..." << std::endl;
 #endif
   {
-    SdlLoader sdlLoader;
-    auto res = sdlLoader.load();
+    auto res = SdlLoader::load();
     if (!res.first) {
       std::cout << "Failed to load SDL because of: " << res.second << std::endl;
       exit(EXIT_FAILURE);
@@ -107,8 +106,6 @@ int main(int argc, char** argv) {
   WindowBuilder windowBuilder;
   windowBuilder.setTitle("Game").setDims(1280, 720).setVisible();
   Window::initMainWindow(windowBuilder);
-
-  Keyboard::init();
 
   {
     GlLoader loader;
@@ -125,12 +122,11 @@ int main(int argc, char** argv) {
   Camera& mainCamera = sceneCamera.addComponent<Camera>();
   sceneCamera.addComponent<TestComponent>();
   sceneCamera.addComponent<FpsCameraController>();
+
   RigidBody& rbd = sceneCamera.addComponent<RigidBody>();
-  rbd.gravityScale = 3;
+  rbd.gravityScale = 0;
 
   RigidBody rbd2 = rbd.copy();
-  std::cout << &rbd2.gameObject() << std::endl;
-  std::cout << rbd.gravityScale << std::endl;
 
   ObjectPool<GameObject> objectPool;
 

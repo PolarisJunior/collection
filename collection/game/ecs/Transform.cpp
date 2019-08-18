@@ -3,7 +3,7 @@
 
 Transform::Transform(float x, float y, float z) : localPosition_(x, y, z) {}
 
-Mat4 Transform::getModelMatrix() {
+Mat4 Transform::getModelMatrix() const {
   if (matrixUpToDate) {
     return modelMatrix;
   } else {
@@ -22,8 +22,7 @@ Mat4 Transform::inverseTranslateMatrix() const {
   return Mat4::translate(-worldPosition());
 }
 
-Mat4 Transform::getInverseModelMatrix() {
+Mat4 Transform::getInverseModelMatrix() const {
   Quaternion rot = worldRotation().inverse();
   return inverseScaleMatrix() * rot.toMatrix() * inverseTranslateMatrix();
-  // return getModelMatrix().inverse();
 }

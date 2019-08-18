@@ -48,8 +48,8 @@ class Transform {
   Mat4 inverseScaleMatrix() const;
   Mat4 inverseTranslateMatrix() const;
 
-  Mat4 getModelMatrix();
-  Mat4 getInverseModelMatrix();
+  Mat4 getModelMatrix() const;
+  Mat4 getInverseModelMatrix() const;
 
   Vec3 right() const { return localRotation_ * Vec3::right(); }
   Vec3 left() const { return localRotation_ * Vec3::left(); }
@@ -64,6 +64,6 @@ class Transform {
   Vec3 localScale_ = Vec3::one();
   Quaternion localRotation_ = Quaternion::identity;
 
-  bool matrixUpToDate = false;
-  Mat4 modelMatrix;
+  mutable bool matrixUpToDate = false;
+  mutable Mat4 modelMatrix;
 };

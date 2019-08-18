@@ -10,6 +10,7 @@
 #include "io/File.h"
 
 #include "dsl/Lexer.h"
+#include "dsl/LispReader.h"
 #include "dsl/Parser.h"
 
 #include "datastructures/LinkedList.h"
@@ -22,6 +23,8 @@
 
 #include "game/ecs/GameObject.h"
 #include "physics/RigidBody.h"
+
+#include <sstream>
 
 namespace test {
 void testComponentCopying() {
@@ -73,6 +76,17 @@ void runBasicTests() {
   } catch (std::string s) {
     std::cout << s << std::endl;
   }
+
+  LispReader reader;
+
+  // std::istringstream stream(File("../res/lisp/lisp.rkt").readAsString());
+  // stream >> std::noskipws;
+  // while (!stream.eof()) {
+  //   char c;
+  //   stream >> c;
+  //   std::cout << c;
+  // }
+  // std::cout << std::endl;
 
   // ServerSocket socket = ServerSocket(27015);
   // std::unique_ptr<Socket> client = socket.acceptConnection();

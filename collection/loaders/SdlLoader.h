@@ -5,5 +5,5 @@
 
 class SdlLoader {
  public:
-  std::pair<bool, std::string> load();
+  static std::pair<bool, std::string> load();
 };

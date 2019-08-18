@@ -4,15 +4,20 @@
 #include <SDL_image.h>
 #include <gl/glew.h>
 
-Texture2d::Texture2d(const std::string& fileName) {
+Texture2d::Format Texture2d::loadFormat(const std::string& fileName) {
   SDL_Surface* surf = IMG_Load(fileName.c_str());
   int32_t numBytes = surf->pitch * surf->h;
   std::vector<uint8_t> pixelBuffer;
 
+  bool isRgba;
+  int32_t width;
+  int32_t height;
+  uint32_t textureId;
+
   if (surf) {
-    isRgba_ = SDL_ISPIXELFORMAT_ALPHA(surf->format->format);
-    width_ = surf->w;
-    height_ = surf->h;
+    isRgba = SDL_ISPIXELFORMAT_ALPHA(surf->format->format);
+    width = surf->w;
+    height = surf->h;
 
     SDL_LockSurface(surf);
     pixelBuffer =
@@ -23,14 +28,14 @@ Texture2d::Texture2d(const std::string& fileName) {
   SDL_FreeSurface(surf);
 
   int32_t pixelType = GL_RGB;
-  if (isRgba()) {
+  if (isRgba) {
     pixelType = GL_RGBA;
   }
 
   glGenTextures(1, &textureId);
   glBindTexture(GL_TEXTURE_2D, textureId);
 
-  glTexImage2D(GL_TEXTURE_2D, 0, pixelType, width(), height(), 0, pixelType,
+  glTexImage2D(GL_TEXTURE_2D, 0, pixelType, width, height, 0, pixelType,
                GL_UNSIGNED_BYTE, pixelBuffer.data());
 
   glGenerateMipmap(GL_TEXTURE_2D);
@@ -41,4 +46,15 @@ Texture2d::Texture2d(const std::string& fileName) {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 1);
 
   glBindTexture(GL_TEXTURE_2D, 0);
+
+  return Texture2d::Format{isRgba, width, height, textureId};
 }
+
+Texture2d::Texture2d(const Format& fmt)
+    : isRgba(fmt.rgba),
+      width(fmt.width),
+      height(fmt.height),
+      textureId(fmt.texId) {}
+
+Texture2d::Texture2d(const std::string& fileName)
+    : Texture2d(loadFormat(fileName)) {}

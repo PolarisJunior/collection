@@ -5,6 +5,8 @@
 #include <SDL_image.h>
 #include <SDL_ttf.h>
 
+#include "ui/Keyboard.h"
+
 #ifdef DEBUG
 #include <iostream>
 #endif
@@ -29,6 +31,7 @@ std::pair<bool, std::string> SdlLoader::load() {
     }
   }
 
+  Keyboard::init();
 #ifdef DEBUG
   std::cout << "SDL Loaded successfully" << std::endl;
 #endif

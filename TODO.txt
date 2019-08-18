@@ -42,3 +42,6 @@ way #3
 copyinto
 copy with a gameObject paired immediately
 less flexible but might be best
+
+how to build a runtime table of components that can be used to copy from?
+each component has a const archetype which is immediately added to a global table
