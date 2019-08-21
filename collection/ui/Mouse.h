@@ -18,15 +18,16 @@ class Mouse {
   static bool buttonDown(int32_t button);
   static bool buttonUp(int32_t button);
 
-  static void update();
+  static void Update();
 
   // gets the current mouse screen pos
   static Vector2<int32_t> pos();
 
   enum class Button { LEFT = 0, RIGHT = 1, MIDDLE = 2 };
+  static int32_t ButtonToIndex(Mouse::Button button);
 
-  inline static std::array<Button, 3> buttons = {Button::LEFT, Button::RIGHT,
-                                                 Button::MIDDLE};
+  inline static const std::array<Button, 3> buttons = {
+      Button::LEFT, Button::RIGHT, Button::MIDDLE};
   inline static std::array<bool, 3> downThisFrame = {false, false, false};
   inline static std::array<bool, 3> upThisFrame = {false, false, false};
 };

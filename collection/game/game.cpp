@@ -170,7 +170,7 @@ int main(int argc, char** argv) {
   groundPlaneTransform.translate(0, -20, 0);
 
   TextureAtlas atlas("../res/toon_voxel.png", 41, 41);
-  Texture2d atlasTexture{atlas};
+  Texture2D atlasTexture{atlas};
 
   std::array<std::string, 6> skyboxFaces = {"right",  "left",  "top",
                                             "bottom", "front", "back"};
@@ -232,7 +232,9 @@ int main(int argc, char** argv) {
 
     flat_shader->useProgram();
     flat_shader->uniform("u_texture", 0);
-    atlasTexture.bind();
+    Texture2D monkey_texture("../res/monkey.png");
+    monkey_texture.Bind();
+    // atlasTexture.Bind();
     glBindVertexArray(VAO);
     glDrawElements(GL_TRIANGLES,
                    std::distance(std::begin(indices), std::end(indices)),
@@ -245,7 +247,7 @@ int main(int argc, char** argv) {
   MeshRenderer& cube_renderer = cube_object.addComponent<MeshRenderer>();
   cube_renderer.mesh(CubeMesh{});
   cube_object.transform().translate(0, 0, 2);
-  cube_object.transform().scale(2);
+  cube_object.transform().scale(atlasTexture.width, atlasTexture.height, 1);
   mainCamera.projectionType = Camera::ProjectionType::ORTHOGRAPHIC;
 
   TileSet tileSet("../res/medieval_tilesheet.png", 64, 64, 32, 32, 32, 32);
@@ -332,7 +334,7 @@ int main(int argc, char** argv) {
         Camera::getMainCamera().transform().rotate(Time::deltaTime(),
                                                    Vec3::up());
       }
-      if (Keyboard::keyDown(Keyboard::ScanCode::M)) {
+      if (Keyboard::KeyPressed(SDL_SCANCODE_M)) {
         Camera::getMainCamera().projectionType =
             Camera::getMainCamera().projectionType ==
                     Camera::ProjectionType::ORTHOGRAPHIC
@@ -344,11 +346,12 @@ int main(int argc, char** argv) {
       sceneCamera.getComponent<RigidBody>().update(Time::deltaTime());
       sceneCamera.getComponent<FpsCameraController>().update(Time::deltaTime());
 
-      Mouse::update();
+      Mouse::Update();
+      Keyboard::Update();
 
       Mat4 viewMatrix = Camera::getMainCamera().getViewMatrix();
-      Mat4 pMatrix = Camera::getMainCamera().getProjectionMatrix();
-      PV = pMatrix * viewMatrix;
+      Mat4 projMatrix = Camera::getMainCamera().getProjectionMatrix();
+      PV = projMatrix * viewMatrix;
       prog->uniform("PV", PV);
       // game code end
 
@@ -370,7 +373,7 @@ int main(int argc, char** argv) {
     skybox.render();
 
     prog->useProgram();
-    atlasTexture.bind();
+    atlasTexture.Bind();
 
     chunkManager.renderChunks();
     std::vector<MeshRenderer*> meshRenderers = MeshRenderer::all();

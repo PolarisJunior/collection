@@ -22,7 +22,7 @@ bool Mouse::buttonUp(int32_t button) {
   return upThisFrame[button];
 }
 
-void Mouse::update() {
+void Mouse::Update() {
   for (auto& b : downThisFrame) {
     b = false;
   }
@@ -35,4 +35,9 @@ Vector2<int32_t> Mouse::pos() {
   Vector2<int32_t> vec;
   SDL_GetMouseState(&vec.x, &vec.y);
   return vec;
+}
+
+int32_t Mouse::ButtonToIndex(Mouse::Button button) {
+  auto bt = std::find(Mouse::buttons.begin(), Mouse::buttons.end(), button);
+  return std::distance(std::begin(buttons), bt);
 }

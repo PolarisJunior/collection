@@ -39,7 +39,7 @@ std::string GlLoader::load() {
   glEnable(GL_CULL_FACE);
   glFrontFace(GL_CW);
   // glFrontFace(GL_CCW);
-  glEnable(GL_MULTISAMPLE);
+  // glEnable(GL_MULTISAMPLE);
 
 #ifdef DEBUG
   std::cout << "OpenGL successfully loaded" << std::endl;

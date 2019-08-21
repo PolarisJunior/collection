@@ -7,7 +7,7 @@
 class TextureAtlas;
 
 // A texture in OpenGL
-class Texture2d {
+class Texture2D {
   struct Format {
     bool rgba;
     int32_t width;
@@ -15,15 +15,15 @@ class Texture2d {
     uint32_t texId;
   };
 
-  Texture2d(const Format& fmt);
+  Texture2D(const Format& fmt);
 
  public:
-  Texture2d(const std::string& fileName);
-  Texture2d(Texture2d&& other);
-  Texture2d(const TextureAtlas& atlas);
-  ~Texture2d();
+  Texture2D(const std::string& fileName);
+  Texture2D(Texture2D&& other);
+  Texture2D(const TextureAtlas& atlas);
+  ~Texture2D();
 
-  void bind() const;
+  void Bind() const;
 
   uint32_t textureId;
   const int32_t width;

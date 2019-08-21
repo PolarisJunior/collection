@@ -22,11 +22,16 @@ Mat4 Camera::getProjectionMatrix() {
                                 nearClipPlane, farClipPlane);
       return Mat4(proj);
     case ProjectionType::ORTHOGRAPHIC:
-      float aspect = width() / height();
       // Everything in the viewspace box is rendered
       // if we use orthographic we need to make the skybox bigger than the scene
       // glm::mat4 ortho = glm::orthoLH<float>(-4, 4, -3, 3, -.1, 1000);
-      glm::mat4 ortho = glm::orthoLH<float>(-1, 1, -1, 1, 0, 1000);
+      // glm::mat4 ortho = glm::orthoLH<float>(-1, 1, -1, 1, 0, 1000);
+      // glm::mat4 ortho = glm::orthoLH<float>(
+      //     -aspect() / 2 * 100, aspect() / 2 * 100, -(1 / aspect()) / 2 * 100,
+      //     (1 / aspect()) / 2 * 100, 0, 1000);
+      glm::mat4 ortho =
+          glm::orthoLH<float>(-width() * 0.5, width() * 0.5, -height() * 0.5,
+                              height() * 0.5, 0, 100);
       return Mat4(ortho);
   }
 }

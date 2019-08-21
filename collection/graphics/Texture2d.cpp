@@ -11,7 +11,7 @@
 
 /* We can replace loadformat returning format with justreturning texture2d, and
 use that with copy constructor */
-Texture2d::Format Texture2d::loadFormat(const std::string& fileName) {
+Texture2D::Format Texture2D::loadFormat(const std::string& fileName) {
   SDL_Surface* surf = IMG_Load(fileName.c_str());
   int32_t numBytes = surf->pitch * surf->h;
   std::vector<uint8_t> pixelBuffer;
@@ -54,19 +54,19 @@ Texture2d::Format Texture2d::loadFormat(const std::string& fileName) {
 
   glBindTexture(GL_TEXTURE_2D, 0);
 
-  return Texture2d::Format{isRgba, width, height, textureId};
+  return Texture2D::Format{isRgba, width, height, textureId};
 }
 
-Texture2d::Texture2d(const Format& fmt)
+Texture2D::Texture2D(const Format& fmt)
     : isRgba(fmt.rgba),
       width(fmt.width),
       height(fmt.height),
       textureId(fmt.texId) {}
 
-Texture2d::Texture2d(const std::string& fileName)
-    : Texture2d(loadFormat(fileName)) {}
+Texture2D::Texture2D(const std::string& fileName)
+    : Texture2D(loadFormat(fileName)) {}
 
-Texture2d::Texture2d(Texture2d&& other)
+Texture2D::Texture2D(Texture2D&& other)
     : isRgba(other.isRgba),
       width(other.width),
       height(other.height),
@@ -74,7 +74,7 @@ Texture2d::Texture2d(Texture2d&& other)
   other.textureId = 0;
 }
 
-Texture2d::Texture2d(const TextureAtlas& atlas)
+Texture2D::Texture2D(const TextureAtlas& atlas)
     : isRgba(atlas.hasAlpha()), width(atlas.width()), height(atlas.height()) {
   glGenTextures(1, &textureId);
 
@@ -100,10 +100,11 @@ Texture2d::Texture2d(const TextureAtlas& atlas)
   glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-Texture2d::~Texture2d() {
+Texture2D::~Texture2D() {
   glDeleteTextures(1, &textureId);
 }
 
-void Texture2d::bind() const {
+void Texture2D::Bind() const {
+  glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, textureId);
 }
