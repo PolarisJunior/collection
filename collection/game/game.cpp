@@ -87,6 +87,8 @@
 
 #include "datastructures/ObjectPool.h"
 
+#include "network/Server.h"
+
 int main(int argc, char** argv) {
   test::runBasicTests();
   const std::type_info& info = typeid(RigidBody);
@@ -145,16 +147,19 @@ int main(int argc, char** argv) {
   quad.transform().translate(-5, -5, 9);
 
   Camera::setMainCamera(mainCamera);
-  mainCamera.projectionType = Camera::ProjectionType::PERSPECTIVE;
 
   GlClient& glClient = GlClient::instance();
 
   std::optional<ShaderProgram> prog = ShaderProgram::createProgram();
   prog->loadVertFromFile("../res/shaders/lighting.vert");
   prog->loadFragFromFile("../res/shaders/lighting.frag");
-
   prog->useProgram();
+  /* Loads sampler2D with Texture0 */
   prog->uniform("u_texture", 0);
+
+  std::optional<ShaderProgram> flat_shader = ShaderProgram::createProgram();
+  flat_shader->loadVertFromFile("../res/shaders/opaque_sprite.vert");
+  flat_shader->loadFragFromFile("../res/shaders/opaque_sprite.frag");
 
   GameObject groundPlane;
   Transform& groundPlaneTransform = groundPlane.transform();
@@ -164,13 +169,8 @@ int main(int argc, char** argv) {
   groundPlaneTransform.scale(100, 1, 100);
   groundPlaneTransform.translate(0, -20, 0);
 
-  std::cout << "Loading Voxel Texture Atlas" << std::endl;
-  int32_t pixelType = GL_RGB;
-
   TextureAtlas atlas("../res/toon_voxel.png", 41, 41);
-  Texture2d atlasTexture(atlas);
-
-  Texture2d tex2d{"../res/monkey.png"};
+  Texture2d atlasTexture{atlas};
 
   std::array<std::string, 6> skyboxFaces = {"right",  "left",  "top",
                                             "bottom", "front", "back"};
@@ -189,6 +189,64 @@ int main(int argc, char** argv) {
   chunkManager.buildRenders();
 
   Renderer& mainRenderer = Window::getMainRenderer();
+
+  {
+    float vertices[] = {
+        0.5f,  0.5f,  0.0f,  // top right
+        0.5f,  -0.5f, 0.0f,  // bottom right
+        -0.5f, -0.5f, 0.0f,  // bottom left
+        -0.5f, 0.5f,  0.0f   // top left
+    };
+    float uvs[] = {1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0};
+    unsigned int indices[] = {
+        // note that we start from 0!
+        0, 1, 3,  // first Triangle
+        1, 2, 3   // second Triangle
+    };
+    unsigned int VBO, VAO, EBO, UVS;
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+    glGenBuffers(1, &EBO);
+    glGenBuffers(1, &UVS);
+
+    glBindVertexArray(VAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float),
+                          (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glBindBuffer(GL_ARRAY_BUFFER, UVS);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(uvs), uvs, GL_STATIC_DRAW);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float),
+                          (void*)0);
+    glEnableVertexAttribArray(1);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices,
+                 GL_STATIC_DRAW);
+
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    flat_shader->useProgram();
+    flat_shader->uniform("u_texture", 0);
+    atlasTexture.bind();
+    glBindVertexArray(VAO);
+    glDrawElements(GL_TRIANGLES,
+                   std::distance(std::begin(indices), std::end(indices)),
+                   GL_UNSIGNED_INT, 0);
+
+    Window::getMainWindow().swapBufferWindow();
+    System::delay(std::chrono::seconds(2));
+  }
+  GameObject& cube_object = scene.addGameObject();
+  MeshRenderer& cube_renderer = cube_object.addComponent<MeshRenderer>();
+  cube_renderer.mesh(CubeMesh{});
+  cube_object.transform().translate(0, 0, 2);
+  cube_object.transform().scale(2);
+  mainCamera.projectionType = Camera::ProjectionType::ORTHOGRAPHIC;
 
   TileSet tileSet("../res/medieval_tilesheet.png", 64, 64, 32, 32, 32, 32);
   TileSet rogueSet("../res/roguelikeSheet_transparent.png", 15, 15, 2, 2, 0, 0,
@@ -224,6 +282,9 @@ int main(int argc, char** argv) {
   Time::Internal::init(lastUpdate);
 
   GameInstance::isRunning = true;
+
+  Server server{};
+  server.launchServer();
   while (GameInstance::isRunning) {
     double mainLoopStart = Time::programTime();
     double timeSpentUpdating = 0;
@@ -271,6 +332,13 @@ int main(int argc, char** argv) {
         Camera::getMainCamera().transform().rotate(Time::deltaTime(),
                                                    Vec3::up());
       }
+      if (Keyboard::keyDown(Keyboard::ScanCode::M)) {
+        Camera::getMainCamera().projectionType =
+            Camera::getMainCamera().projectionType ==
+                    Camera::ProjectionType::ORTHOGRAPHIC
+                ? Camera::ProjectionType::PERSPECTIVE
+                : Camera::ProjectionType::ORTHOGRAPHIC;
+      }
 
       chunkManager.moveCenter(mainCamera.transform().worldPosition());
       sceneCamera.getComponent<RigidBody>().update(Time::deltaTime());
@@ -315,5 +383,6 @@ int main(int argc, char** argv) {
     lastRenderTime = Time::programTime();
   }
 
+  server.finish();
   return EXIT_SUCCESS;
 }

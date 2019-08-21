@@ -25,7 +25,8 @@ Mat4 Camera::getProjectionMatrix() {
       float aspect = width() / height();
       // Everything in the viewspace box is rendered
       // if we use orthographic we need to make the skybox bigger than the scene
-      glm::mat4 ortho = glm::orthoLH<float>(-4, 4, -3, 3, -.1, 1000);
+      // glm::mat4 ortho = glm::orthoLH<float>(-4, 4, -3, 3, -.1, 1000);
+      glm::mat4 ortho = glm::orthoLH<float>(-1, 1, -1, 1, 0, 1000);
       return Mat4(ortho);
   }
 }

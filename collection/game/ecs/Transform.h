@@ -33,6 +33,7 @@ class Transform {
   }
 
   void scale(float x, float y, float z) { scale(Vec3(x, y, z)); }
+  void scale(float s) { scale(s, s, s); }
 
   void rotate(float rad, const Vec3& axis) { rotate(Quaternion(rad, axis)); }
 

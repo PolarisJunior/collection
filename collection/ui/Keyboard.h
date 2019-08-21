@@ -20,6 +20,7 @@ class Keyboard {
   static void init();
 
   enum ScanCode {
+    M = 16,
     Alpha1 = 30,
     Alpha2 = 31,
     Alpha3 = 32,

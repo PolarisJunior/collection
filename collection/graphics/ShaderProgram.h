@@ -21,7 +21,7 @@ class ShaderProgram {
   void uniform(const std::string& name, const Mat4& m);
   // warning: be careful of ambiguity between floats and integers
   void uniform(const std::string& name, float f);
-  // Note use this to load uniform variables as sampler types
+  // Note use this to load uniform variables as sampler types,
   void uniform(const std::string& name, int32_t v);
 
   // Links the program after adding vertex and fragment shaders
